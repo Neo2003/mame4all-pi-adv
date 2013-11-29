@@ -199,6 +199,10 @@ constants for each address space type we support.
 #define ABITS1_24BEW	15
 #define ABITS2_24BEW	8
 #define ABITS_MIN_24BEW 1			/* minimum memory block is 2 bytes */
+/* 24 bits address (little endian - dword access) */
+#define ABITS1_24LEW    16
+#define ABITS2_24LEW    7
+#define ABITS_MIN_24LEW 1			/* minimum memory block is 2 bytes */
 /* 26 bits address (little endian - dword access) */
 #define ABITS1_26LEW	16
 #define ABITS2_26LEW	8
@@ -268,6 +272,7 @@ extern unsigned char *cpu_bankbase[];	/* array of bank bases */
 #define change_pc20(pc) 	change_pc_generic(pc, ABITS2_20, ABITS_MIN_20, 0, cpu_setOPbase20)
 #define change_pc21(pc) 	change_pc_generic(pc, ABITS2_21, ABITS_MIN_21, 0, cpu_setOPbase21)
 #define change_pc24(pc) 	change_pc_generic(pc, ABITS2_24, ABITS_MIN_24, 0, cpu_setOPbase24)
+#define change_pc24lew(pc)      change_pc_generic(pc, ABITS2_24LEW, ABITS_MIN_24LEW, 0, cpu_setOPbase24lew)
 #define change_pc24bew(pc)	change_pc_generic(pc, ABITS2_24BEW, ABITS_MIN_24BEW, 0, cpu_setOPbase24bew)
 #define change_pc26lew(pc)	change_pc_generic(pc, ABITS2_26LEW, ABITS_MIN_26LEW, 0, cpu_setOPbase26lew)
 #define change_pc29(pc)     change_pc_generic(pc, ABITS2_29, ABITS_MIN_29, 3, cpu_setOPbase29)
@@ -336,9 +341,11 @@ void memorycontextswap(int activecpu);
 #if LSB_FIRST
 	#define BYTE_XOR_BE(a) ((a) ^ 1)
 	#define BYTE_XOR_LE(a) (a)
+	#define BYTE4_XOR_LE(a) (a)
 #else
 	#define BYTE_XOR_BE(a) (a)
 	#define BYTE_XOR_LE(a) ((a) ^ 1)
+	#define BYTE4_XOR_LE(a) ((a) ^ 3)
 #endif
 
 /* stupid workarounds so that we can generate an address mask that works even for 32 bits */
@@ -366,6 +373,9 @@ INLINE READ_HANDLER(cpu_readmem24);
 INLINE READ_HANDLER(cpu_readmem24bew);
 INLINE READ_HANDLER(cpu_readmem24bew_word);
 INLINE READ_HANDLER(cpu_readmem24bew_dword);
+INLINE READ_HANDLER(cpu_readmem24lew);
+INLINE READ_HANDLER(cpu_readmem24lew_word);
+INLINE READ_HANDLER(cpu_readmem24lew_dword);
 INLINE READ_HANDLER(cpu_readmem26lew);
 INLINE READ_HANDLER(cpu_readmem26lew_word);
 INLINE READ_HANDLER(cpu_readmem26lew_dword);
@@ -391,6 +401,9 @@ READ_HANDLER(cpu_readmem24);
 READ_HANDLER(cpu_readmem24bew);
 READ_HANDLER(cpu_readmem24bew_word);
 READ_HANDLER(cpu_readmem24bew_dword);
+READ_HANDLER(cpu_readmem24lew);
+READ_HANDLER(cpu_readmem24lew_word);
+READ_HANDLER(cpu_readmem24lew_dword);
 READ_HANDLER(cpu_readmem26lew);
 READ_HANDLER(cpu_readmem26lew_word);
 READ_HANDLER(cpu_readmem26lew_dword);
@@ -424,6 +437,9 @@ INLINE WRITE_HANDLER(cpu_writemem24);
 INLINE WRITE_HANDLER(cpu_writemem24bew);
 INLINE WRITE_HANDLER(cpu_writemem24bew_word);
 INLINE WRITE_HANDLER(cpu_writemem24bew_dword);
+INLINE WRITE_HANDLER(cpu_writemem24lew);
+INLINE WRITE_HANDLER(cpu_writemem24lew_word);
+INLINE WRITE_HANDLER(cpu_writemem24lew_dword);
 INLINE WRITE_HANDLER(cpu_writemem26lew);
 INLINE WRITE_HANDLER(cpu_writemem26lew_word);
 INLINE WRITE_HANDLER(cpu_writemem26lew_dword);
@@ -449,6 +465,9 @@ WRITE_HANDLER(cpu_writemem24);
 WRITE_HANDLER(cpu_writemem24bew);
 WRITE_HANDLER(cpu_writemem24bew_word);
 WRITE_HANDLER(cpu_writemem24bew_dword);
+WRITE_HANDLER(cpu_writemem24lew);
+WRITE_HANDLER(cpu_writemem24lew_word);
+WRITE_HANDLER(cpu_writemem24lew_dword);
 WRITE_HANDLER(cpu_writemem26lew);
 WRITE_HANDLER(cpu_writemem26lew_word);
 WRITE_HANDLER(cpu_writemem26lew_dword);
@@ -485,6 +504,7 @@ void cpu_setOPbase20(int pc);
 void cpu_setOPbase21(int pc);
 void cpu_setOPbase24(int pc);
 void cpu_setOPbase24bew(int pc);
+void cpu_setOPbase24lew(int pc);
 void cpu_setOPbase26lew(int pc);
 void cpu_setOPbase29(int pc);
 void cpu_setOPbase32(int pc);

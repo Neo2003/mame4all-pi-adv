@@ -622,6 +622,145 @@ void cpu_writemem24bew_dword(offs_t address,data_t data)
 	}
 }
 
+//WRITEBYTE(cpu_writemem24lew, TYPE_16BIT_LE, 24LEW)
+#ifdef MAME_MEMINLINE
+INLINE
+#endif
+void cpu_writemem24lew(offs_t address,data_t data)
+{
+	MHELE hw;
+
+	/* first-level lookup */
+	hw = cur_mwhard[(UINT32)address >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+
+	/* for compatibility with setbankhandler, 8-bit systems must call handlers */
+	/* for banked memory reads/writes */
+	if (hw <= HT_BANKMAX)
+	{
+		cpu_bankbase[hw][BYTE_XOR_LE(address) - memorywriteoffset[hw]] = data;
+		return;
+	}
+
+	/* second-level lookup */
+	if (hw >= MH_HARDMAX)
+	{
+		hw -= MH_HARDMAX;
+		hw = writehardware[(hw << MH_SBITS) + (((UINT32)address >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))];
+
+		/* for compatibility with setbankhandler, 8-bit systems must call handlers */
+		/* for banked memory reads/writes */
+		if (hw <= HT_BANKMAX)
+		{
+			cpu_bankbase[hw][BYTE_XOR_LE(address) - memorywriteoffset[hw]] = data;
+			return;
+		}
+	}
+
+	/* fall back to handler */
+	{
+	    int shift = ((address & 1) << 3)^8;
+	    data = (0xff000000 >> shift) | ((data & 0xff) << shift);
+	    address &= ~1;
+	}
+	(*memorywritehandler[hw])(address - memorywriteoffset[hw], data);
+}
+
+//WRITEWORD(cpu_writemem24lew, TYPE_16BIT_LE, 24LEW, CAN_BE_MISALIGNED)
+#ifdef MAME_MEMINLINE
+INLINE
+#endif
+void cpu_writemem24lew_word(offs_t address,data_t data)
+{
+	MHELE hw;
+
+	/* handle aligned case first */
+	if (!(address & 1))
+	{
+		/* first-level lookup */
+		hw = cur_mwhard[(UINT32)address >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+		if (hw <= HT_BANKMAX)
+		{
+			WRITE_WORD(&cpu_bankbase[hw][address - memorywriteoffset[hw]], data);
+			return;
+		}
+
+		/* second-level lookup */
+		if (hw >= MH_HARDMAX)
+		{
+			hw -= MH_HARDMAX;
+			hw = writehardware[(hw << MH_SBITS) + (((UINT32)address >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))]; 
+			if (hw <= HT_BANKMAX)
+			{
+				WRITE_WORD(&cpu_bankbase[hw][address - memorywriteoffset[hw]], data);
+				return;
+			}
+		}
+
+		/* fall back to handler */
+		(*memorywritehandler[hw])(address - memorywriteoffset[hw], data & 0xffff);
+	}
+
+	/* unaligned case */
+	else
+	{
+		cpu_writemem24lew(address, data >> 8);
+		cpu_writemem24lew(address + 1, data & 0xff);
+	}
+}
+
+//WRITELONG(cpu_writemem24lew, TYPE_16BIT_LE, 24LEW, CAN_BE_MISALIGNED)
+#ifdef MAME_MEMINLINE
+INLINE
+#endif
+void cpu_writemem24lew_dword(offs_t address,data_t data)
+{
+	UINT16 word1, word2;
+	MHELE hw1, hw2;
+
+	/* handle aligned case first */
+	if (!(address & 1))
+	{
+		int address2 = (address + 2) & ADDRESS_MASK(24LEW);
+
+		/* first-level lookup */
+		hw1 = cur_mwhard[(UINT32)address >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+		hw2 = cur_mwhard[(UINT32)address2 >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+
+		/* second-level lookup */
+		if (hw1 >= MH_HARDMAX)
+		{
+			hw1 -= MH_HARDMAX;
+			hw1 = writehardware[(hw1 << MH_SBITS) + (((UINT32)address >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))]; 
+		}
+		if (hw2 >= MH_HARDMAX)
+		{
+			hw2 -= MH_HARDMAX;
+			hw2 = writehardware[(hw2 << MH_SBITS) + (((UINT32)address2 >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))];
+		}
+
+		/* extract words */
+		word1 = data >> 16;
+		word2 = data & 0xffff;
+
+		/* process each word */
+		if (hw1 <= HT_BANKMAX)
+			WRITE_WORD(&cpu_bankbase[hw1][address - memorywriteoffset[hw1]], word1);
+		else
+			(*memorywritehandler[hw1])(address - memorywriteoffset[hw1], word1);
+		if (hw2 <= HT_BANKMAX)
+			WRITE_WORD(&cpu_bankbase[hw2][address2 - memorywriteoffset[hw2]], word2);
+		else
+			(*memorywritehandler[hw2])(address2 - memorywriteoffset[hw2], word2);
+	}
+
+	/* unaligned case */
+	else
+	{
+		cpu_writemem24lew(address, data >> 24);
+		cpu_writemem24lew_word(address + 1, (data >> 8) & 0xffff);
+		cpu_writemem24lew(address + 3, data & 0xff);
+	}
+}
 
 //WRITEBYTE(cpu_writemem26lew, TYPE_16BIT_LE, 26LEW)
 #ifdef MAME_MEMINLINE

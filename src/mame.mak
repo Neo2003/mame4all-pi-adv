@@ -23,6 +23,7 @@ CPUS+=I186@
 CPUS+=V20@
 CPUS+=V30@
 CPUS+=V33@
+CPUS+=V60@
 CPUS+=I8035@
 CPUS+=I8039@
 CPUS+=I8048@
@@ -44,6 +45,7 @@ CPUS+=M68000@
 CPUS+=M68010@
 CPUS+=M68EC020@
 CPUS+=M68020@
+CPUS+=MB86233@
 CPUS+=T11@
 CPUS+=S2650@
 CPUS+=TMS34010@
@@ -639,6 +641,8 @@ $(OBJ)/drivers/macross.o: src/vidhrdw/macross.cpp src/drivers/macross.cpp
 $(OBJ)/drivers/bjtwin.o: src/vidhrdw/bjtwin.cpp src/drivers/bjtwin.cpp
 OBJ_NMK = $(OBJ)/drivers/macross.o $(OBJ)/drivers/bjtwin.o
 
+$(OBJ)/drivers/model1.o: src/machine/model1.cpp src/drivers/model1.cpp
+OBJ_MODEL1 = $(OBJ)/drivers/model1.o
 
 $(OBJ)/drivers/spacefb.o: src/vidhrdw/spacefb.cpp src/drivers/spacefb.cpp
 $(OBJ)/drivers/blueprnt.o: src/vidhrdw/blueprnt.cpp src/drivers/blueprnt.cpp
@@ -679,7 +683,7 @@ DRVOBJS = \
 	$(OBJ_EXIDY) $(OBJ_ATARI) $(OBJ_SNK) $(OBJ_ALPHA) $(OBJ_TECHNOS) $(OBJ_BERZERK) $(OBJ_GAMEPLAN) $(OBJ_STRATVOX) $(OBJ_ZACCARIA) \
 	$(OBJ_UPL) $(OBJ_TMS) $(OBJ_CINEMAR) $(OBJ_CINEMAV) $(OBJ_THEPIT) $(OBJ_VALADON) $(OBJ_SEIBU) $(OBJ_TAD) $(OBJ_JALECO) \
 	$(OBJ_VSYSTEM) $(OBJ_PSIKYO) $(OBJ_ORCA) $(OBJ_GAELCO) $(OBJ_KANEKO) $(OBJ_SUNA) $(OBJ_SETA) $(OBJ_ATLUS) $(OBJ_SUN) \
-	$(OBJ_DOOYONG) $(OBJ_NMK) $(OBJ_OTHER) $(OBJ_NEOGEO)
+	$(OBJ_DOOYONG) $(OBJ_NMK) $(OBJ_OTHER) $(OBJ_NEOGEO) $(OBJ_MODEL1)
 
 COREOBJS += $(OBJ)/driver.o
 

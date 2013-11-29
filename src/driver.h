@@ -120,6 +120,9 @@ enum
 #if (HAS_V33)
 	CPU_V33,
 #endif
+#if (HAS_V60)
+        CPU_V60,
+#endif
 #if (HAS_ARMNEC)
 	CPU_ARMV30,
 	CPU_ARMV33,
@@ -189,6 +192,9 @@ enum
 #endif
 #if (HAS_M68020)
 	CPU_M68020,
+#endif
+#if (HAS_MB86233)
+        CPU_MB86233,
 #endif
 #if (HAS_T11)
 	CPU_T11,

@@ -9,13 +9,67 @@
 #define NEW_INTERRUPT_SYSTEM    1
 
 #define MAX_IRQ_LINES   8       /* maximum number of IRQ lines per CPU */
+#define IRQ_LINE_NMI    127	/* IRQ line for NMIs */
 
 #define CLEAR_LINE		0		/* clear (a fired, held or pulsed) line */
 #define ASSERT_LINE     1       /* assert an interrupt immediately */
 #define HOLD_LINE       2       /* hold interrupt line until enable is true */
 #define PULSE_LINE		3		/* pulse interrupt line for one instruction */
 
-#define MAX_REGS		128 	/* maximum number of register of any CPU */
+//#define MAX_REGS		128 	/* maximum number of register of any CPU */
+
+/*************************************
+ *
+ *	CPU information constants
+ *
+ *************************************/
+
+/* get_reg/set_reg constants */
+enum {
+	MAX_REGS = 128,				/* maximum number of register of any CPU */
+
+	/* This value is passed to cpu_get_reg to retrieve the previous
+	 * program counter value, ie. before a CPU emulation started
+	 * to fetch opcodes and arguments for the current instrution. */
+	REG_PREVIOUSPC = -1,
+
+	/* This value is passed to cpu_get_reg to retrieve the current
+	 * program counter value. */
+	REG_PC = -2,
+
+	/* This value is passed to cpu_get_reg to retrieve the current
+	 * stack pointer value. */
+	REG_SP = -3,
+
+	/* This value is passed to cpu_get_reg/cpu_set_reg, instead of one of
+	 * the names from the enum a CPU core defines for it's registers,
+	 * to get or set the contents of the memory pointed to by a stack pointer.
+	 * You can specify the n'th element on the stack by (REG_SP_CONTENTS-n),
+	 * ie. lower negative values. The actual element size (UINT16 or UINT32)
+	 * depends on the CPU core. */
+	REG_SP_CONTENTS = -4
+};
+
+// I/O line definitions
+enum {
+	// input lines
+	MAX_INPUT_LINES = 32+3,
+	INPUT_LINE_IRQ0 = 0,
+	INPUT_LINE_IRQ1 = 1,
+	INPUT_LINE_IRQ2 = 2,
+	INPUT_LINE_IRQ3 = 3,
+	INPUT_LINE_IRQ4 = 4,
+	INPUT_LINE_IRQ5 = 5,
+	INPUT_LINE_IRQ6 = 6,
+	INPUT_LINE_IRQ7 = 7,
+	INPUT_LINE_IRQ8 = 8,
+	INPUT_LINE_IRQ9 = 9,
+	INPUT_LINE_NMI = MAX_INPUT_LINES - 3,
+
+	// special input lines that are implemented in the core
+	INPUT_LINE_RESET = MAX_INPUT_LINES - 2,
+	INPUT_LINE_HALT = MAX_INPUT_LINES - 1
+};
 
 /* Values passed to the cpu_info function of a core to retrieve information */
 enum {
@@ -130,6 +184,9 @@ enum {
 #ifndef HAS_V33
 #define HAS_V33 		0
 #endif
+#ifndef HAS_V60
+#define HAS_V60                 0
+#endif
 #ifndef HAS_ARMNEC
 #define HAS_ARMNEC 		0
 #endif
@@ -192,6 +249,9 @@ enum {
 #endif
 #ifndef HAS_M68020
 #define HAS_M68020		0
+#endif
+#ifndef HAS_MB86233
+#define HAS_MB86233                 0
 #endif
 #ifndef HAS_T11
 #define HAS_T11 		0

@@ -797,6 +797,7 @@ SETOPBASE(cpu_setOPbase20,	  20,	 0)
 SETOPBASE(cpu_setOPbase21,	  21,	 0)
 SETOPBASE(cpu_setOPbase24,	  24,	 0)
 SETOPBASE(cpu_setOPbase24bew, 24BEW, 0)
+SETOPBASE(cpu_setOPbase24lew, 24LEW, 0)
 SETOPBASE(cpu_setOPbase29,	  29,	 3)
 SETOPBASE(cpu_setOPbase32,	  32,	 0)
 SETOPBASE(cpu_setOPbase32lew, 32LEW, 0)
@@ -914,13 +915,13 @@ void cpu_setbankhandler_w(int bank, mem_write_handler handler)
 	{
 		handler = mwh_ram;
 	}
-	else if ((((FPTR)handler)==((FPTR)MWA_BANK1)) || (((FPTR)handler)==((FPTR)MWA_BANK2)) || 
-		(((FPTR)handler)==((FPTR)MWA_BANK3)) || (((FPTR)handler)==((FPTR)MWA_BANK4)) || 
-		(((FPTR)handler)==((FPTR)MWA_BANK5)) || (((FPTR)handler)==((FPTR)MWA_BANK6)) || 
-		(((FPTR)handler)==((FPTR)MWA_BANK7)) || (((FPTR)handler)==((FPTR)MWA_BANK8)) || 
-		(((FPTR)handler)==((FPTR)MWA_BANK9)) || (((FPTR)handler)==((FPTR)MWA_BANK10)) || 
-		(((FPTR)handler)==((FPTR)MWA_BANK11)) || (((FPTR)handler)==((FPTR)MWA_BANK12)) || 
-		(((FPTR)handler)==((FPTR)MWA_BANK13)) || (((FPTR)handler)==((FPTR)MWA_BANK14)) || 
+	else if ((((FPTR)handler)==((FPTR)MWA_BANK1)) || (((FPTR)handler)==((FPTR)MWA_BANK2)) ||
+		(((FPTR)handler)==((FPTR)MWA_BANK3)) || (((FPTR)handler)==((FPTR)MWA_BANK4)) ||
+		(((FPTR)handler)==((FPTR)MWA_BANK5)) || (((FPTR)handler)==((FPTR)MWA_BANK6)) ||
+		(((FPTR)handler)==((FPTR)MWA_BANK7)) || (((FPTR)handler)==((FPTR)MWA_BANK8)) ||
+		(((FPTR)handler)==((FPTR)MWA_BANK9)) || (((FPTR)handler)==((FPTR)MWA_BANK10)) ||
+		(((FPTR)handler)==((FPTR)MWA_BANK11)) || (((FPTR)handler)==((FPTR)MWA_BANK12)) ||
+		(((FPTR)handler)==((FPTR)MWA_BANK13)) || (((FPTR)handler)==((FPTR)MWA_BANK14)) ||
 		(((FPTR)handler)==((FPTR)MWA_BANK15)) || (((FPTR)handler)==((FPTR)MWA_BANK16)))
 	{
 		hardware = (int)MWA_BANK1 - (int)handler + 1;

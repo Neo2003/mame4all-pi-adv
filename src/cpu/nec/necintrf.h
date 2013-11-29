@@ -75,4 +75,23 @@ extern void v33_set_irq_callback(int (*callback)(int irqline));
 extern const char *v33_info(void *context, int regnum);
 extern unsigned v33_dasm(char *buffer, unsigned pc);
 
+#define v60_ICount nec_ICount
+extern void v60_init(void);
+extern void v60_reset(void *param);
+extern void v60_exit(void);
+extern int v60_execute(int cycles);
+extern unsigned v60_get_context(void *dst);
+extern void v60_set_context(void *src);
+extern unsigned v60_get_pc(void);
+extern void v60_set_pc(unsigned val);
+extern unsigned v60_get_sp(void);
+extern void v60_set_sp(unsigned val);
+extern unsigned v60_get_reg(int regnum);
+extern void v60_set_reg(int regnum, unsigned val);
+extern void v60_set_nmi_line(int state);
+extern void v60_set_irq_line(int irqline, int state);
+extern void v60_set_irq_callback(int (*callback)(int irqline));
+extern const char *v60_info(void *context, int regnum);
+extern unsigned v60_dasm(char *buffer, unsigned pc);
+
 #endif

@@ -191,6 +191,14 @@ CPUOBJS += $(OBJ)/cpu/nec/nec.o
 $(OBJ)/cpu/nec/nec.o: nec.cpp nec.h necintrf.h necea.h nechost.h necinstr.h necmodrm.h
 endif
 
+CPU=$(strip $(findstring V60@,$(CPUS)))
+ifneq ($(CPU),)
+OBJDIRS += $(OBJ)/cpu/v60
+CPUDEFS += -DHAS_V60=1
+CPUOBJS += $(OBJ)/cpu/v60/v60.o
+$(OBJ)/cpu/v60/v60.o: am.cpp am1.cpp am2.cpp am3.cpp op2.cpp op3.cpp op4.cpp op5.cpp op6.cpp op7a.cpp op12.cpp optable.cpp v60.cpp v60.h v60d.cpp
+endif
+
 CPU=$(strip $(findstring I8035@,$(CPUS)))
 ifneq ($(CPU),)
 OBJDIRS += $(OBJ)/cpu/i8039
@@ -361,6 +369,14 @@ CPUDEFS += -DHAS_M68020=1
 OBJDIRS += $(OBJ)/cpu/m68000
 $(OBJ)/cpu/m68000/m68kmame.o: m68k.h m68kconf.h m68kcpu.cpp m68kcpu.h m68kmame.cpp m68kmame.h m68kopac.cpp m68kopdm.cpp m68kopnz.cpp m68kops.cpp m68kops.h m68000.h
 CPUOBJS += $(OBJ)/cpu/m68000/m68kmame.o
+endif
+
+CPU=$(strip $(findstring MB86233@,$(CPUS)))
+ifneq ($(CPU),)
+OBJDIRS += $(OBJ)/cpu/mb86233
+CPUDEFS += -DHAS_MB86233=1
+$(OBJ)/cpu/mb86233/mb86233.o: mb86233.cpp mb86233.h
+CPUOBJS += $(OBJ)/cpu/mb86233/mb86233.o
 endif
 
 CPU=$(strip $(findstring T11@,$(CPUS)))

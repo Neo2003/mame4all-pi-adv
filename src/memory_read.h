@@ -533,6 +533,42 @@ data_t cpu_readmem24bew_dword(offs_t address)
 	return (cpu_readmem24bew(address) << 24) | (cpu_readmem24bew_word(address + 1) << 8) | (cpu_readmem24bew(address + 3) & 0xff);
 }
 
+//READBYTE(cpu_readmem24lew, TYPE_16BIT_LE, 24LEW)
+#ifdef MAME_MEMINLINE
+INLINE
+#endif
+data_t cpu_readmem24lew (offs_t address)
+{
+	MHELE hw;
+
+	/* first-level lookup */
+	hw = cur_mrhard[(UINT32)address >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+
+	/* for compatibility with setbankhandler, 8-bit systems must call handlers */
+	/* for banked memory reads/writes */
+	if (hw <= HT_BANKMAX)
+	{
+		return cpu_bankbase[hw][BYTE_XOR_LE(address) - memoryreadoffset[hw]];
+	}
+
+	/* second-level lookup */
+	if (hw >= MH_HARDMAX)
+	{
+		hw -= MH_HARDMAX;
+		hw = readhardware[(hw << MH_SBITS) + (((UINT32)address >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))];
+
+		/* for compatibility with setbankhandler, 8-bit systems must call handlers */
+		/* for banked memory reads/writes */
+		if (hw <= HT_BANKMAX)
+		{
+			return cpu_bankbase[hw][BYTE_XOR_LE(address) - memoryreadoffset[hw]];
+		}
+	}
+
+	/* fall back to handler */
+	return ((*memoryreadhandler[hw])((address & ~1) - memoryreadoffset[hw]) >> ((address & 1) << 3)) & 0xff;
+}
+
 //READBYTE(cpu_readmem26lew, TYPE_16BIT_LE, 26LEW)
 #ifdef MAME_MEMINLINE
 INLINE
@@ -593,6 +629,73 @@ data_t cpu_readmem26lew_word(offs_t address)
 
 	/* fall back to handler */
 	return (*memoryreadhandler[hw])(address - memoryreadoffset[hw]);
+}
+
+//READWORD(cpu_readmem24lew, TYPE_16BIT_LE, 24LEW, ALWAYS_ALIGNED)
+#ifdef MAME_MEMINLINE
+INLINE
+#endif
+data_t cpu_readmem24lew_word(offs_t address)
+{
+        MHELE hw;
+
+        /* first-level lookup */
+        hw = cur_mrhard[(UINT32)address >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+        if (hw <= HT_BANKMAX)
+                return READ_WORD(&cpu_bankbase[hw][address - memoryreadoffset[hw]]);
+
+        /* second-level lookup */
+        if (hw >= MH_HARDMAX)
+        {
+                hw -= MH_HARDMAX;
+                hw = readhardware[(hw << MH_SBITS) + (((UINT32)address >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))];
+                if (hw <= HT_BANKMAX)
+                        return READ_WORD(&cpu_bankbase[hw][address - memoryreadoffset[hw]]);
+        }
+
+        /* fall back to handler */
+        return (*memoryreadhandler[hw])(address - memoryreadoffset[hw]);
+}
+
+//READLONG(cpu_readmem24lew, TYPE_16BIT_LE, 24LEW, ALWAYS_ALIGNED)
+#ifdef MAME_MEMINLINE
+INLINE
+#endif
+data_t cpu_readmem24lew_dword(offs_t address)
+{
+	UINT16 word1, word2;
+	MHELE hw1, hw2;
+
+	int address2 = (address + 2) & ADDRESS_MASK(24LEW);
+
+	/* first-level lookup */
+	hw1 = cur_mrhard[(UINT32)address >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+	hw2 = cur_mrhard[(UINT32)address2 >> (ABITS2_24LEW + ABITS_MIN_24LEW)];
+
+	/* second-level lookup */
+	if (hw1 >= MH_HARDMAX)
+	{
+		hw1 -= MH_HARDMAX;
+		hw1 = readhardware[(hw1 << MH_SBITS) + (((UINT32)address >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))];
+	}
+	if (hw2 >= MH_HARDMAX)
+	{
+		hw2 -= MH_HARDMAX;
+		hw2 = readhardware[(hw2 << MH_SBITS) + (((UINT32)address2 >> ABITS_MIN_24LEW) & MHMASK(ABITS2_24LEW))];
+	}
+
+	/* process each word */
+	if (hw1 <= HT_BANKMAX)
+		word1 = READ_WORD(&cpu_bankbase[hw1][address - memoryreadoffset[hw1]]);
+	else
+		word1 = (*memoryreadhandler[hw1])(address - memoryreadoffset[hw1]);
+	if (hw2 <= HT_BANKMAX)
+		word2 = READ_WORD(&cpu_bankbase[hw2][address2 - memoryreadoffset[hw2]]);
+	else
+		word2 = (*memoryreadhandler[hw2])(address2 - memoryreadoffset[hw2]);
+
+	/* fall back to handler */
+	return (word1 & 0xffff) | (word2 << 16);
 }
 
 //READLONG(cpu_readmem26lew, TYPE_16BIT_LE, 26LEW, ALWAYS_ALIGNED)

@@ -56,7 +56,7 @@
 #if (HAS_I286)
 #include "cpu/i86/i286intf.h"
 #endif
-#if (HAS_V20 || HAS_V30 || HAS_V33)
+#if (HAS_V20 || HAS_V30 || HAS_V33 || HAS_V60)
 #include "cpu/nec/necintrf.h"
 #endif
 #if (HAS_ARMNEC)
@@ -82,6 +82,9 @@
 #endif
 #if (HAS_CYCLONE)
 #include "cpu/m68000_cyclone/c68000.h"
+#endif
+#if (HAS_MB86233)
+#include "cpu/mb86233/mb86233.h"
 #endif
 #if (HAS_T11)
 #include "cpu/t11/t11.h"
@@ -120,7 +123,6 @@
 #if (HAS_ARM)
 #include "cpu/arm/arm.h"
 #endif
-
 
 /* these are triggers sent to the timer system for various interrupt events */
 #define TRIGGER_TIMESLICE		-1000
@@ -406,6 +408,9 @@ struct cpu_interface cpuintf[] =
 #if (HAS_V33)
 	CPU0(V33,	   v33, 	 1,  0,1.20,NEC_INT_NONE,	   -1000,		   NEC_NMI_INT,    20,	  0,20,LE,1, 5,20	),
 #endif
+#if (HAS_V60)
+	 CPU0(V60,         v60,	 	 1,  0,1.00,NEC_INT_NONE,	   -1000,		   NEC_NMI_INT,24lew, 	  0,24,LE,1,11,24LEW	),
+#endif
 #if (HAS_ARMNEC)
 	CPU0(ARMV30,   armv30, 	 1,  0,1.00,NEC_INT_NONE,	   -1000,		   NEC_NMI_INT,    20,	  0,20,LE,1, 5,20	),
 	CPU0(ARMV33,   armv33, 	 1,  0,1.20,NEC_INT_NONE,	   -1000,		   NEC_NMI_INT,    20,	  0,20,LE,1, 5,20	),
@@ -475,6 +480,9 @@ struct cpu_interface cpuintf[] =
 #endif
 #if (HAS_M68020)
 	CPU0(M68020,   m68020,	 8, -1,1.00,MC68020_INT_NONE,  -1,			   -1,			   24bew, 0,24,BE,2,10,24BEW),
+#endif
+#if (HAS_MB86233)
+        CPU0(MB86233,  mb86233,  8, -1,1.00,MC68020_INT_NONE,  -1,                         -1,                     24bew, 0,24,BE,2,10,24BEW),
 #endif
 #if (HAS_T11)
 	CPU0(T11,	   t11, 	 4,  0,1.00,T11_INT_NONE,	   -1,			   -1,			   16lew, 0,16,LE,2, 6,16LEW),
