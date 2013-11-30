@@ -19,21 +19,12 @@
 #define M_IN(A)		I8039_In(A)
 #define M_OUT(A,V)	I8039_Out(A,V)
 
-#if OLDPORTHANDLING
-        #define port_r(A)	I8039_port_r(A)
-        #define port_w(A,V)	I8039_port_w(A,V)
-        #define test_r(A)	I8039_test_r(A)
-        #define test_w(A,V)	I8039_test_w(A,V)
-        #define bus_r		I8039_bus_r
-        #define bus_w(V)	I8039_bus_w(V)
-#else
-        #define port_r(A)	I8039_In(I8039_p0 + A)
-        #define port_w(A,V)	I8039_Out(I8039_p0 + A,V)
-        #define test_r(A)	I8039_In(I8039_t0 + A)
-        #define test_w(A,V)	I8039_Out(I8039_t0 + A,V)
-        #define bus_r()		I8039_In(I8039_bus)
-        #define bus_w(V)	I8039_Out(I8039_bus,V)
-#endif
+#define port_r(A)	I8039_In(I8039_p0 + A)
+#define port_w(A,V)	I8039_Out(I8039_p0 + A,V)
+#define test_r(A)	I8039_In(I8039_t0 + A)
+#define test_w(A,V)	I8039_Out(I8039_t0 + A,V)
+#define bus_r()		I8039_In(I8039_bus)
+#define bus_w(V)	I8039_Out(I8039_bus,V)
 
 #define C_FLAG          0x80
 #define A_FLAG          0x40
@@ -47,6 +38,7 @@ typedef struct
     UINT8   A, SP, PSW;
     UINT8   RAM[128];
     UINT8   bus, f1;        /* Bus data, and flag1 */
+	UINT8   P1, P2;			/* Internal Port 1 and 2 latched outputs */
 
     int     pending_irq,irq_executing, masterClock, regPtr;
     UINT8   t_flag, timer, timerON, countON, xirq_en, tirq_en;
@@ -184,18 +176,6 @@ INLINE void M_UNDEFINED(void)
 	/*logerror("I8039:  PC = %04x,  Unimplemented opcode = %02x\n", R.PC.w.l-1, M_RDMEM(R.PC.w.l-1));*/
 }
 
-
-#if OLDPORTHANDLING
-	UINT8 I8039_port_r(UINT8 port)			  { return R.p[port & 7]; }
-	void I8039_port_w(UINT8 port, UINT8 data) { R.p[port & 7] = data; }
-
-	UINT8 I8039_test_r(UINT8 port)			  { return R.t[port & 1]; }
-	void I8039_test_w(UINT8 port, UINT8 data) { R.t[port & 1] = data; }
-
-	UINT8 I8039_bus_r(void) 	 { return R.bus; }
-	void I8039_bus_w(UINT8 data) { R.bus = data; }
-#endif
-
 static void illegal(void)    { M_ILLEGAL(); }
 
 static void add_a_n(void)    { M_ADD(M_RDMEM_OPCODE()); }
@@ -232,8 +212,8 @@ static void anl_a_r7(void)   { R.A &= R7; }
 static void anl_a_xr0(void)  { R.A &= intRAM[R0 & 0x7f]; }
 static void anl_a_xr1(void)  { R.A &= intRAM[R1 & 0x7f]; }
 static void anl_bus_n(void)  { bus_w( bus_r() & M_RDMEM_OPCODE() ); }
-static void anl_p1_n(void)   { port_w( 1, port_r(1) & M_RDMEM_OPCODE() ); }
-static void anl_p2_n(void)   { port_w( 2, port_r(2) & M_RDMEM_OPCODE() ); }
+static void anl_p1_n(void)   { R.P1 &= M_RDMEM_OPCODE(); port_w( 1, R.P1); }
+static void anl_p2_n(void)   { R.P2 &= M_RDMEM_OPCODE(); port_w( 2, R.P2 ); }
 static void anld_p4_a(void)  { port_w( 4, port_r(4) & M_RDMEM_OPCODE() ); }
 static void anld_p5_a(void)  { port_w( 5, port_r(5) & M_RDMEM_OPCODE() ); }
 static void anld_p6_a(void)  { port_w( 6, port_r(6) & M_RDMEM_OPCODE() ); }
@@ -287,8 +267,8 @@ static void dis_tcnti(void)  { R.tirq_en = 0; }
 static void en_i(void)       { R.xirq_en = 1; if (R.irq_state != CLEAR_LINE) R.pending_irq |= I8039_EXT_INT; }
 static void en_tcnti(void)   { R.tirq_en = 1; }
 static void ento_clk(void)   { M_UNDEFINED(); }
-static void in_a_p1(void)    { R.A = port_r(1); }
-static void in_a_p2(void)    { R.A = port_r(2); }
+static void in_a_p1(void)    { R.A = port_r(1) & R.P1; }
+static void in_a_p2(void)    { R.A = port_r(2) & R.P2; }
 static void ins_a_bus(void)  { R.A = bus_r(); }
 static void inc_a(void)      { R.A++; }
 static void inc_r0(void)     { R0++; }
@@ -443,15 +423,15 @@ static void orl_a_r7(void)   { R.A |= R7; }
 static void orl_a_xr0(void)  { R.A |= intRAM[R0 & 0x7f]; }
 static void orl_a_xr1(void)  { R.A |= intRAM[R1 & 0x7f]; }
 static void orl_bus_n(void)  { bus_w( bus_r() | M_RDMEM_OPCODE() ); }
-static void orl_p1_n(void)   { port_w(1, port_r(1) | M_RDMEM_OPCODE() ); }
-static void orl_p2_n(void)   { port_w(2, port_r(2) | M_RDMEM_OPCODE() ); }
+static void orl_p1_n(void)   { R.P1 |= M_RDMEM_OPCODE(); port_w(1, R.P1); }
+static void orl_p2_n(void)   { R.P2 |= M_RDMEM_OPCODE(); port_w(2, R.P2); }
 static void orld_p4_a(void)  { port_w(4, port_r(4) | R.A ); }
 static void orld_p5_a(void)  { port_w(5, port_r(5) | R.A ); }
 static void orld_p6_a(void)  { port_w(6, port_r(6) | R.A ); }
 static void orld_p7_a(void)  { port_w(7, port_r(7) | R.A ); }
 static void outl_bus_a(void) { bus_w(R.A); }
-static void outl_p1_a(void)  { port_w(1, R.A ); }
-static void outl_p2_a(void)  { port_w(2, R.A ); }
+static void outl_p1_a(void)  { port_w(1, R.A); R.P1 = R.A; }
+static void outl_p2_a(void)  { port_w(2, R.A); R.P2 = R.A; }
 #ifdef MESS
 	static void ret(void)		 { R.PC.w.l = ((pull() & 0x0f) << 8); R.PC.w.l |= pull(); change_pc(R.PC.w.l); }
 #else
@@ -594,6 +574,8 @@ void i8039_reset (void *param)
 	R.A   = 0;
 	R.PSW = 0x08;		/* Start with Carry SET, Bit 4 is always SET */
 	memset(R.RAM, 0x0, 128);
+	R.P1  = 0xff;
+	R.P2  = 0xff;
 	R.bus = 0;
 	R.irq_executing = I8039_IGNORE_INT;
 	R.pending_irq	= I8039_IGNORE_INT;
@@ -765,6 +747,8 @@ unsigned i8039_get_reg (int regnum)
 		case I8039_R5: return R5;
 		case I8039_R6: return R6;
 		case I8039_R7: return R7;
+		case I8039_P1: return R.P1;
+		case I8039_P2: return R.P2;
 		case REG_PREVIOUSPC: return R.PREPC.w.l;
 		default:
 			if( regnum <= REG_SP_CONTENTS )
@@ -797,6 +781,8 @@ void i8039_set_reg (int regnum, unsigned val)
 		case I8039_R5: R5 = val; break;
 		case I8039_R6: R6 = val; break;
 		case I8039_R7: R7 = val; break;
+		case I8039_P1: R.P1 = val; break;
+		case I8039_P2: R.P2 = val; break;
 		default:
 			if( regnum <= REG_SP_CONTENTS )
 			{
