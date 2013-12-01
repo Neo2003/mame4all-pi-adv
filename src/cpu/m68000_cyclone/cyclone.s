@@ -1,5 +1,5 @@
 
-;@ Dave's Cyclone 68000 Emulator v0.088 - Assembler Output
+;@ Dave's Cyclone 68000 Emulator v0.089 - Assembler Output
 
 ;@ (c) Copyright 2003 Dave, All rights reserved.
 ;@ some code (c) Copyright 2005-2007 notaz, All rights reserved.
@@ -19,7 +19,7 @@
   .global CycloneUnpack
   .global CycloneVer
 
-CycloneVer: .long 0x0088
+CycloneVer: .long 0x0089
 
 ;@ --------------------------- Framework --------------------------
 CycloneRun:
@@ -324,7 +324,7 @@ CycloneDoInterrupt:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#44 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 Exception:
@@ -501,7 +501,7 @@ ExceptionAddressError:
   bic r4,r4,#1
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#50 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 CycloneDoTraceWithChecks:
@@ -509,7 +509,7 @@ CycloneDoTraceWithChecks:
   cmp r5,#0
   orr r0,r0,#2 ;@ go to trace mode
   str r0,[r7,#0x58]
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   beq CycloneDoTrace
@@ -545,13 +545,13 @@ TraceEnd:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 TraceDisabled:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   cmp r5,#0
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------------------------- Opcodes ---------------------------
@@ -565,7 +565,7 @@ Op____: ;@ Called if an opcode is not recognised
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 Op__al: ;@ Unrecognised a-line opcode
@@ -575,7 +575,7 @@ Op__al: ;@ Unrecognised a-line opcode
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 Op__fl: ;@ Unrecognised f-line opcode
@@ -585,7 +585,7 @@ Op__fl: ;@ Unrecognised f-line opcode
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0000] ori.b #$33, d0 uses Op0000 ----------
@@ -611,7 +611,7 @@ Op0000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0010] ori.b #$33, (a0) uses Op0010 ----------
@@ -648,7 +648,7 @@ Op0010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0018] ori.b #$33, (a0)+ uses Op0018 ----------
@@ -686,7 +686,7 @@ Op0018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [001f] ori.b #$33, (a7)+ uses Op001f ----------
@@ -723,7 +723,7 @@ Op001f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0020] ori.b #$33, -(a0) uses Op0020 ----------
@@ -762,7 +762,7 @@ Op0020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0027] ori.b #$33, -(a7) uses Op0027 ----------
@@ -799,7 +799,7 @@ Op0027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0028] ori.b #$33, ($3333,a0) uses Op0028 ----------
@@ -837,7 +837,7 @@ Op0028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0030] ori.b #$33, ($33,a0,d3.w*2) uses Op0030 ----------
@@ -884,7 +884,7 @@ Op0030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0038] ori.b #$33, $3333.w uses Op0038 ----------
@@ -919,7 +919,7 @@ Op0038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0039] ori.b #$33, $33333333.l uses Op0039 ----------
@@ -956,7 +956,7 @@ Op0039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [003c] ori.b #$33, ccr uses Op003c ----------
@@ -975,7 +975,7 @@ Op003c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0040] ori.w #$3333, d0 uses Op0040 ----------
@@ -1002,7 +1002,7 @@ Op0040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0050] ori.w #$3333, (a0) uses Op0050 ----------
@@ -1039,7 +1039,7 @@ Op0050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0058] ori.w #$3333, (a0)+ uses Op0058 ----------
@@ -1077,7 +1077,7 @@ Op0058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0060] ori.w #$3333, -(a0) uses Op0060 ----------
@@ -1116,7 +1116,7 @@ Op0060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0068] ori.w #$3333, ($3333,a0) uses Op0068 ----------
@@ -1154,7 +1154,7 @@ Op0068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0070] ori.w #$3333, ($33,a0,d3.w*2) uses Op0070 ----------
@@ -1201,7 +1201,7 @@ Op0070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0078] ori.w #$3333, $3333.w uses Op0078 ----------
@@ -1236,7 +1236,7 @@ Op0078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0079] ori.w #$3333, $33333333.l uses Op0079 ----------
@@ -1273,7 +1273,7 @@ Op0079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [007c] ori.w #$3333, sr uses Op007c ----------
@@ -1304,7 +1304,7 @@ Op007c:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0080] ori.l #$33333333, d0 uses Op0080 ----------
@@ -1330,7 +1330,7 @@ Op0080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0090] ori.l #$33333333, (a0) uses Op0090 ----------
@@ -1367,7 +1367,7 @@ Op0090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0098] ori.l #$33333333, (a0)+ uses Op0098 ----------
@@ -1405,7 +1405,7 @@ Op0098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [00a0] ori.l #$33333333, -(a0) uses Op00a0 ----------
@@ -1444,7 +1444,7 @@ Op00a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [00a8] ori.l #$33333333, ($3333,a0) uses Op00a8 ----------
@@ -1482,7 +1482,7 @@ Op00a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [00b0] ori.l #$33333333, ($33,a0,d3.w*2) uses Op00b0 ----------
@@ -1529,7 +1529,7 @@ Op00b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [00b8] ori.l #$33333333, $3333.w uses Op00b8 ----------
@@ -1564,7 +1564,7 @@ Op00b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [00b9] ori.l #$33333333, $33333333.l uses Op00b9 ----------
@@ -1601,7 +1601,7 @@ Op00b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#36 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0100] btst d0, d0 uses Op0100 ----------
@@ -1625,7 +1625,7 @@ Op0100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0108] movep.w ($3333,a0), d0 uses Op0108 ----------
@@ -1663,7 +1663,7 @@ Op0108:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0110] btst d0, (a0) uses Op0110 ----------
@@ -1696,7 +1696,7 @@ Op0110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0118] btst d0, (a0)+ uses Op0118 ----------
@@ -1730,7 +1730,7 @@ Op0118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [011f] btst d0, (a7)+ uses Op011f ----------
@@ -1763,7 +1763,7 @@ Op011f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0120] btst d0, -(a0) uses Op0120 ----------
@@ -1798,7 +1798,7 @@ Op0120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0127] btst d0, -(a7) uses Op0127 ----------
@@ -1831,7 +1831,7 @@ Op0127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0128] btst d0, ($3333,a0) uses Op0128 ----------
@@ -1865,7 +1865,7 @@ Op0128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0130] btst d0, ($33,a0,d3.w*2) uses Op0130 ----------
@@ -1908,7 +1908,7 @@ Op0130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0138] btst d0, $3333.w uses Op0138 ----------
@@ -1939,7 +1939,7 @@ Op0138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0139] btst d0, $33333333.l uses Op0139 ----------
@@ -1972,7 +1972,7 @@ Op0139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [013a] btst d0, ($3333,pc); =3335 uses Op013a ----------
@@ -2007,7 +2007,7 @@ Op013a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [013b] btst d0, ($33,pc,d3.w*2); =35 uses Op013b ----------
@@ -2050,7 +2050,7 @@ Op013b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [013c] btst d0, #$33 uses Op013c ----------
@@ -2073,7 +2073,7 @@ Op013c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0140] bchg d0, d0 uses Op0140 ----------
@@ -2102,7 +2102,7 @@ Op0140:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0148] movep.l ($3333,a0), d0 uses Op0148 ----------
@@ -2154,7 +2154,7 @@ Op0148:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0150] bchg d0, (a0) uses Op0150 ----------
@@ -2194,7 +2194,7 @@ Op0150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0158] bchg d0, (a0)+ uses Op0158 ----------
@@ -2235,7 +2235,7 @@ Op0158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [015f] bchg d0, (a7)+ uses Op015f ----------
@@ -2275,7 +2275,7 @@ Op015f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0160] bchg d0, -(a0) uses Op0160 ----------
@@ -2317,7 +2317,7 @@ Op0160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0167] bchg d0, -(a7) uses Op0167 ----------
@@ -2357,7 +2357,7 @@ Op0167:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0168] bchg d0, ($3333,a0) uses Op0168 ----------
@@ -2398,7 +2398,7 @@ Op0168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0170] bchg d0, ($33,a0,d3.w*2) uses Op0170 ----------
@@ -2448,7 +2448,7 @@ Op0170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0178] bchg d0, $3333.w uses Op0178 ----------
@@ -2486,7 +2486,7 @@ Op0178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0179] bchg d0, $33333333.l uses Op0179 ----------
@@ -2526,7 +2526,7 @@ Op0179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0180] bclr d0, d0 uses Op0180 ----------
@@ -2555,7 +2555,7 @@ Op0180:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0188] movep.w d0, ($3333,a0) uses Op0188 ----------
@@ -2591,7 +2591,7 @@ Op0188:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0190] bclr d0, (a0) uses Op0190 ----------
@@ -2631,7 +2631,7 @@ Op0190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0198] bclr d0, (a0)+ uses Op0198 ----------
@@ -2672,7 +2672,7 @@ Op0198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [019f] bclr d0, (a7)+ uses Op019f ----------
@@ -2712,7 +2712,7 @@ Op019f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01a0] bclr d0, -(a0) uses Op01a0 ----------
@@ -2754,7 +2754,7 @@ Op01a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01a7] bclr d0, -(a7) uses Op01a7 ----------
@@ -2794,7 +2794,7 @@ Op01a7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01a8] bclr d0, ($3333,a0) uses Op01a8 ----------
@@ -2835,7 +2835,7 @@ Op01a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01b0] bclr d0, ($33,a0,d3.w*2) uses Op01b0 ----------
@@ -2885,7 +2885,7 @@ Op01b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01b8] bclr d0, $3333.w uses Op01b8 ----------
@@ -2923,7 +2923,7 @@ Op01b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01b9] bclr d0, $33333333.l uses Op01b9 ----------
@@ -2963,7 +2963,7 @@ Op01b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01c0] bset d0, d0 uses Op01c0 ----------
@@ -2992,7 +2992,7 @@ Op01c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01c8] movep.l d0, ($3333,a0) uses Op01c8 ----------
@@ -3041,7 +3041,7 @@ Op01c8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01d0] bset d0, (a0) uses Op01d0 ----------
@@ -3081,7 +3081,7 @@ Op01d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01d8] bset d0, (a0)+ uses Op01d8 ----------
@@ -3122,7 +3122,7 @@ Op01d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01df] bset d0, (a7)+ uses Op01df ----------
@@ -3162,7 +3162,7 @@ Op01df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01e0] bset d0, -(a0) uses Op01e0 ----------
@@ -3204,7 +3204,7 @@ Op01e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01e7] bset d0, -(a7) uses Op01e7 ----------
@@ -3244,7 +3244,7 @@ Op01e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01e8] bset d0, ($3333,a0) uses Op01e8 ----------
@@ -3285,7 +3285,7 @@ Op01e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01f0] bset d0, ($33,a0,d3.w*2) uses Op01f0 ----------
@@ -3335,7 +3335,7 @@ Op01f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01f8] bset d0, $3333.w uses Op01f8 ----------
@@ -3373,7 +3373,7 @@ Op01f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [01f9] bset d0, $33333333.l uses Op01f9 ----------
@@ -3413,7 +3413,7 @@ Op01f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0200] andi.b #$33, d0 uses Op0200 ----------
@@ -3439,7 +3439,7 @@ Op0200:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0210] andi.b #$33, (a0) uses Op0210 ----------
@@ -3476,7 +3476,7 @@ Op0210:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0218] andi.b #$33, (a0)+ uses Op0218 ----------
@@ -3514,7 +3514,7 @@ Op0218:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [021f] andi.b #$33, (a7)+ uses Op021f ----------
@@ -3551,7 +3551,7 @@ Op021f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0220] andi.b #$33, -(a0) uses Op0220 ----------
@@ -3590,7 +3590,7 @@ Op0220:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0227] andi.b #$33, -(a7) uses Op0227 ----------
@@ -3627,7 +3627,7 @@ Op0227:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0228] andi.b #$33, ($3333,a0) uses Op0228 ----------
@@ -3665,7 +3665,7 @@ Op0228:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0230] andi.b #$33, ($33,a0,d3.w*2) uses Op0230 ----------
@@ -3712,7 +3712,7 @@ Op0230:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0238] andi.b #$33, $3333.w uses Op0238 ----------
@@ -3747,7 +3747,7 @@ Op0238:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0239] andi.b #$33, $33333333.l uses Op0239 ----------
@@ -3784,7 +3784,7 @@ Op0239:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [023c] andi.b #$33, ccr uses Op023c ----------
@@ -3803,7 +3803,7 @@ Op023c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0240] andi.w #$3333, d0 uses Op0240 ----------
@@ -3830,7 +3830,7 @@ Op0240:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0250] andi.w #$3333, (a0) uses Op0250 ----------
@@ -3867,7 +3867,7 @@ Op0250:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0258] andi.w #$3333, (a0)+ uses Op0258 ----------
@@ -3905,7 +3905,7 @@ Op0258:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0260] andi.w #$3333, -(a0) uses Op0260 ----------
@@ -3944,7 +3944,7 @@ Op0260:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0268] andi.w #$3333, ($3333,a0) uses Op0268 ----------
@@ -3982,7 +3982,7 @@ Op0268:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0270] andi.w #$3333, ($33,a0,d3.w*2) uses Op0270 ----------
@@ -4029,7 +4029,7 @@ Op0270:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0278] andi.w #$3333, $3333.w uses Op0278 ----------
@@ -4064,7 +4064,7 @@ Op0278:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0279] andi.w #$3333, $33333333.l uses Op0279 ----------
@@ -4101,7 +4101,7 @@ Op0279:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [027c] andi.w #$3333, sr uses Op027c ----------
@@ -4137,7 +4137,7 @@ no_sp_swap027c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   ldr r1,[r7,#0x44]
   movs r0,r1,lsr #24 ;@ Get IRQ level
@@ -4171,7 +4171,7 @@ Op0280:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0290] andi.l #$33333333, (a0) uses Op0290 ----------
@@ -4208,7 +4208,7 @@ Op0290:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0298] andi.l #$33333333, (a0)+ uses Op0298 ----------
@@ -4246,7 +4246,7 @@ Op0298:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [02a0] andi.l #$33333333, -(a0) uses Op02a0 ----------
@@ -4285,7 +4285,7 @@ Op02a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [02a8] andi.l #$33333333, ($3333,a0) uses Op02a8 ----------
@@ -4323,7 +4323,7 @@ Op02a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [02b0] andi.l #$33333333, ($33,a0,d3.w*2) uses Op02b0 ----------
@@ -4370,7 +4370,7 @@ Op02b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [02b8] andi.l #$33333333, $3333.w uses Op02b8 ----------
@@ -4405,7 +4405,7 @@ Op02b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [02b9] andi.l #$33333333, $33333333.l uses Op02b9 ----------
@@ -4442,7 +4442,7 @@ Op02b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#36 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0400] subi.b #$33, d0 uses Op0400 ----------
@@ -4469,7 +4469,7 @@ Op0400:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0410] subi.b #$33, (a0) uses Op0410 ----------
@@ -4507,7 +4507,7 @@ Op0410:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0418] subi.b #$33, (a0)+ uses Op0418 ----------
@@ -4546,7 +4546,7 @@ Op0418:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [041f] subi.b #$33, (a7)+ uses Op041f ----------
@@ -4584,7 +4584,7 @@ Op041f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0420] subi.b #$33, -(a0) uses Op0420 ----------
@@ -4624,7 +4624,7 @@ Op0420:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0427] subi.b #$33, -(a7) uses Op0427 ----------
@@ -4662,7 +4662,7 @@ Op0427:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0428] subi.b #$33, ($3333,a0) uses Op0428 ----------
@@ -4701,7 +4701,7 @@ Op0428:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0430] subi.b #$33, ($33,a0,d3.w*2) uses Op0430 ----------
@@ -4749,7 +4749,7 @@ Op0430:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0438] subi.b #$33, $3333.w uses Op0438 ----------
@@ -4785,7 +4785,7 @@ Op0438:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0439] subi.b #$33, $33333333.l uses Op0439 ----------
@@ -4823,7 +4823,7 @@ Op0439:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0440] subi.w #$3333, d0 uses Op0440 ----------
@@ -4851,7 +4851,7 @@ Op0440:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0450] subi.w #$3333, (a0) uses Op0450 ----------
@@ -4889,7 +4889,7 @@ Op0450:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0458] subi.w #$3333, (a0)+ uses Op0458 ----------
@@ -4928,7 +4928,7 @@ Op0458:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0460] subi.w #$3333, -(a0) uses Op0460 ----------
@@ -4968,7 +4968,7 @@ Op0460:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0468] subi.w #$3333, ($3333,a0) uses Op0468 ----------
@@ -5007,7 +5007,7 @@ Op0468:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0470] subi.w #$3333, ($33,a0,d3.w*2) uses Op0470 ----------
@@ -5055,7 +5055,7 @@ Op0470:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0478] subi.w #$3333, $3333.w uses Op0478 ----------
@@ -5091,7 +5091,7 @@ Op0478:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0479] subi.w #$3333, $33333333.l uses Op0479 ----------
@@ -5129,7 +5129,7 @@ Op0479:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0480] subi.l #$33333333, d0 uses Op0480 ----------
@@ -5156,7 +5156,7 @@ Op0480:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0490] subi.l #$33333333, (a0) uses Op0490 ----------
@@ -5194,7 +5194,7 @@ Op0490:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0498] subi.l #$33333333, (a0)+ uses Op0498 ----------
@@ -5233,7 +5233,7 @@ Op0498:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [04a0] subi.l #$33333333, -(a0) uses Op04a0 ----------
@@ -5273,7 +5273,7 @@ Op04a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [04a8] subi.l #$33333333, ($3333,a0) uses Op04a8 ----------
@@ -5312,7 +5312,7 @@ Op04a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [04b0] subi.l #$33333333, ($33,a0,d3.w*2) uses Op04b0 ----------
@@ -5360,7 +5360,7 @@ Op04b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [04b8] subi.l #$33333333, $3333.w uses Op04b8 ----------
@@ -5396,7 +5396,7 @@ Op04b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [04b9] subi.l #$33333333, $33333333.l uses Op04b9 ----------
@@ -5434,7 +5434,7 @@ Op04b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#36 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0600] addi.b #$33, d0 uses Op0600 ----------
@@ -5460,7 +5460,7 @@ Op0600:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0610] addi.b #$33, (a0) uses Op0610 ----------
@@ -5497,7 +5497,7 @@ Op0610:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0618] addi.b #$33, (a0)+ uses Op0618 ----------
@@ -5535,7 +5535,7 @@ Op0618:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [061f] addi.b #$33, (a7)+ uses Op061f ----------
@@ -5572,7 +5572,7 @@ Op061f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0620] addi.b #$33, -(a0) uses Op0620 ----------
@@ -5611,7 +5611,7 @@ Op0620:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0627] addi.b #$33, -(a7) uses Op0627 ----------
@@ -5648,7 +5648,7 @@ Op0627:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0628] addi.b #$33, ($3333,a0) uses Op0628 ----------
@@ -5686,7 +5686,7 @@ Op0628:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0630] addi.b #$33, ($33,a0,d3.w*2) uses Op0630 ----------
@@ -5733,7 +5733,7 @@ Op0630:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0638] addi.b #$33, $3333.w uses Op0638 ----------
@@ -5768,7 +5768,7 @@ Op0638:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0639] addi.b #$33, $33333333.l uses Op0639 ----------
@@ -5805,7 +5805,7 @@ Op0639:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0640] addi.w #$3333, d0 uses Op0640 ----------
@@ -5832,7 +5832,7 @@ Op0640:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0650] addi.w #$3333, (a0) uses Op0650 ----------
@@ -5869,7 +5869,7 @@ Op0650:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0658] addi.w #$3333, (a0)+ uses Op0658 ----------
@@ -5907,7 +5907,7 @@ Op0658:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0660] addi.w #$3333, -(a0) uses Op0660 ----------
@@ -5946,7 +5946,7 @@ Op0660:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0668] addi.w #$3333, ($3333,a0) uses Op0668 ----------
@@ -5984,7 +5984,7 @@ Op0668:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0670] addi.w #$3333, ($33,a0,d3.w*2) uses Op0670 ----------
@@ -6031,7 +6031,7 @@ Op0670:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0678] addi.w #$3333, $3333.w uses Op0678 ----------
@@ -6066,7 +6066,7 @@ Op0678:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0679] addi.w #$3333, $33333333.l uses Op0679 ----------
@@ -6103,7 +6103,7 @@ Op0679:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0680] addi.l #$33333333, d0 uses Op0680 ----------
@@ -6129,7 +6129,7 @@ Op0680:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0690] addi.l #$33333333, (a0) uses Op0690 ----------
@@ -6166,7 +6166,7 @@ Op0690:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0698] addi.l #$33333333, (a0)+ uses Op0698 ----------
@@ -6204,7 +6204,7 @@ Op0698:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [06a0] addi.l #$33333333, -(a0) uses Op06a0 ----------
@@ -6243,7 +6243,7 @@ Op06a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [06a8] addi.l #$33333333, ($3333,a0) uses Op06a8 ----------
@@ -6281,7 +6281,7 @@ Op06a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [06b0] addi.l #$33333333, ($33,a0,d3.w*2) uses Op06b0 ----------
@@ -6328,7 +6328,7 @@ Op06b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [06b8] addi.l #$33333333, $3333.w uses Op06b8 ----------
@@ -6363,7 +6363,7 @@ Op06b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [06b9] addi.l #$33333333, $33333333.l uses Op06b9 ----------
@@ -6400,7 +6400,7 @@ Op06b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#36 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0800] btst #$33, d0 uses Op0800 ----------
@@ -6425,7 +6425,7 @@ Op0800:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0810] btst #$33, (a0) uses Op0810 ----------
@@ -6459,7 +6459,7 @@ Op0810:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0818] btst #$33, (a0)+ uses Op0818 ----------
@@ -6494,7 +6494,7 @@ Op0818:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [081f] btst #$33, (a7)+ uses Op081f ----------
@@ -6528,7 +6528,7 @@ Op081f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0820] btst #$33, -(a0) uses Op0820 ----------
@@ -6564,7 +6564,7 @@ Op0820:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0827] btst #$33, -(a7) uses Op0827 ----------
@@ -6598,7 +6598,7 @@ Op0827:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0828] btst #$33, ($3333,a0) uses Op0828 ----------
@@ -6633,7 +6633,7 @@ Op0828:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0830] btst #$33, ($33,a0,d3.w*2) uses Op0830 ----------
@@ -6677,7 +6677,7 @@ Op0830:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0838] btst #$33, $3333.w uses Op0838 ----------
@@ -6709,7 +6709,7 @@ Op0838:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0839] btst #$33, $33333333.l uses Op0839 ----------
@@ -6743,7 +6743,7 @@ Op0839:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [083a] btst #$33, ($3333,pc); =3337 uses Op083a ----------
@@ -6779,7 +6779,7 @@ Op083a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [083b] btst #$33, ($33,pc,d3.w*2); =37 uses Op083b ----------
@@ -6823,7 +6823,7 @@ Op083b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0840] bchg #$33, d0 uses Op0840 ----------
@@ -6853,7 +6853,7 @@ Op0840:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0850] bchg #$33, (a0) uses Op0850 ----------
@@ -6894,7 +6894,7 @@ Op0850:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0858] bchg #$33, (a0)+ uses Op0858 ----------
@@ -6936,7 +6936,7 @@ Op0858:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [085f] bchg #$33, (a7)+ uses Op085f ----------
@@ -6977,7 +6977,7 @@ Op085f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0860] bchg #$33, -(a0) uses Op0860 ----------
@@ -7020,7 +7020,7 @@ Op0860:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0867] bchg #$33, -(a7) uses Op0867 ----------
@@ -7061,7 +7061,7 @@ Op0867:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0868] bchg #$33, ($3333,a0) uses Op0868 ----------
@@ -7103,7 +7103,7 @@ Op0868:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0870] bchg #$33, ($33,a0,d3.w*2) uses Op0870 ----------
@@ -7154,7 +7154,7 @@ Op0870:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0878] bchg #$33, $3333.w uses Op0878 ----------
@@ -7193,7 +7193,7 @@ Op0878:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0879] bchg #$33, $33333333.l uses Op0879 ----------
@@ -7234,7 +7234,7 @@ Op0879:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0880] bclr #$33, d0 uses Op0880 ----------
@@ -7264,7 +7264,7 @@ Op0880:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0890] bclr #$33, (a0) uses Op0890 ----------
@@ -7305,7 +7305,7 @@ Op0890:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0898] bclr #$33, (a0)+ uses Op0898 ----------
@@ -7347,7 +7347,7 @@ Op0898:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [089f] bclr #$33, (a7)+ uses Op089f ----------
@@ -7388,7 +7388,7 @@ Op089f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08a0] bclr #$33, -(a0) uses Op08a0 ----------
@@ -7431,7 +7431,7 @@ Op08a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08a7] bclr #$33, -(a7) uses Op08a7 ----------
@@ -7472,7 +7472,7 @@ Op08a7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08a8] bclr #$33, ($3333,a0) uses Op08a8 ----------
@@ -7514,7 +7514,7 @@ Op08a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08b0] bclr #$33, ($33,a0,d3.w*2) uses Op08b0 ----------
@@ -7565,7 +7565,7 @@ Op08b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08b8] bclr #$33, $3333.w uses Op08b8 ----------
@@ -7604,7 +7604,7 @@ Op08b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08b9] bclr #$33, $33333333.l uses Op08b9 ----------
@@ -7645,7 +7645,7 @@ Op08b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08c0] bset #$33, d0 uses Op08c0 ----------
@@ -7675,7 +7675,7 @@ Op08c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08d0] bset #$33, (a0) uses Op08d0 ----------
@@ -7716,7 +7716,7 @@ Op08d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08d8] bset #$33, (a0)+ uses Op08d8 ----------
@@ -7758,7 +7758,7 @@ Op08d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08df] bset #$33, (a7)+ uses Op08df ----------
@@ -7799,7 +7799,7 @@ Op08df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08e0] bset #$33, -(a0) uses Op08e0 ----------
@@ -7842,7 +7842,7 @@ Op08e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08e7] bset #$33, -(a7) uses Op08e7 ----------
@@ -7883,7 +7883,7 @@ Op08e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08e8] bset #$33, ($3333,a0) uses Op08e8 ----------
@@ -7925,7 +7925,7 @@ Op08e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08f0] bset #$33, ($33,a0,d3.w*2) uses Op08f0 ----------
@@ -7976,7 +7976,7 @@ Op08f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08f8] bset #$33, $3333.w uses Op08f8 ----------
@@ -8015,7 +8015,7 @@ Op08f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [08f9] bset #$33, $33333333.l uses Op08f9 ----------
@@ -8056,7 +8056,7 @@ Op08f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a00] eori.b #$33, d0 uses Op0a00 ----------
@@ -8082,7 +8082,7 @@ Op0a00:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a10] eori.b #$33, (a0) uses Op0a10 ----------
@@ -8119,7 +8119,7 @@ Op0a10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a18] eori.b #$33, (a0)+ uses Op0a18 ----------
@@ -8157,7 +8157,7 @@ Op0a18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a1f] eori.b #$33, (a7)+ uses Op0a1f ----------
@@ -8194,7 +8194,7 @@ Op0a1f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a20] eori.b #$33, -(a0) uses Op0a20 ----------
@@ -8233,7 +8233,7 @@ Op0a20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a27] eori.b #$33, -(a7) uses Op0a27 ----------
@@ -8270,7 +8270,7 @@ Op0a27:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a28] eori.b #$33, ($3333,a0) uses Op0a28 ----------
@@ -8308,7 +8308,7 @@ Op0a28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a30] eori.b #$33, ($33,a0,d3.w*2) uses Op0a30 ----------
@@ -8355,7 +8355,7 @@ Op0a30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a38] eori.b #$33, $3333.w uses Op0a38 ----------
@@ -8390,7 +8390,7 @@ Op0a38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a39] eori.b #$33, $33333333.l uses Op0a39 ----------
@@ -8427,7 +8427,7 @@ Op0a39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a3c] eori.b #$33, ccr uses Op0a3c ----------
@@ -8446,7 +8446,7 @@ Op0a3c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a40] eori.w #$3333, d0 uses Op0a40 ----------
@@ -8473,7 +8473,7 @@ Op0a40:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a50] eori.w #$3333, (a0) uses Op0a50 ----------
@@ -8510,7 +8510,7 @@ Op0a50:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a58] eori.w #$3333, (a0)+ uses Op0a58 ----------
@@ -8548,7 +8548,7 @@ Op0a58:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a60] eori.w #$3333, -(a0) uses Op0a60 ----------
@@ -8587,7 +8587,7 @@ Op0a60:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a68] eori.w #$3333, ($3333,a0) uses Op0a68 ----------
@@ -8625,7 +8625,7 @@ Op0a68:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a70] eori.w #$3333, ($33,a0,d3.w*2) uses Op0a70 ----------
@@ -8672,7 +8672,7 @@ Op0a70:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a78] eori.w #$3333, $3333.w uses Op0a78 ----------
@@ -8707,7 +8707,7 @@ Op0a78:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a79] eori.w #$3333, $33333333.l uses Op0a79 ----------
@@ -8744,7 +8744,7 @@ Op0a79:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a7c] eori.w #$3333, sr uses Op0a7c ----------
@@ -8786,7 +8786,7 @@ no_sp_swap0a7c:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -8819,7 +8819,7 @@ Op0a80:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a90] eori.l #$33333333, (a0) uses Op0a90 ----------
@@ -8856,7 +8856,7 @@ Op0a90:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0a98] eori.l #$33333333, (a0)+ uses Op0a98 ----------
@@ -8894,7 +8894,7 @@ Op0a98:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0aa0] eori.l #$33333333, -(a0) uses Op0aa0 ----------
@@ -8933,7 +8933,7 @@ Op0aa0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0aa8] eori.l #$33333333, ($3333,a0) uses Op0aa8 ----------
@@ -8971,7 +8971,7 @@ Op0aa8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0ab0] eori.l #$33333333, ($33,a0,d3.w*2) uses Op0ab0 ----------
@@ -9018,7 +9018,7 @@ Op0ab0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0ab8] eori.l #$33333333, $3333.w uses Op0ab8 ----------
@@ -9053,7 +9053,7 @@ Op0ab8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0ab9] eori.l #$33333333, $33333333.l uses Op0ab9 ----------
@@ -9090,7 +9090,7 @@ Op0ab9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#36 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c00] cmpi.b #$33, d0 uses Op0c00 ----------
@@ -9112,7 +9112,7 @@ Op0c00:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c10] cmpi.b #$33, (a0) uses Op0c10 ----------
@@ -9143,7 +9143,7 @@ Op0c10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c18] cmpi.b #$33, (a0)+ uses Op0c18 ----------
@@ -9175,7 +9175,7 @@ Op0c18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c1f] cmpi.b #$33, (a7)+ uses Op0c1f ----------
@@ -9206,7 +9206,7 @@ Op0c1f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c20] cmpi.b #$33, -(a0) uses Op0c20 ----------
@@ -9239,7 +9239,7 @@ Op0c20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c27] cmpi.b #$33, -(a7) uses Op0c27 ----------
@@ -9270,7 +9270,7 @@ Op0c27:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c28] cmpi.b #$33, ($3333,a0) uses Op0c28 ----------
@@ -9302,7 +9302,7 @@ Op0c28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c30] cmpi.b #$33, ($33,a0,d3.w*2) uses Op0c30 ----------
@@ -9343,7 +9343,7 @@ Op0c30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c38] cmpi.b #$33, $3333.w uses Op0c38 ----------
@@ -9372,7 +9372,7 @@ Op0c38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c39] cmpi.b #$33, $33333333.l uses Op0c39 ----------
@@ -9403,7 +9403,7 @@ Op0c39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c40] cmpi.w #$3333, d0 uses Op0c40 ----------
@@ -9425,7 +9425,7 @@ Op0c40:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c50] cmpi.w #$3333, (a0) uses Op0c50 ----------
@@ -9456,7 +9456,7 @@ Op0c50:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c58] cmpi.w #$3333, (a0)+ uses Op0c58 ----------
@@ -9488,7 +9488,7 @@ Op0c58:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c60] cmpi.w #$3333, -(a0) uses Op0c60 ----------
@@ -9521,7 +9521,7 @@ Op0c60:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c68] cmpi.w #$3333, ($3333,a0) uses Op0c68 ----------
@@ -9553,7 +9553,7 @@ Op0c68:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c70] cmpi.w #$3333, ($33,a0,d3.w*2) uses Op0c70 ----------
@@ -9594,7 +9594,7 @@ Op0c70:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c78] cmpi.w #$3333, $3333.w uses Op0c78 ----------
@@ -9623,7 +9623,7 @@ Op0c78:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c79] cmpi.w #$3333, $33333333.l uses Op0c79 ----------
@@ -9654,7 +9654,7 @@ Op0c79:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c80] cmpi.l #$33333333, d0 uses Op0c80 ----------
@@ -9677,7 +9677,7 @@ Op0c80:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c90] cmpi.l #$33333333, (a0) uses Op0c90 ----------
@@ -9709,7 +9709,7 @@ Op0c90:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0c98] cmpi.l #$33333333, (a0)+ uses Op0c98 ----------
@@ -9742,7 +9742,7 @@ Op0c98:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0ca0] cmpi.l #$33333333, -(a0) uses Op0ca0 ----------
@@ -9776,7 +9776,7 @@ Op0ca0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0ca8] cmpi.l #$33333333, ($3333,a0) uses Op0ca8 ----------
@@ -9809,7 +9809,7 @@ Op0ca8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0cb0] cmpi.l #$33333333, ($33,a0,d3.w*2) uses Op0cb0 ----------
@@ -9851,7 +9851,7 @@ Op0cb0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0cb8] cmpi.l #$33333333, $3333.w uses Op0cb8 ----------
@@ -9881,7 +9881,7 @@ Op0cb8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [0cb9] cmpi.l #$33333333, $33333333.l uses Op0cb9 ----------
@@ -9913,7 +9913,7 @@ Op0cb9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1000] move.b d0, d0 uses Op1000 ----------
@@ -9934,7 +9934,7 @@ Op1000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1010] move.b (a0), d0 uses Op1010 ----------
@@ -9965,7 +9965,7 @@ Op1010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1018] move.b (a0)+, d0 uses Op1018 ----------
@@ -9997,7 +9997,7 @@ Op1018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [101f] move.b (a7)+, d0 uses Op101f ----------
@@ -10028,7 +10028,7 @@ Op101f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1020] move.b -(a0), d0 uses Op1020 ----------
@@ -10061,7 +10061,7 @@ Op1020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1027] move.b -(a7), d0 uses Op1027 ----------
@@ -10092,7 +10092,7 @@ Op1027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1028] move.b ($3333,a0), d0 uses Op1028 ----------
@@ -10124,7 +10124,7 @@ Op1028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1030] move.b ($33,a0,d3.w*2), d0 uses Op1030 ----------
@@ -10165,7 +10165,7 @@ Op1030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1038] move.b $3333.w, d0 uses Op1038 ----------
@@ -10194,7 +10194,7 @@ Op1038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1039] move.b $33333333.l, d0 uses Op1039 ----------
@@ -10225,7 +10225,7 @@ Op1039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [103a] move.b ($3333,pc), d0; =3335 uses Op103a ----------
@@ -10258,7 +10258,7 @@ Op103a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [103b] move.b ($33,pc,d3.w*2), d0; =35 uses Op103b ----------
@@ -10299,7 +10299,7 @@ Op103b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [103c] move.b #$33, d0 uses Op103c ----------
@@ -10318,7 +10318,7 @@ Op103c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1080] move.b d0, (a0) uses Op1080 ----------
@@ -10347,7 +10347,7 @@ Op1080:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1090] move.b (a0), (a0) uses Op1090 ----------
@@ -10381,7 +10381,7 @@ Op1090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1098] move.b (a0)+, (a0) uses Op1098 ----------
@@ -10416,7 +10416,7 @@ Op1098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [109f] move.b (a7)+, (a0) uses Op109f ----------
@@ -10450,7 +10450,7 @@ Op109f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10a0] move.b -(a0), (a0) uses Op10a0 ----------
@@ -10486,7 +10486,7 @@ Op10a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10a7] move.b -(a7), (a0) uses Op10a7 ----------
@@ -10520,7 +10520,7 @@ Op10a7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10a8] move.b ($3333,a0), (a0) uses Op10a8 ----------
@@ -10555,7 +10555,7 @@ Op10a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10b0] move.b ($33,a0,d3.w*2), (a0) uses Op10b0 ----------
@@ -10599,7 +10599,7 @@ Op10b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10b8] move.b $3333.w, (a0) uses Op10b8 ----------
@@ -10631,7 +10631,7 @@ Op10b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10b9] move.b $33333333.l, (a0) uses Op10b9 ----------
@@ -10665,7 +10665,7 @@ Op10b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10ba] move.b ($3333,pc), (a0); =3335 uses Op10ba ----------
@@ -10701,7 +10701,7 @@ Op10ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10bb] move.b ($33,pc,d3.w*2), (a0); =35 uses Op10bb ----------
@@ -10745,7 +10745,7 @@ Op10bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10bc] move.b #$33, (a0) uses Op10bc ----------
@@ -10772,7 +10772,7 @@ Op10bc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10c0] move.b d0, (a0)+ uses Op10c0 ----------
@@ -10803,7 +10803,7 @@ Op10c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10d0] move.b (a0), (a0)+ uses Op10d0 ----------
@@ -10839,7 +10839,7 @@ Op10d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10d8] move.b (a0)+, (a0)+ uses Op10d8 ----------
@@ -10876,7 +10876,7 @@ Op10d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10df] move.b (a7)+, (a0)+ uses Op10df ----------
@@ -10912,7 +10912,7 @@ Op10df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10e0] move.b -(a0), (a0)+ uses Op10e0 ----------
@@ -10950,7 +10950,7 @@ Op10e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10e7] move.b -(a7), (a0)+ uses Op10e7 ----------
@@ -10986,7 +10986,7 @@ Op10e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10e8] move.b ($3333,a0), (a0)+ uses Op10e8 ----------
@@ -11023,7 +11023,7 @@ Op10e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10f0] move.b ($33,a0,d3.w*2), (a0)+ uses Op10f0 ----------
@@ -11069,7 +11069,7 @@ Op10f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10f8] move.b $3333.w, (a0)+ uses Op10f8 ----------
@@ -11103,7 +11103,7 @@ Op10f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10f9] move.b $33333333.l, (a0)+ uses Op10f9 ----------
@@ -11139,7 +11139,7 @@ Op10f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10fa] move.b ($3333,pc), (a0)+; =3335 uses Op10fa ----------
@@ -11177,7 +11177,7 @@ Op10fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10fb] move.b ($33,pc,d3.w*2), (a0)+; =35 uses Op10fb ----------
@@ -11223,7 +11223,7 @@ Op10fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [10fc] move.b #$33, (a0)+ uses Op10fc ----------
@@ -11252,7 +11252,7 @@ Op10fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1100] move.b d0, -(a0) uses Op1100 ----------
@@ -11283,7 +11283,7 @@ Op1100:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1110] move.b (a0), -(a0) uses Op1110 ----------
@@ -11319,7 +11319,7 @@ Op1110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1118] move.b (a0)+, -(a0) uses Op1118 ----------
@@ -11356,7 +11356,7 @@ Op1118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [111f] move.b (a7)+, -(a0) uses Op111f ----------
@@ -11392,7 +11392,7 @@ Op111f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1120] move.b -(a0), -(a0) uses Op1120 ----------
@@ -11430,7 +11430,7 @@ Op1120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1127] move.b -(a7), -(a0) uses Op1127 ----------
@@ -11466,7 +11466,7 @@ Op1127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1128] move.b ($3333,a0), -(a0) uses Op1128 ----------
@@ -11503,7 +11503,7 @@ Op1128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1130] move.b ($33,a0,d3.w*2), -(a0) uses Op1130 ----------
@@ -11549,7 +11549,7 @@ Op1130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1138] move.b $3333.w, -(a0) uses Op1138 ----------
@@ -11583,7 +11583,7 @@ Op1138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1139] move.b $33333333.l, -(a0) uses Op1139 ----------
@@ -11619,7 +11619,7 @@ Op1139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [113a] move.b ($3333,pc), -(a0); =3335 uses Op113a ----------
@@ -11657,7 +11657,7 @@ Op113a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [113b] move.b ($33,pc,d3.w*2), -(a0); =35 uses Op113b ----------
@@ -11703,7 +11703,7 @@ Op113b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [113c] move.b #$33, -(a0) uses Op113c ----------
@@ -11732,7 +11732,7 @@ Op113c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1140] move.b d0, ($3333,a0) uses Op1140 ----------
@@ -11764,7 +11764,7 @@ Op1140:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1150] move.b (a0), ($3333,a0) uses Op1150 ----------
@@ -11802,7 +11802,7 @@ Op1150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1158] move.b (a0)+, ($3333,a0) uses Op1158 ----------
@@ -11841,7 +11841,7 @@ Op1158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [115f] move.b (a7)+, ($3333,a0) uses Op115f ----------
@@ -11879,7 +11879,7 @@ Op115f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1160] move.b -(a0), ($3333,a0) uses Op1160 ----------
@@ -11919,7 +11919,7 @@ Op1160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1167] move.b -(a7), ($3333,a0) uses Op1167 ----------
@@ -11957,7 +11957,7 @@ Op1167:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1168] move.b ($3333,a0), ($3333,a0) uses Op1168 ----------
@@ -11996,7 +11996,7 @@ Op1168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1170] move.b ($33,a0,d3.w*2), ($3333,a0) uses Op1170 ----------
@@ -12044,7 +12044,7 @@ Op1170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1178] move.b $3333.w, ($3333,a0) uses Op1178 ----------
@@ -12080,7 +12080,7 @@ Op1178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1179] move.b $33333333.l, ($3333,a0) uses Op1179 ----------
@@ -12118,7 +12118,7 @@ Op1179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [117a] move.b ($3333,pc), ($3333,a0); =3335 uses Op117a ----------
@@ -12158,7 +12158,7 @@ Op117a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [117b] move.b ($33,pc,d3.w*2), ($3333,a0); =35 uses Op117b ----------
@@ -12206,7 +12206,7 @@ Op117b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [117c] move.b #$33, ($3333,a0) uses Op117c ----------
@@ -12236,7 +12236,7 @@ Op117c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1180] move.b d0, ($33,a0,d3.w*2) uses Op1180 ----------
@@ -12277,7 +12277,7 @@ Op1180:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1190] move.b (a0), ($33,a0,d3.w*2) uses Op1190 ----------
@@ -12324,7 +12324,7 @@ Op1190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1198] move.b (a0)+, ($33,a0,d3.w*2) uses Op1198 ----------
@@ -12372,7 +12372,7 @@ Op1198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [119f] move.b (a7)+, ($33,a0,d3.w*2) uses Op119f ----------
@@ -12419,7 +12419,7 @@ Op119f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11a0] move.b -(a0), ($33,a0,d3.w*2) uses Op11a0 ----------
@@ -12468,7 +12468,7 @@ Op11a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11a7] move.b -(a7), ($33,a0,d3.w*2) uses Op11a7 ----------
@@ -12515,7 +12515,7 @@ Op11a7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11a8] move.b ($3333,a0), ($33,a0,d3.w*2) uses Op11a8 ----------
@@ -12563,7 +12563,7 @@ Op11a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11b0] move.b ($33,a0,d3.w*2), ($33,a0,d3.w*2) uses Op11b0 ----------
@@ -12620,7 +12620,7 @@ Op11b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11b8] move.b $3333.w, ($33,a0,d3.w*2) uses Op11b8 ----------
@@ -12665,7 +12665,7 @@ Op11b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11b9] move.b $33333333.l, ($33,a0,d3.w*2) uses Op11b9 ----------
@@ -12712,7 +12712,7 @@ Op11b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11ba] move.b ($3333,pc), ($33,a0,d3.w*2); =3335 uses Op11ba ----------
@@ -12761,7 +12761,7 @@ Op11ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11bb] move.b ($33,pc,d3.w*2), ($33,a0,d3.w*2); =35 uses Op11bb ----------
@@ -12818,7 +12818,7 @@ Op11bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11bc] move.b #$33, ($33,a0,d3.w*2) uses Op11bc ----------
@@ -12857,7 +12857,7 @@ Op11bc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11c0] move.b d0, $3333.w uses Op11c0 ----------
@@ -12885,7 +12885,7 @@ Op11c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11d0] move.b (a0), $3333.w uses Op11d0 ----------
@@ -12919,7 +12919,7 @@ Op11d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11d8] move.b (a0)+, $3333.w uses Op11d8 ----------
@@ -12954,7 +12954,7 @@ Op11d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11df] move.b (a7)+, $3333.w uses Op11df ----------
@@ -12988,7 +12988,7 @@ Op11df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11e0] move.b -(a0), $3333.w uses Op11e0 ----------
@@ -13024,7 +13024,7 @@ Op11e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11e7] move.b -(a7), $3333.w uses Op11e7 ----------
@@ -13058,7 +13058,7 @@ Op11e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11e8] move.b ($3333,a0), $3333.w uses Op11e8 ----------
@@ -13093,7 +13093,7 @@ Op11e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11f0] move.b ($33,a0,d3.w*2), $3333.w uses Op11f0 ----------
@@ -13137,7 +13137,7 @@ Op11f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11f8] move.b $3333.w, $3333.w uses Op11f8 ----------
@@ -13169,7 +13169,7 @@ Op11f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11f9] move.b $33333333.l, $3333.w uses Op11f9 ----------
@@ -13203,7 +13203,7 @@ Op11f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11fa] move.b ($3333,pc), $3333.w; =3335 uses Op11fa ----------
@@ -13239,7 +13239,7 @@ Op11fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11fb] move.b ($33,pc,d3.w*2), $3333.w; =35 uses Op11fb ----------
@@ -13283,7 +13283,7 @@ Op11fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [11fc] move.b #$33, $3333.w uses Op11fc ----------
@@ -13309,7 +13309,7 @@ Op11fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13c0] move.b d0, $33333333.l uses Op13c0 ----------
@@ -13339,7 +13339,7 @@ Op13c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13d0] move.b (a0), $33333333.l uses Op13d0 ----------
@@ -13375,7 +13375,7 @@ Op13d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13d8] move.b (a0)+, $33333333.l uses Op13d8 ----------
@@ -13412,7 +13412,7 @@ Op13d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13df] move.b (a7)+, $33333333.l uses Op13df ----------
@@ -13448,7 +13448,7 @@ Op13df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13e0] move.b -(a0), $33333333.l uses Op13e0 ----------
@@ -13486,7 +13486,7 @@ Op13e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13e7] move.b -(a7), $33333333.l uses Op13e7 ----------
@@ -13522,7 +13522,7 @@ Op13e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13e8] move.b ($3333,a0), $33333333.l uses Op13e8 ----------
@@ -13559,7 +13559,7 @@ Op13e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13f0] move.b ($33,a0,d3.w*2), $33333333.l uses Op13f0 ----------
@@ -13605,7 +13605,7 @@ Op13f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13f8] move.b $3333.w, $33333333.l uses Op13f8 ----------
@@ -13639,7 +13639,7 @@ Op13f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13f9] move.b $33333333.l, $33333333.l uses Op13f9 ----------
@@ -13675,7 +13675,7 @@ Op13f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13fa] move.b ($3333,pc), $33333333.l; =3335 uses Op13fa ----------
@@ -13713,7 +13713,7 @@ Op13fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13fb] move.b ($33,pc,d3.w*2), $33333333.l; =35 uses Op13fb ----------
@@ -13759,7 +13759,7 @@ Op13fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [13fc] move.b #$33, $33333333.l uses Op13fc ----------
@@ -13787,7 +13787,7 @@ Op13fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ec0] move.b d0, (a7)+ uses Op1ec0 ----------
@@ -13817,7 +13817,7 @@ Op1ec0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ed0] move.b (a0), (a7)+ uses Op1ed0 ----------
@@ -13852,7 +13852,7 @@ Op1ed0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ed8] move.b (a0)+, (a7)+ uses Op1ed8 ----------
@@ -13888,7 +13888,7 @@ Op1ed8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1edf] move.b (a7)+, (a7)+ uses Op1edf ----------
@@ -13923,7 +13923,7 @@ Op1edf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ee0] move.b -(a0), (a7)+ uses Op1ee0 ----------
@@ -13960,7 +13960,7 @@ Op1ee0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ee7] move.b -(a7), (a7)+ uses Op1ee7 ----------
@@ -13995,7 +13995,7 @@ Op1ee7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ee8] move.b ($3333,a0), (a7)+ uses Op1ee8 ----------
@@ -14031,7 +14031,7 @@ Op1ee8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ef0] move.b ($33,a0,d3.w*2), (a7)+ uses Op1ef0 ----------
@@ -14076,7 +14076,7 @@ Op1ef0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ef8] move.b $3333.w, (a7)+ uses Op1ef8 ----------
@@ -14109,7 +14109,7 @@ Op1ef8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1ef9] move.b $33333333.l, (a7)+ uses Op1ef9 ----------
@@ -14144,7 +14144,7 @@ Op1ef9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1efa] move.b ($3333,pc), (a7)+; =3335 uses Op1efa ----------
@@ -14181,7 +14181,7 @@ Op1efa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1efb] move.b ($33,pc,d3.w*2), (a7)+; =35 uses Op1efb ----------
@@ -14226,7 +14226,7 @@ Op1efb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1efc] move.b #$33, (a7)+ uses Op1efc ----------
@@ -14254,7 +14254,7 @@ Op1efc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f00] move.b d0, -(a7) uses Op1f00 ----------
@@ -14284,7 +14284,7 @@ Op1f00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f10] move.b (a0), -(a7) uses Op1f10 ----------
@@ -14319,7 +14319,7 @@ Op1f10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f18] move.b (a0)+, -(a7) uses Op1f18 ----------
@@ -14355,7 +14355,7 @@ Op1f18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f1f] move.b (a7)+, -(a7) uses Op1f1f ----------
@@ -14390,7 +14390,7 @@ Op1f1f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f20] move.b -(a0), -(a7) uses Op1f20 ----------
@@ -14427,7 +14427,7 @@ Op1f20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f27] move.b -(a7), -(a7) uses Op1f27 ----------
@@ -14462,7 +14462,7 @@ Op1f27:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f28] move.b ($3333,a0), -(a7) uses Op1f28 ----------
@@ -14498,7 +14498,7 @@ Op1f28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f30] move.b ($33,a0,d3.w*2), -(a7) uses Op1f30 ----------
@@ -14543,7 +14543,7 @@ Op1f30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f38] move.b $3333.w, -(a7) uses Op1f38 ----------
@@ -14576,7 +14576,7 @@ Op1f38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f39] move.b $33333333.l, -(a7) uses Op1f39 ----------
@@ -14611,7 +14611,7 @@ Op1f39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f3a] move.b ($3333,pc), -(a7); =3335 uses Op1f3a ----------
@@ -14648,7 +14648,7 @@ Op1f3a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f3b] move.b ($33,pc,d3.w*2), -(a7); =35 uses Op1f3b ----------
@@ -14693,7 +14693,7 @@ Op1f3b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [1f3c] move.b #$33, -(a7) uses Op1f3c ----------
@@ -14721,7 +14721,7 @@ Op1f3c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2000] move.l d0, d0 uses Op2000 ----------
@@ -14741,7 +14741,7 @@ Op2000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2010] move.l (a0), d0 uses Op2010 ----------
@@ -14771,7 +14771,7 @@ Op2010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2018] move.l (a0)+, d0 uses Op2018 ----------
@@ -14802,7 +14802,7 @@ Op2018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2020] move.l -(a0), d0 uses Op2020 ----------
@@ -14834,7 +14834,7 @@ Op2020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2028] move.l ($3333,a0), d0 uses Op2028 ----------
@@ -14865,7 +14865,7 @@ Op2028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2030] move.l ($33,a0,d3.w*2), d0 uses Op2030 ----------
@@ -14905,7 +14905,7 @@ Op2030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2038] move.l $3333.w, d0 uses Op2038 ----------
@@ -14933,7 +14933,7 @@ Op2038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2039] move.l $33333333.l, d0 uses Op2039 ----------
@@ -14963,7 +14963,7 @@ Op2039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [203a] move.l ($3333,pc), d0; =3335 uses Op203a ----------
@@ -14995,7 +14995,7 @@ Op203a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [203b] move.l ($33,pc,d3.w*2), d0; =35 uses Op203b ----------
@@ -15035,7 +15035,7 @@ Op203b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [203c] move.l #$33333333, d0 uses Op203c ----------
@@ -15056,7 +15056,7 @@ Op203c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2040] movea.l d0, a0 uses Op2040 ----------
@@ -15074,7 +15074,7 @@ Op2040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2050] movea.l (a0), a0 uses Op2050 ----------
@@ -15102,7 +15102,7 @@ Op2050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2058] movea.l (a0)+, a0 uses Op2058 ----------
@@ -15131,7 +15131,7 @@ Op2058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2060] movea.l -(a0), a0 uses Op2060 ----------
@@ -15161,7 +15161,7 @@ Op2060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2068] movea.l ($3333,a0), a0 uses Op2068 ----------
@@ -15190,7 +15190,7 @@ Op2068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2070] movea.l ($33,a0,d3.w*2), a0 uses Op2070 ----------
@@ -15228,7 +15228,7 @@ Op2070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2078] movea.l $3333.w, a0 uses Op2078 ----------
@@ -15254,7 +15254,7 @@ Op2078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2079] movea.l $33333333.l, a0 uses Op2079 ----------
@@ -15282,7 +15282,7 @@ Op2079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [207a] movea.l ($3333,pc), a0; =3335 uses Op207a ----------
@@ -15312,7 +15312,7 @@ Op207a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [207b] movea.l ($33,pc,d3.w*2), a0; =35 uses Op207b ----------
@@ -15350,7 +15350,7 @@ Op207b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [207c] movea.l #$33333333, a0 uses Op207c ----------
@@ -15369,7 +15369,7 @@ Op207c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2080] move.l d0, (a0) uses Op2080 ----------
@@ -15398,7 +15398,7 @@ Op2080:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2090] move.l (a0), (a0) uses Op2090 ----------
@@ -15432,7 +15432,7 @@ Op2090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2098] move.l (a0)+, (a0) uses Op2098 ----------
@@ -15467,7 +15467,7 @@ Op2098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20a0] move.l -(a0), (a0) uses Op20a0 ----------
@@ -15503,7 +15503,7 @@ Op20a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20a8] move.l ($3333,a0), (a0) uses Op20a8 ----------
@@ -15538,7 +15538,7 @@ Op20a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20b0] move.l ($33,a0,d3.w*2), (a0) uses Op20b0 ----------
@@ -15582,7 +15582,7 @@ Op20b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20b8] move.l $3333.w, (a0) uses Op20b8 ----------
@@ -15614,7 +15614,7 @@ Op20b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20b9] move.l $33333333.l, (a0) uses Op20b9 ----------
@@ -15648,7 +15648,7 @@ Op20b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20ba] move.l ($3333,pc), (a0); =3335 uses Op20ba ----------
@@ -15684,7 +15684,7 @@ Op20ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20bb] move.l ($33,pc,d3.w*2), (a0); =35 uses Op20bb ----------
@@ -15728,7 +15728,7 @@ Op20bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20bc] move.l #$33333333, (a0) uses Op20bc ----------
@@ -15758,7 +15758,7 @@ Op20bc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20c0] move.l d0, (a0)+ uses Op20c0 ----------
@@ -15789,7 +15789,7 @@ Op20c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20d0] move.l (a0), (a0)+ uses Op20d0 ----------
@@ -15825,7 +15825,7 @@ Op20d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20d8] move.l (a0)+, (a0)+ uses Op20d8 ----------
@@ -15862,7 +15862,7 @@ Op20d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20e0] move.l -(a0), (a0)+ uses Op20e0 ----------
@@ -15900,7 +15900,7 @@ Op20e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20e8] move.l ($3333,a0), (a0)+ uses Op20e8 ----------
@@ -15937,7 +15937,7 @@ Op20e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20f0] move.l ($33,a0,d3.w*2), (a0)+ uses Op20f0 ----------
@@ -15983,7 +15983,7 @@ Op20f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20f8] move.l $3333.w, (a0)+ uses Op20f8 ----------
@@ -16017,7 +16017,7 @@ Op20f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20f9] move.l $33333333.l, (a0)+ uses Op20f9 ----------
@@ -16053,7 +16053,7 @@ Op20f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20fa] move.l ($3333,pc), (a0)+; =3335 uses Op20fa ----------
@@ -16091,7 +16091,7 @@ Op20fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20fb] move.l ($33,pc,d3.w*2), (a0)+; =35 uses Op20fb ----------
@@ -16137,7 +16137,7 @@ Op20fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [20fc] move.l #$33333333, (a0)+ uses Op20fc ----------
@@ -16169,7 +16169,7 @@ Op20fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2100] move.l d0, -(a0) uses Op2100 ----------
@@ -16208,7 +16208,7 @@ Op2100:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2110] move.l (a0), -(a0) uses Op2110 ----------
@@ -16252,7 +16252,7 @@ Op2110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2118] move.l (a0)+, -(a0) uses Op2118 ----------
@@ -16297,7 +16297,7 @@ Op2118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2120] move.l -(a0), -(a0) uses Op2120 ----------
@@ -16343,7 +16343,7 @@ Op2120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2128] move.l ($3333,a0), -(a0) uses Op2128 ----------
@@ -16388,7 +16388,7 @@ Op2128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2130] move.l ($33,a0,d3.w*2), -(a0) uses Op2130 ----------
@@ -16442,7 +16442,7 @@ Op2130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2138] move.l $3333.w, -(a0) uses Op2138 ----------
@@ -16484,7 +16484,7 @@ Op2138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2139] move.l $33333333.l, -(a0) uses Op2139 ----------
@@ -16528,7 +16528,7 @@ Op2139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [213a] move.l ($3333,pc), -(a0); =3335 uses Op213a ----------
@@ -16574,7 +16574,7 @@ Op213a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [213b] move.l ($33,pc,d3.w*2), -(a0); =35 uses Op213b ----------
@@ -16628,7 +16628,7 @@ Op213b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [213c] move.l #$33333333, -(a0) uses Op213c ----------
@@ -16668,7 +16668,7 @@ Op213c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2140] move.l d0, ($3333,a0) uses Op2140 ----------
@@ -16700,7 +16700,7 @@ Op2140:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2150] move.l (a0), ($3333,a0) uses Op2150 ----------
@@ -16738,7 +16738,7 @@ Op2150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2158] move.l (a0)+, ($3333,a0) uses Op2158 ----------
@@ -16777,7 +16777,7 @@ Op2158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2160] move.l -(a0), ($3333,a0) uses Op2160 ----------
@@ -16817,7 +16817,7 @@ Op2160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2168] move.l ($3333,a0), ($3333,a0) uses Op2168 ----------
@@ -16856,7 +16856,7 @@ Op2168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2170] move.l ($33,a0,d3.w*2), ($3333,a0) uses Op2170 ----------
@@ -16904,7 +16904,7 @@ Op2170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2178] move.l $3333.w, ($3333,a0) uses Op2178 ----------
@@ -16940,7 +16940,7 @@ Op2178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2179] move.l $33333333.l, ($3333,a0) uses Op2179 ----------
@@ -16978,7 +16978,7 @@ Op2179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [217a] move.l ($3333,pc), ($3333,a0); =3335 uses Op217a ----------
@@ -17018,7 +17018,7 @@ Op217a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [217b] move.l ($33,pc,d3.w*2), ($3333,a0); =35 uses Op217b ----------
@@ -17066,7 +17066,7 @@ Op217b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [217c] move.l #$33333333, ($3333,a0) uses Op217c ----------
@@ -17099,7 +17099,7 @@ Op217c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2180] move.l d0, ($33,a0,d3.w*2) uses Op2180 ----------
@@ -17139,7 +17139,7 @@ Op2180:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2190] move.l (a0), ($33,a0,d3.w*2) uses Op2190 ----------
@@ -17185,7 +17185,7 @@ Op2190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2198] move.l (a0)+, ($33,a0,d3.w*2) uses Op2198 ----------
@@ -17232,7 +17232,7 @@ Op2198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21a0] move.l -(a0), ($33,a0,d3.w*2) uses Op21a0 ----------
@@ -17280,7 +17280,7 @@ Op21a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21a8] move.l ($3333,a0), ($33,a0,d3.w*2) uses Op21a8 ----------
@@ -17327,7 +17327,7 @@ Op21a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21b0] move.l ($33,a0,d3.w*2), ($33,a0,d3.w*2) uses Op21b0 ----------
@@ -17383,7 +17383,7 @@ Op21b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21b8] move.l $3333.w, ($33,a0,d3.w*2) uses Op21b8 ----------
@@ -17427,7 +17427,7 @@ Op21b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21b9] move.l $33333333.l, ($33,a0,d3.w*2) uses Op21b9 ----------
@@ -17473,7 +17473,7 @@ Op21b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21ba] move.l ($3333,pc), ($33,a0,d3.w*2); =3335 uses Op21ba ----------
@@ -17521,7 +17521,7 @@ Op21ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21bb] move.l ($33,pc,d3.w*2), ($33,a0,d3.w*2); =35 uses Op21bb ----------
@@ -17577,7 +17577,7 @@ Op21bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21bc] move.l #$33333333, ($33,a0,d3.w*2) uses Op21bc ----------
@@ -17618,7 +17618,7 @@ Op21bc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21c0] move.l d0, $3333.w uses Op21c0 ----------
@@ -17645,7 +17645,7 @@ Op21c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21d0] move.l (a0), $3333.w uses Op21d0 ----------
@@ -17678,7 +17678,7 @@ Op21d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21d8] move.l (a0)+, $3333.w uses Op21d8 ----------
@@ -17712,7 +17712,7 @@ Op21d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21e0] move.l -(a0), $3333.w uses Op21e0 ----------
@@ -17747,7 +17747,7 @@ Op21e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21e8] move.l ($3333,a0), $3333.w uses Op21e8 ----------
@@ -17781,7 +17781,7 @@ Op21e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21f0] move.l ($33,a0,d3.w*2), $3333.w uses Op21f0 ----------
@@ -17824,7 +17824,7 @@ Op21f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21f8] move.l $3333.w, $3333.w uses Op21f8 ----------
@@ -17855,7 +17855,7 @@ Op21f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21f9] move.l $33333333.l, $3333.w uses Op21f9 ----------
@@ -17888,7 +17888,7 @@ Op21f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21fa] move.l ($3333,pc), $3333.w; =3335 uses Op21fa ----------
@@ -17923,7 +17923,7 @@ Op21fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21fb] move.l ($33,pc,d3.w*2), $3333.w; =35 uses Op21fb ----------
@@ -17966,7 +17966,7 @@ Op21fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [21fc] move.l #$33333333, $3333.w uses Op21fc ----------
@@ -17994,7 +17994,7 @@ Op21fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23c0] move.l d0, $33333333.l uses Op23c0 ----------
@@ -18023,7 +18023,7 @@ Op23c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23d0] move.l (a0), $33333333.l uses Op23d0 ----------
@@ -18058,7 +18058,7 @@ Op23d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23d8] move.l (a0)+, $33333333.l uses Op23d8 ----------
@@ -18094,7 +18094,7 @@ Op23d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23e0] move.l -(a0), $33333333.l uses Op23e0 ----------
@@ -18131,7 +18131,7 @@ Op23e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23e8] move.l ($3333,a0), $33333333.l uses Op23e8 ----------
@@ -18167,7 +18167,7 @@ Op23e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23f0] move.l ($33,a0,d3.w*2), $33333333.l uses Op23f0 ----------
@@ -18212,7 +18212,7 @@ Op23f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23f8] move.l $3333.w, $33333333.l uses Op23f8 ----------
@@ -18245,7 +18245,7 @@ Op23f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23f9] move.l $33333333.l, $33333333.l uses Op23f9 ----------
@@ -18280,7 +18280,7 @@ Op23f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#36 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23fa] move.l ($3333,pc), $33333333.l; =3335 uses Op23fa ----------
@@ -18317,7 +18317,7 @@ Op23fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#32 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23fb] move.l ($33,pc,d3.w*2), $33333333.l; =35 uses Op23fb ----------
@@ -18362,7 +18362,7 @@ Op23fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [23fc] move.l #$33333333, $33333333.l uses Op23fc ----------
@@ -18392,7 +18392,7 @@ Op23fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ec0] move.l d0, (a7)+ uses Op2ec0 ----------
@@ -18421,7 +18421,7 @@ Op2ec0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ed0] move.l (a0), (a7)+ uses Op2ed0 ----------
@@ -18455,7 +18455,7 @@ Op2ed0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ed8] move.l (a0)+, (a7)+ uses Op2ed8 ----------
@@ -18490,7 +18490,7 @@ Op2ed8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ee0] move.l -(a0), (a7)+ uses Op2ee0 ----------
@@ -18526,7 +18526,7 @@ Op2ee0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ee8] move.l ($3333,a0), (a7)+ uses Op2ee8 ----------
@@ -18561,7 +18561,7 @@ Op2ee8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ef0] move.l ($33,a0,d3.w*2), (a7)+ uses Op2ef0 ----------
@@ -18605,7 +18605,7 @@ Op2ef0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ef8] move.l $3333.w, (a7)+ uses Op2ef8 ----------
@@ -18637,7 +18637,7 @@ Op2ef8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2ef9] move.l $33333333.l, (a7)+ uses Op2ef9 ----------
@@ -18671,7 +18671,7 @@ Op2ef9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2efa] move.l ($3333,pc), (a7)+; =3335 uses Op2efa ----------
@@ -18707,7 +18707,7 @@ Op2efa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2efb] move.l ($33,pc,d3.w*2), (a7)+; =35 uses Op2efb ----------
@@ -18751,7 +18751,7 @@ Op2efb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2efc] move.l #$33333333, (a7)+ uses Op2efc ----------
@@ -18781,7 +18781,7 @@ Op2efc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f00] move.l d0, -(a7) uses Op2f00 ----------
@@ -18818,7 +18818,7 @@ Op2f00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f10] move.l (a0), -(a7) uses Op2f10 ----------
@@ -18860,7 +18860,7 @@ Op2f10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f18] move.l (a0)+, -(a7) uses Op2f18 ----------
@@ -18903,7 +18903,7 @@ Op2f18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f20] move.l -(a0), -(a7) uses Op2f20 ----------
@@ -18947,7 +18947,7 @@ Op2f20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f28] move.l ($3333,a0), -(a7) uses Op2f28 ----------
@@ -18990,7 +18990,7 @@ Op2f28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f30] move.l ($33,a0,d3.w*2), -(a7) uses Op2f30 ----------
@@ -19042,7 +19042,7 @@ Op2f30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f38] move.l $3333.w, -(a7) uses Op2f38 ----------
@@ -19082,7 +19082,7 @@ Op2f38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f39] move.l $33333333.l, -(a7) uses Op2f39 ----------
@@ -19124,7 +19124,7 @@ Op2f39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f3a] move.l ($3333,pc), -(a7); =3335 uses Op2f3a ----------
@@ -19168,7 +19168,7 @@ Op2f3a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f3b] move.l ($33,pc,d3.w*2), -(a7); =35 uses Op2f3b ----------
@@ -19220,7 +19220,7 @@ Op2f3b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [2f3c] move.l #$33333333, -(a7) uses Op2f3c ----------
@@ -19258,7 +19258,7 @@ Op2f3c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3000] move.w d0, d0 uses Op3000 ----------
@@ -19280,7 +19280,7 @@ Op3000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3010] move.w (a0), d0 uses Op3010 ----------
@@ -19312,7 +19312,7 @@ Op3010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3018] move.w (a0)+, d0 uses Op3018 ----------
@@ -19345,7 +19345,7 @@ Op3018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3020] move.w -(a0), d0 uses Op3020 ----------
@@ -19379,7 +19379,7 @@ Op3020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3028] move.w ($3333,a0), d0 uses Op3028 ----------
@@ -19412,7 +19412,7 @@ Op3028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3030] move.w ($33,a0,d3.w*2), d0 uses Op3030 ----------
@@ -19454,7 +19454,7 @@ Op3030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3038] move.w $3333.w, d0 uses Op3038 ----------
@@ -19484,7 +19484,7 @@ Op3038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3039] move.w $33333333.l, d0 uses Op3039 ----------
@@ -19516,7 +19516,7 @@ Op3039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [303a] move.w ($3333,pc), d0; =3335 uses Op303a ----------
@@ -19550,7 +19550,7 @@ Op303a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [303b] move.w ($33,pc,d3.w*2), d0; =35 uses Op303b ----------
@@ -19592,7 +19592,7 @@ Op303b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [303c] move.w #$3333, d0 uses Op303c ----------
@@ -19612,7 +19612,7 @@ Op303c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3040] movea.w d0, a0 uses Op3040 ----------
@@ -19630,7 +19630,7 @@ Op3040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3050] movea.w (a0), a0 uses Op3050 ----------
@@ -19658,7 +19658,7 @@ Op3050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3058] movea.w (a0)+, a0 uses Op3058 ----------
@@ -19687,7 +19687,7 @@ Op3058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3060] movea.w -(a0), a0 uses Op3060 ----------
@@ -19717,7 +19717,7 @@ Op3060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3068] movea.w ($3333,a0), a0 uses Op3068 ----------
@@ -19746,7 +19746,7 @@ Op3068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3070] movea.w ($33,a0,d3.w*2), a0 uses Op3070 ----------
@@ -19784,7 +19784,7 @@ Op3070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3078] movea.w $3333.w, a0 uses Op3078 ----------
@@ -19810,7 +19810,7 @@ Op3078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3079] movea.w $33333333.l, a0 uses Op3079 ----------
@@ -19838,7 +19838,7 @@ Op3079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [307a] movea.w ($3333,pc), a0; =3335 uses Op307a ----------
@@ -19868,7 +19868,7 @@ Op307a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [307b] movea.w ($33,pc,d3.w*2), a0; =35 uses Op307b ----------
@@ -19906,7 +19906,7 @@ Op307b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [307c] movea.w #$3333, a0 uses Op307c ----------
@@ -19922,7 +19922,7 @@ Op307c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3080] move.w d0, (a0) uses Op3080 ----------
@@ -19951,7 +19951,7 @@ Op3080:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3090] move.w (a0), (a0) uses Op3090 ----------
@@ -19985,7 +19985,7 @@ Op3090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3098] move.w (a0)+, (a0) uses Op3098 ----------
@@ -20020,7 +20020,7 @@ Op3098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30a0] move.w -(a0), (a0) uses Op30a0 ----------
@@ -20056,7 +20056,7 @@ Op30a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30a8] move.w ($3333,a0), (a0) uses Op30a8 ----------
@@ -20091,7 +20091,7 @@ Op30a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30b0] move.w ($33,a0,d3.w*2), (a0) uses Op30b0 ----------
@@ -20135,7 +20135,7 @@ Op30b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30b8] move.w $3333.w, (a0) uses Op30b8 ----------
@@ -20167,7 +20167,7 @@ Op30b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30b9] move.w $33333333.l, (a0) uses Op30b9 ----------
@@ -20201,7 +20201,7 @@ Op30b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30ba] move.w ($3333,pc), (a0); =3335 uses Op30ba ----------
@@ -20237,7 +20237,7 @@ Op30ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30bb] move.w ($33,pc,d3.w*2), (a0); =35 uses Op30bb ----------
@@ -20281,7 +20281,7 @@ Op30bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30bc] move.w #$3333, (a0) uses Op30bc ----------
@@ -20308,7 +20308,7 @@ Op30bc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30c0] move.w d0, (a0)+ uses Op30c0 ----------
@@ -20339,7 +20339,7 @@ Op30c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30d0] move.w (a0), (a0)+ uses Op30d0 ----------
@@ -20375,7 +20375,7 @@ Op30d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30d8] move.w (a0)+, (a0)+ uses Op30d8 ----------
@@ -20412,7 +20412,7 @@ Op30d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30e0] move.w -(a0), (a0)+ uses Op30e0 ----------
@@ -20450,7 +20450,7 @@ Op30e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30e8] move.w ($3333,a0), (a0)+ uses Op30e8 ----------
@@ -20487,7 +20487,7 @@ Op30e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30f0] move.w ($33,a0,d3.w*2), (a0)+ uses Op30f0 ----------
@@ -20533,7 +20533,7 @@ Op30f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30f8] move.w $3333.w, (a0)+ uses Op30f8 ----------
@@ -20567,7 +20567,7 @@ Op30f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30f9] move.w $33333333.l, (a0)+ uses Op30f9 ----------
@@ -20603,7 +20603,7 @@ Op30f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30fa] move.w ($3333,pc), (a0)+; =3335 uses Op30fa ----------
@@ -20641,7 +20641,7 @@ Op30fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30fb] move.w ($33,pc,d3.w*2), (a0)+; =35 uses Op30fb ----------
@@ -20687,7 +20687,7 @@ Op30fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [30fc] move.w #$3333, (a0)+ uses Op30fc ----------
@@ -20716,7 +20716,7 @@ Op30fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3100] move.w d0, -(a0) uses Op3100 ----------
@@ -20747,7 +20747,7 @@ Op3100:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3110] move.w (a0), -(a0) uses Op3110 ----------
@@ -20783,7 +20783,7 @@ Op3110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3118] move.w (a0)+, -(a0) uses Op3118 ----------
@@ -20820,7 +20820,7 @@ Op3118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3120] move.w -(a0), -(a0) uses Op3120 ----------
@@ -20858,7 +20858,7 @@ Op3120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3128] move.w ($3333,a0), -(a0) uses Op3128 ----------
@@ -20895,7 +20895,7 @@ Op3128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3130] move.w ($33,a0,d3.w*2), -(a0) uses Op3130 ----------
@@ -20941,7 +20941,7 @@ Op3130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3138] move.w $3333.w, -(a0) uses Op3138 ----------
@@ -20975,7 +20975,7 @@ Op3138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3139] move.w $33333333.l, -(a0) uses Op3139 ----------
@@ -21011,7 +21011,7 @@ Op3139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [313a] move.w ($3333,pc), -(a0); =3335 uses Op313a ----------
@@ -21049,7 +21049,7 @@ Op313a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [313b] move.w ($33,pc,d3.w*2), -(a0); =35 uses Op313b ----------
@@ -21095,7 +21095,7 @@ Op313b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [313c] move.w #$3333, -(a0) uses Op313c ----------
@@ -21124,7 +21124,7 @@ Op313c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3140] move.w d0, ($3333,a0) uses Op3140 ----------
@@ -21156,7 +21156,7 @@ Op3140:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3150] move.w (a0), ($3333,a0) uses Op3150 ----------
@@ -21194,7 +21194,7 @@ Op3150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3158] move.w (a0)+, ($3333,a0) uses Op3158 ----------
@@ -21233,7 +21233,7 @@ Op3158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3160] move.w -(a0), ($3333,a0) uses Op3160 ----------
@@ -21273,7 +21273,7 @@ Op3160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3168] move.w ($3333,a0), ($3333,a0) uses Op3168 ----------
@@ -21312,7 +21312,7 @@ Op3168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3170] move.w ($33,a0,d3.w*2), ($3333,a0) uses Op3170 ----------
@@ -21360,7 +21360,7 @@ Op3170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3178] move.w $3333.w, ($3333,a0) uses Op3178 ----------
@@ -21396,7 +21396,7 @@ Op3178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3179] move.w $33333333.l, ($3333,a0) uses Op3179 ----------
@@ -21434,7 +21434,7 @@ Op3179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [317a] move.w ($3333,pc), ($3333,a0); =3335 uses Op317a ----------
@@ -21474,7 +21474,7 @@ Op317a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [317b] move.w ($33,pc,d3.w*2), ($3333,a0); =35 uses Op317b ----------
@@ -21522,7 +21522,7 @@ Op317b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [317c] move.w #$3333, ($3333,a0) uses Op317c ----------
@@ -21552,7 +21552,7 @@ Op317c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3180] move.w d0, ($33,a0,d3.w*2) uses Op3180 ----------
@@ -21593,7 +21593,7 @@ Op3180:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3190] move.w (a0), ($33,a0,d3.w*2) uses Op3190 ----------
@@ -21640,7 +21640,7 @@ Op3190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3198] move.w (a0)+, ($33,a0,d3.w*2) uses Op3198 ----------
@@ -21688,7 +21688,7 @@ Op3198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31a0] move.w -(a0), ($33,a0,d3.w*2) uses Op31a0 ----------
@@ -21737,7 +21737,7 @@ Op31a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31a8] move.w ($3333,a0), ($33,a0,d3.w*2) uses Op31a8 ----------
@@ -21785,7 +21785,7 @@ Op31a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31b0] move.w ($33,a0,d3.w*2), ($33,a0,d3.w*2) uses Op31b0 ----------
@@ -21842,7 +21842,7 @@ Op31b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31b8] move.w $3333.w, ($33,a0,d3.w*2) uses Op31b8 ----------
@@ -21887,7 +21887,7 @@ Op31b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31b9] move.w $33333333.l, ($33,a0,d3.w*2) uses Op31b9 ----------
@@ -21934,7 +21934,7 @@ Op31b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31ba] move.w ($3333,pc), ($33,a0,d3.w*2); =3335 uses Op31ba ----------
@@ -21983,7 +21983,7 @@ Op31ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31bb] move.w ($33,pc,d3.w*2), ($33,a0,d3.w*2); =35 uses Op31bb ----------
@@ -22040,7 +22040,7 @@ Op31bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31bc] move.w #$3333, ($33,a0,d3.w*2) uses Op31bc ----------
@@ -22079,7 +22079,7 @@ Op31bc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31c0] move.w d0, $3333.w uses Op31c0 ----------
@@ -22107,7 +22107,7 @@ Op31c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31d0] move.w (a0), $3333.w uses Op31d0 ----------
@@ -22141,7 +22141,7 @@ Op31d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31d8] move.w (a0)+, $3333.w uses Op31d8 ----------
@@ -22176,7 +22176,7 @@ Op31d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31e0] move.w -(a0), $3333.w uses Op31e0 ----------
@@ -22212,7 +22212,7 @@ Op31e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31e8] move.w ($3333,a0), $3333.w uses Op31e8 ----------
@@ -22247,7 +22247,7 @@ Op31e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31f0] move.w ($33,a0,d3.w*2), $3333.w uses Op31f0 ----------
@@ -22291,7 +22291,7 @@ Op31f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31f8] move.w $3333.w, $3333.w uses Op31f8 ----------
@@ -22323,7 +22323,7 @@ Op31f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31f9] move.w $33333333.l, $3333.w uses Op31f9 ----------
@@ -22357,7 +22357,7 @@ Op31f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31fa] move.w ($3333,pc), $3333.w; =3335 uses Op31fa ----------
@@ -22393,7 +22393,7 @@ Op31fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31fb] move.w ($33,pc,d3.w*2), $3333.w; =35 uses Op31fb ----------
@@ -22437,7 +22437,7 @@ Op31fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [31fc] move.w #$3333, $3333.w uses Op31fc ----------
@@ -22463,7 +22463,7 @@ Op31fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33c0] move.w d0, $33333333.l uses Op33c0 ----------
@@ -22493,7 +22493,7 @@ Op33c0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33d0] move.w (a0), $33333333.l uses Op33d0 ----------
@@ -22529,7 +22529,7 @@ Op33d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33d8] move.w (a0)+, $33333333.l uses Op33d8 ----------
@@ -22566,7 +22566,7 @@ Op33d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33e0] move.w -(a0), $33333333.l uses Op33e0 ----------
@@ -22604,7 +22604,7 @@ Op33e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33e8] move.w ($3333,a0), $33333333.l uses Op33e8 ----------
@@ -22641,7 +22641,7 @@ Op33e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33f0] move.w ($33,a0,d3.w*2), $33333333.l uses Op33f0 ----------
@@ -22687,7 +22687,7 @@ Op33f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33f8] move.w $3333.w, $33333333.l uses Op33f8 ----------
@@ -22721,7 +22721,7 @@ Op33f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33f9] move.w $33333333.l, $33333333.l uses Op33f9 ----------
@@ -22757,7 +22757,7 @@ Op33f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33fa] move.w ($3333,pc), $33333333.l; =3335 uses Op33fa ----------
@@ -22795,7 +22795,7 @@ Op33fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33fb] move.w ($33,pc,d3.w*2), $33333333.l; =35 uses Op33fb ----------
@@ -22841,7 +22841,7 @@ Op33fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [33fc] move.w #$3333, $33333333.l uses Op33fc ----------
@@ -22869,7 +22869,7 @@ Op33fc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ec0] move.w d0, (a7)+ uses Op3ec0 ----------
@@ -22899,7 +22899,7 @@ Op3ec0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ed0] move.w (a0), (a7)+ uses Op3ed0 ----------
@@ -22934,7 +22934,7 @@ Op3ed0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ed8] move.w (a0)+, (a7)+ uses Op3ed8 ----------
@@ -22970,7 +22970,7 @@ Op3ed8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ee0] move.w -(a0), (a7)+ uses Op3ee0 ----------
@@ -23007,7 +23007,7 @@ Op3ee0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ee8] move.w ($3333,a0), (a7)+ uses Op3ee8 ----------
@@ -23043,7 +23043,7 @@ Op3ee8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ef0] move.w ($33,a0,d3.w*2), (a7)+ uses Op3ef0 ----------
@@ -23088,7 +23088,7 @@ Op3ef0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ef8] move.w $3333.w, (a7)+ uses Op3ef8 ----------
@@ -23121,7 +23121,7 @@ Op3ef8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3ef9] move.w $33333333.l, (a7)+ uses Op3ef9 ----------
@@ -23156,7 +23156,7 @@ Op3ef9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3efa] move.w ($3333,pc), (a7)+; =3335 uses Op3efa ----------
@@ -23193,7 +23193,7 @@ Op3efa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3efb] move.w ($33,pc,d3.w*2), (a7)+; =35 uses Op3efb ----------
@@ -23238,7 +23238,7 @@ Op3efb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3efc] move.w #$3333, (a7)+ uses Op3efc ----------
@@ -23266,7 +23266,7 @@ Op3efc:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f00] move.w d0, -(a7) uses Op3f00 ----------
@@ -23296,7 +23296,7 @@ Op3f00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f10] move.w (a0), -(a7) uses Op3f10 ----------
@@ -23331,7 +23331,7 @@ Op3f10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f18] move.w (a0)+, -(a7) uses Op3f18 ----------
@@ -23367,7 +23367,7 @@ Op3f18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f20] move.w -(a0), -(a7) uses Op3f20 ----------
@@ -23404,7 +23404,7 @@ Op3f20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f28] move.w ($3333,a0), -(a7) uses Op3f28 ----------
@@ -23440,7 +23440,7 @@ Op3f28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f30] move.w ($33,a0,d3.w*2), -(a7) uses Op3f30 ----------
@@ -23485,7 +23485,7 @@ Op3f30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f38] move.w $3333.w, -(a7) uses Op3f38 ----------
@@ -23518,7 +23518,7 @@ Op3f38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f39] move.w $33333333.l, -(a7) uses Op3f39 ----------
@@ -23553,7 +23553,7 @@ Op3f39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f3a] move.w ($3333,pc), -(a7); =3335 uses Op3f3a ----------
@@ -23590,7 +23590,7 @@ Op3f3a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f3b] move.w ($33,pc,d3.w*2), -(a7); =35 uses Op3f3b ----------
@@ -23635,7 +23635,7 @@ Op3f3b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [3f3c] move.w #$3333, -(a7) uses Op3f3c ----------
@@ -23663,7 +23663,7 @@ Op3f3c:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4000] negx.b d0 uses Op4000 ----------
@@ -23694,7 +23694,7 @@ Op4000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4010] negx.b (a0) uses Op4010 ----------
@@ -23736,7 +23736,7 @@ Op4010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4018] negx.b (a0)+ uses Op4018 ----------
@@ -23779,7 +23779,7 @@ Op4018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [401f] negx.b (a7)+ uses Op401f ----------
@@ -23821,7 +23821,7 @@ Op401f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4020] negx.b -(a0) uses Op4020 ----------
@@ -23865,7 +23865,7 @@ Op4020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4027] negx.b -(a7) uses Op4027 ----------
@@ -23907,7 +23907,7 @@ Op4027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4028] negx.b ($3333,a0) uses Op4028 ----------
@@ -23950,7 +23950,7 @@ Op4028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4030] negx.b ($33,a0,d3.w*2) uses Op4030 ----------
@@ -24002,7 +24002,7 @@ Op4030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4038] negx.b $3333.w uses Op4038 ----------
@@ -24042,7 +24042,7 @@ Op4038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4039] negx.b $33333333.l uses Op4039 ----------
@@ -24084,7 +24084,7 @@ Op4039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4040] negx.w d0 uses Op4040 ----------
@@ -24116,7 +24116,7 @@ Op4040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4050] negx.w (a0) uses Op4050 ----------
@@ -24158,7 +24158,7 @@ Op4050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4058] negx.w (a0)+ uses Op4058 ----------
@@ -24201,7 +24201,7 @@ Op4058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4060] negx.w -(a0) uses Op4060 ----------
@@ -24245,7 +24245,7 @@ Op4060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4068] negx.w ($3333,a0) uses Op4068 ----------
@@ -24288,7 +24288,7 @@ Op4068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4070] negx.w ($33,a0,d3.w*2) uses Op4070 ----------
@@ -24340,7 +24340,7 @@ Op4070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4078] negx.w $3333.w uses Op4078 ----------
@@ -24380,7 +24380,7 @@ Op4078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4079] negx.w $33333333.l uses Op4079 ----------
@@ -24422,7 +24422,7 @@ Op4079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4080] negx.l d0 uses Op4080 ----------
@@ -24450,7 +24450,7 @@ Op4080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4090] negx.l (a0) uses Op4090 ----------
@@ -24489,7 +24489,7 @@ Op4090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4098] negx.l (a0)+ uses Op4098 ----------
@@ -24529,7 +24529,7 @@ Op4098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40a0] negx.l -(a0) uses Op40a0 ----------
@@ -24570,7 +24570,7 @@ Op40a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40a8] negx.l ($3333,a0) uses Op40a8 ----------
@@ -24610,7 +24610,7 @@ Op40a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40b0] negx.l ($33,a0,d3.w*2) uses Op40b0 ----------
@@ -24659,7 +24659,7 @@ Op40b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40b8] negx.l $3333.w uses Op40b8 ----------
@@ -24696,7 +24696,7 @@ Op40b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40b9] negx.l $33333333.l uses Op40b9 ----------
@@ -24735,7 +24735,7 @@ Op40b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40c0] move sr, d0 uses Op40c0 ----------
@@ -24759,7 +24759,7 @@ Op40c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40d0] move sr, (a0) uses Op40d0 ----------
@@ -24791,7 +24791,7 @@ Op40d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40d8] move sr, (a0)+ uses Op40d8 ----------
@@ -24824,7 +24824,7 @@ Op40d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40e0] move sr, -(a0) uses Op40e0 ----------
@@ -24858,7 +24858,7 @@ Op40e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40e8] move sr, ($3333,a0) uses Op40e8 ----------
@@ -24891,7 +24891,7 @@ Op40e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40f0] move sr, ($33,a0,d3.w*2) uses Op40f0 ----------
@@ -24933,7 +24933,7 @@ Op40f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40f8] move sr, $3333.w uses Op40f8 ----------
@@ -24963,7 +24963,7 @@ Op40f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [40f9] move sr, $33333333.l uses Op40f9 ----------
@@ -24995,7 +24995,7 @@ Op40f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4180] chk d0, a0 uses Op4180 ----------
@@ -25029,7 +25029,7 @@ Op4180:
   orr r9,r9,r3
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap4180: ;@ CHK exception:
@@ -25037,7 +25037,7 @@ chktrap4180: ;@ CHK exception:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#50 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4190] chk (a0), a0 uses Op4190 ----------
@@ -25080,7 +25080,7 @@ Op4190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap4190: ;@ CHK exception:
@@ -25089,7 +25089,7 @@ chktrap4190: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#54 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4198] chk (a0)+, a0 uses Op4198 ----------
@@ -25133,7 +25133,7 @@ Op4198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap4198: ;@ CHK exception:
@@ -25142,7 +25142,7 @@ chktrap4198: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#54 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41a0] chk -(a0), a0 uses Op41a0 ----------
@@ -25187,7 +25187,7 @@ Op41a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41a0: ;@ CHK exception:
@@ -25196,7 +25196,7 @@ chktrap41a0: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#56 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41a8] chk ($3333,a0), a0 uses Op41a8 ----------
@@ -25240,7 +25240,7 @@ Op41a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41a8: ;@ CHK exception:
@@ -25249,7 +25249,7 @@ chktrap41a8: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41b0] chk ($33,a0,d3.w*2), a0 uses Op41b0 ----------
@@ -25302,7 +25302,7 @@ Op41b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41b0: ;@ CHK exception:
@@ -25311,7 +25311,7 @@ chktrap41b0: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#60 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41b8] chk $3333.w, a0 uses Op41b8 ----------
@@ -25352,7 +25352,7 @@ Op41b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41b8: ;@ CHK exception:
@@ -25361,7 +25361,7 @@ chktrap41b8: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41b9] chk $33333333.l, a0 uses Op41b9 ----------
@@ -25404,7 +25404,7 @@ Op41b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41b9: ;@ CHK exception:
@@ -25413,7 +25413,7 @@ chktrap41b9: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#62 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41ba] chk ($3333,pc), a0; =3335 uses Op41ba ----------
@@ -25458,7 +25458,7 @@ Op41ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41ba: ;@ CHK exception:
@@ -25467,7 +25467,7 @@ chktrap41ba: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41bb] chk ($33,pc,d3.w*2), a0; =35 uses Op41bb ----------
@@ -25520,7 +25520,7 @@ Op41bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41bb: ;@ CHK exception:
@@ -25529,7 +25529,7 @@ chktrap41bb: ;@ CHK exception:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#60 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41bc] chk #$33, a0 uses Op41bc ----------
@@ -25562,7 +25562,7 @@ Op41bc:
   orr r9,r9,r3
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 chktrap41bc: ;@ CHK exception:
@@ -25570,7 +25570,7 @@ chktrap41bc: ;@ CHK exception:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#54 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41d0] lea (a0), a0 uses Op41d0 ----------
@@ -25591,7 +25591,7 @@ Op41d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41e8] lea ($3333,a0), a0 uses Op41e8 ----------
@@ -25613,7 +25613,7 @@ Op41e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41f0] lea ($33,a0,d3.w*2), a0 uses Op41f0 ----------
@@ -25644,7 +25644,7 @@ Op41f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41f8] lea $3333.w, a0 uses Op41f8 ----------
@@ -25663,7 +25663,7 @@ Op41f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41f9] lea $33333333.l, a0 uses Op41f9 ----------
@@ -25684,7 +25684,7 @@ Op41f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41fa] lea ($3333,pc), a0; =3335 uses Op41fa ----------
@@ -25707,7 +25707,7 @@ Op41fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [41fb] lea ($33,pc,d3.w*2), a0; =35 uses Op41fb ----------
@@ -25738,7 +25738,7 @@ Op41fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4200] clr.b d0 uses Op4200 ----------
@@ -25755,7 +25755,7 @@ Op4200:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4210] clr.b (a0) uses Op4210 ----------
@@ -25781,7 +25781,7 @@ Op4210:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4218] clr.b (a0)+ uses Op4218 ----------
@@ -25808,7 +25808,7 @@ Op4218:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [421f] clr.b (a7)+ uses Op421f ----------
@@ -25834,7 +25834,7 @@ Op421f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4220] clr.b -(a0) uses Op4220 ----------
@@ -25862,7 +25862,7 @@ Op4220:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4227] clr.b -(a7) uses Op4227 ----------
@@ -25888,7 +25888,7 @@ Op4227:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4228] clr.b ($3333,a0) uses Op4228 ----------
@@ -25915,7 +25915,7 @@ Op4228:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4230] clr.b ($33,a0,d3.w*2) uses Op4230 ----------
@@ -25951,7 +25951,7 @@ Op4230:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4238] clr.b $3333.w uses Op4238 ----------
@@ -25975,7 +25975,7 @@ Op4238:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4239] clr.b $33333333.l uses Op4239 ----------
@@ -26001,7 +26001,7 @@ Op4239:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4240] clr.w d0 uses Op4240 ----------
@@ -26019,7 +26019,7 @@ Op4240:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4250] clr.w (a0) uses Op4250 ----------
@@ -26045,7 +26045,7 @@ Op4250:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4258] clr.w (a0)+ uses Op4258 ----------
@@ -26072,7 +26072,7 @@ Op4258:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4260] clr.w -(a0) uses Op4260 ----------
@@ -26100,7 +26100,7 @@ Op4260:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4268] clr.w ($3333,a0) uses Op4268 ----------
@@ -26127,7 +26127,7 @@ Op4268:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4270] clr.w ($33,a0,d3.w*2) uses Op4270 ----------
@@ -26163,7 +26163,7 @@ Op4270:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4278] clr.w $3333.w uses Op4278 ----------
@@ -26187,7 +26187,7 @@ Op4278:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4279] clr.w $33333333.l uses Op4279 ----------
@@ -26213,7 +26213,7 @@ Op4279:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4280] clr.l d0 uses Op4280 ----------
@@ -26230,7 +26230,7 @@ Op4280:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4290] clr.l (a0) uses Op4290 ----------
@@ -26256,7 +26256,7 @@ Op4290:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4298] clr.l (a0)+ uses Op4298 ----------
@@ -26283,7 +26283,7 @@ Op4298:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [42a0] clr.l -(a0) uses Op42a0 ----------
@@ -26311,7 +26311,7 @@ Op42a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [42a8] clr.l ($3333,a0) uses Op42a8 ----------
@@ -26338,7 +26338,7 @@ Op42a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [42b0] clr.l ($33,a0,d3.w*2) uses Op42b0 ----------
@@ -26374,7 +26374,7 @@ Op42b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [42b8] clr.l $3333.w uses Op42b8 ----------
@@ -26398,7 +26398,7 @@ Op42b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [42b9] clr.l $33333333.l uses Op42b9 ----------
@@ -26424,7 +26424,7 @@ Op42b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4400] neg.b d0 uses Op4400 ----------
@@ -26447,7 +26447,7 @@ Op4400:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4410] neg.b (a0) uses Op4410 ----------
@@ -26481,7 +26481,7 @@ Op4410:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4418] neg.b (a0)+ uses Op4418 ----------
@@ -26516,7 +26516,7 @@ Op4418:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [441f] neg.b (a7)+ uses Op441f ----------
@@ -26550,7 +26550,7 @@ Op441f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4420] neg.b -(a0) uses Op4420 ----------
@@ -26586,7 +26586,7 @@ Op4420:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4427] neg.b -(a7) uses Op4427 ----------
@@ -26620,7 +26620,7 @@ Op4427:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4428] neg.b ($3333,a0) uses Op4428 ----------
@@ -26655,7 +26655,7 @@ Op4428:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4430] neg.b ($33,a0,d3.w*2) uses Op4430 ----------
@@ -26699,7 +26699,7 @@ Op4430:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4438] neg.b $3333.w uses Op4438 ----------
@@ -26731,7 +26731,7 @@ Op4438:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4439] neg.b $33333333.l uses Op4439 ----------
@@ -26765,7 +26765,7 @@ Op4439:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4440] neg.w d0 uses Op4440 ----------
@@ -26789,7 +26789,7 @@ Op4440:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4450] neg.w (a0) uses Op4450 ----------
@@ -26823,7 +26823,7 @@ Op4450:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4458] neg.w (a0)+ uses Op4458 ----------
@@ -26858,7 +26858,7 @@ Op4458:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4460] neg.w -(a0) uses Op4460 ----------
@@ -26894,7 +26894,7 @@ Op4460:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4468] neg.w ($3333,a0) uses Op4468 ----------
@@ -26929,7 +26929,7 @@ Op4468:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4470] neg.w ($33,a0,d3.w*2) uses Op4470 ----------
@@ -26973,7 +26973,7 @@ Op4470:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4478] neg.w $3333.w uses Op4478 ----------
@@ -27005,7 +27005,7 @@ Op4478:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4479] neg.w $33333333.l uses Op4479 ----------
@@ -27039,7 +27039,7 @@ Op4479:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4480] neg.l d0 uses Op4480 ----------
@@ -27060,7 +27060,7 @@ Op4480:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4490] neg.l (a0) uses Op4490 ----------
@@ -27092,7 +27092,7 @@ Op4490:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4498] neg.l (a0)+ uses Op4498 ----------
@@ -27125,7 +27125,7 @@ Op4498:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44a0] neg.l -(a0) uses Op44a0 ----------
@@ -27159,7 +27159,7 @@ Op44a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44a8] neg.l ($3333,a0) uses Op44a8 ----------
@@ -27192,7 +27192,7 @@ Op44a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44b0] neg.l ($33,a0,d3.w*2) uses Op44b0 ----------
@@ -27234,7 +27234,7 @@ Op44b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44b8] neg.l $3333.w uses Op44b8 ----------
@@ -27264,7 +27264,7 @@ Op44b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44b9] neg.l $33333333.l uses Op44b9 ----------
@@ -27296,7 +27296,7 @@ Op44b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44c0] move d0, ccr uses Op44c0 ----------
@@ -27315,7 +27315,7 @@ Op44c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44d0] move (a0), ccr uses Op44d0 ----------
@@ -27343,7 +27343,7 @@ Op44d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44d8] move (a0)+, ccr uses Op44d8 ----------
@@ -27372,7 +27372,7 @@ Op44d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44e0] move -(a0), ccr uses Op44e0 ----------
@@ -27402,7 +27402,7 @@ Op44e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44e8] move ($3333,a0), ccr uses Op44e8 ----------
@@ -27431,7 +27431,7 @@ Op44e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44f0] move ($33,a0,d3.w*2), ccr uses Op44f0 ----------
@@ -27469,7 +27469,7 @@ Op44f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44f8] move $3333.w, ccr uses Op44f8 ----------
@@ -27495,7 +27495,7 @@ Op44f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44f9] move $33333333.l, ccr uses Op44f9 ----------
@@ -27523,7 +27523,7 @@ Op44f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44fa] move ($3333,pc), ccr; =3335 uses Op44fa ----------
@@ -27553,7 +27553,7 @@ Op44fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44fb] move ($33,pc,d3.w*2), ccr; =35 uses Op44fb ----------
@@ -27591,7 +27591,7 @@ Op44fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [44fc] move #$3333, ccr uses Op44fc ----------
@@ -27609,7 +27609,7 @@ Op44fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4600] not.b d0 uses Op4600 ----------
@@ -27630,7 +27630,7 @@ Op4600:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4610] not.b (a0) uses Op4610 ----------
@@ -27662,7 +27662,7 @@ Op4610:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4618] not.b (a0)+ uses Op4618 ----------
@@ -27695,7 +27695,7 @@ Op4618:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [461f] not.b (a7)+ uses Op461f ----------
@@ -27727,7 +27727,7 @@ Op461f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4620] not.b -(a0) uses Op4620 ----------
@@ -27761,7 +27761,7 @@ Op4620:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4627] not.b -(a7) uses Op4627 ----------
@@ -27793,7 +27793,7 @@ Op4627:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4628] not.b ($3333,a0) uses Op4628 ----------
@@ -27826,7 +27826,7 @@ Op4628:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4630] not.b ($33,a0,d3.w*2) uses Op4630 ----------
@@ -27868,7 +27868,7 @@ Op4630:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4638] not.b $3333.w uses Op4638 ----------
@@ -27898,7 +27898,7 @@ Op4638:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4639] not.b $33333333.l uses Op4639 ----------
@@ -27930,7 +27930,7 @@ Op4639:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4640] not.w d0 uses Op4640 ----------
@@ -27952,7 +27952,7 @@ Op4640:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4650] not.w (a0) uses Op4650 ----------
@@ -27984,7 +27984,7 @@ Op4650:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4658] not.w (a0)+ uses Op4658 ----------
@@ -28017,7 +28017,7 @@ Op4658:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4660] not.w -(a0) uses Op4660 ----------
@@ -28051,7 +28051,7 @@ Op4660:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4668] not.w ($3333,a0) uses Op4668 ----------
@@ -28084,7 +28084,7 @@ Op4668:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4670] not.w ($33,a0,d3.w*2) uses Op4670 ----------
@@ -28126,7 +28126,7 @@ Op4670:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4678] not.w $3333.w uses Op4678 ----------
@@ -28156,7 +28156,7 @@ Op4678:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4679] not.w $33333333.l uses Op4679 ----------
@@ -28188,7 +28188,7 @@ Op4679:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4680] not.l d0 uses Op4680 ----------
@@ -28208,7 +28208,7 @@ Op4680:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4690] not.l (a0) uses Op4690 ----------
@@ -28239,7 +28239,7 @@ Op4690:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4698] not.l (a0)+ uses Op4698 ----------
@@ -28271,7 +28271,7 @@ Op4698:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [46a0] not.l -(a0) uses Op46a0 ----------
@@ -28304,7 +28304,7 @@ Op46a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [46a8] not.l ($3333,a0) uses Op46a8 ----------
@@ -28336,7 +28336,7 @@ Op46a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [46b0] not.l ($33,a0,d3.w*2) uses Op46b0 ----------
@@ -28377,7 +28377,7 @@ Op46b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [46b8] not.l $3333.w uses Op46b8 ----------
@@ -28406,7 +28406,7 @@ Op46b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [46b9] not.l $33333333.l uses Op46b9 ----------
@@ -28437,7 +28437,7 @@ Op46b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [46c0] move d0, sr uses Op46c0 ----------
@@ -28478,7 +28478,7 @@ no_sp_swap46c0:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28534,7 +28534,7 @@ no_sp_swap46d0:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28591,7 +28591,7 @@ no_sp_swap46d8:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28649,7 +28649,7 @@ no_sp_swap46e0:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28706,7 +28706,7 @@ no_sp_swap46e8:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28772,7 +28772,7 @@ no_sp_swap46f0:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28826,7 +28826,7 @@ no_sp_swap46f8:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28882,7 +28882,7 @@ no_sp_swap46f9:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -28940,7 +28940,7 @@ no_sp_swap46fa:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -29006,7 +29006,7 @@ no_sp_swap46fb:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -29053,7 +29053,7 @@ no_sp_swap46fc:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -29100,7 +29100,7 @@ finish4800:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4810] nbcd (a0) uses Op4810 ----------
@@ -29151,7 +29151,7 @@ finish4810:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4818] nbcd (a0)+ uses Op4818 ----------
@@ -29203,7 +29203,7 @@ finish4818:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [481f] nbcd (a7)+ uses Op481f ----------
@@ -29254,7 +29254,7 @@ finish481f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4820] nbcd -(a0) uses Op4820 ----------
@@ -29307,7 +29307,7 @@ finish4820:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4827] nbcd -(a7) uses Op4827 ----------
@@ -29358,7 +29358,7 @@ finish4827:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4828] nbcd ($3333,a0) uses Op4828 ----------
@@ -29410,7 +29410,7 @@ finish4828:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4830] nbcd ($33,a0,d3.w*2) uses Op4830 ----------
@@ -29471,7 +29471,7 @@ finish4830:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4838] nbcd $3333.w uses Op4838 ----------
@@ -29520,7 +29520,7 @@ finish4838:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4839] nbcd $33333333.l uses Op4839 ----------
@@ -29571,7 +29571,7 @@ finish4839:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4840] swap d0 uses Op4840 ----------
@@ -29589,7 +29589,7 @@ Op4840:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4850] pea (a0) uses Op4850 ----------
@@ -29614,7 +29614,7 @@ Op4850:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4868] pea ($3333,a0) uses Op4868 ----------
@@ -29640,7 +29640,7 @@ Op4868:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4870] pea ($33,a0,d3.w*2) uses Op4870 ----------
@@ -29675,7 +29675,7 @@ Op4870:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4878] pea $3333.w uses Op4878 ----------
@@ -29698,7 +29698,7 @@ Op4878:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4879] pea $33333333.l uses Op4879 ----------
@@ -29723,7 +29723,7 @@ Op4879:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [487a] pea ($3333,pc); =3335 uses Op487a ----------
@@ -29750,7 +29750,7 @@ Op487a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [487b] pea ($33,pc,d3.w*2); =35 uses Op487b ----------
@@ -29785,7 +29785,7 @@ Op487b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4880] ext.w d0 uses Op4880 ----------
@@ -29806,7 +29806,7 @@ Op4880:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4890] movem.w d0-d1/d4-d5/a0-a1/a4-a5, (a0) uses Op4890 ----------
@@ -29853,7 +29853,7 @@ NoRegs4890:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -29909,7 +29909,7 @@ NoRegs48a0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -29959,7 +29959,7 @@ NoRegs48a8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30018,7 +30018,7 @@ NoRegs48b0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30065,7 +30065,7 @@ NoRegs48b8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30114,7 +30114,7 @@ NoRegs48b9:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30136,7 +30136,7 @@ Op48c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [48d0] movem.l d0-d1/d4-d5/a0-a1/a4-a5, (a0) uses Op48d0 ----------
@@ -30183,7 +30183,7 @@ NoRegs48d0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30239,7 +30239,7 @@ NoRegs48e0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30289,7 +30289,7 @@ NoRegs48e8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30348,7 +30348,7 @@ NoRegs48f0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30395,7 +30395,7 @@ NoRegs48f8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30444,7 +30444,7 @@ NoRegs48f9:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -30462,7 +30462,7 @@ Op4a00:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a10] tst.b (a0) uses Op4a10 ----------
@@ -30487,7 +30487,7 @@ Op4a10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a18] tst.b (a0)+ uses Op4a18 ----------
@@ -30513,7 +30513,7 @@ Op4a18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a1f] tst.b (a7)+ uses Op4a1f ----------
@@ -30538,7 +30538,7 @@ Op4a1f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a20] tst.b -(a0) uses Op4a20 ----------
@@ -30565,7 +30565,7 @@ Op4a20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a27] tst.b -(a7) uses Op4a27 ----------
@@ -30590,7 +30590,7 @@ Op4a27:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a28] tst.b ($3333,a0) uses Op4a28 ----------
@@ -30616,7 +30616,7 @@ Op4a28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a30] tst.b ($33,a0,d3.w*2) uses Op4a30 ----------
@@ -30651,7 +30651,7 @@ Op4a30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a38] tst.b $3333.w uses Op4a38 ----------
@@ -30674,7 +30674,7 @@ Op4a38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a39] tst.b $33333333.l uses Op4a39 ----------
@@ -30699,7 +30699,7 @@ Op4a39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a40] tst.w d0 uses Op4a40 ----------
@@ -30716,7 +30716,7 @@ Op4a40:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a50] tst.w (a0) uses Op4a50 ----------
@@ -30741,7 +30741,7 @@ Op4a50:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a58] tst.w (a0)+ uses Op4a58 ----------
@@ -30767,7 +30767,7 @@ Op4a58:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a60] tst.w -(a0) uses Op4a60 ----------
@@ -30794,7 +30794,7 @@ Op4a60:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a68] tst.w ($3333,a0) uses Op4a68 ----------
@@ -30820,7 +30820,7 @@ Op4a68:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a70] tst.w ($33,a0,d3.w*2) uses Op4a70 ----------
@@ -30855,7 +30855,7 @@ Op4a70:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a78] tst.w $3333.w uses Op4a78 ----------
@@ -30878,7 +30878,7 @@ Op4a78:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a79] tst.w $33333333.l uses Op4a79 ----------
@@ -30903,7 +30903,7 @@ Op4a79:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a80] tst.l d0 uses Op4a80 ----------
@@ -30918,7 +30918,7 @@ Op4a80:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a90] tst.l (a0) uses Op4a90 ----------
@@ -30942,7 +30942,7 @@ Op4a90:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4a98] tst.l (a0)+ uses Op4a98 ----------
@@ -30967,7 +30967,7 @@ Op4a98:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4aa0] tst.l -(a0) uses Op4aa0 ----------
@@ -30993,7 +30993,7 @@ Op4aa0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4aa8] tst.l ($3333,a0) uses Op4aa8 ----------
@@ -31018,7 +31018,7 @@ Op4aa8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ab0] tst.l ($33,a0,d3.w*2) uses Op4ab0 ----------
@@ -31052,7 +31052,7 @@ Op4ab0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ab8] tst.l $3333.w uses Op4ab8 ----------
@@ -31074,7 +31074,7 @@ Op4ab8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ab9] tst.l $33333333.l uses Op4ab9 ----------
@@ -31098,7 +31098,7 @@ Op4ab9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ac0] tas d0 uses Op4ac0 ----------
@@ -31119,7 +31119,7 @@ Op4ac0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ad0] tas (a0) uses Op4ad0 ----------
@@ -31151,7 +31151,7 @@ Op4ad0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ad8] tas (a0)+ uses Op4ad8 ----------
@@ -31184,7 +31184,7 @@ Op4ad8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4adf] tas (a7)+ uses Op4adf ----------
@@ -31216,7 +31216,7 @@ Op4adf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ae0] tas -(a0) uses Op4ae0 ----------
@@ -31250,7 +31250,7 @@ Op4ae0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ae7] tas -(a7) uses Op4ae7 ----------
@@ -31282,7 +31282,7 @@ Op4ae7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ae8] tas ($3333,a0) uses Op4ae8 ----------
@@ -31315,7 +31315,7 @@ Op4ae8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4af0] tas ($33,a0,d3.w*2) uses Op4af0 ----------
@@ -31357,7 +31357,7 @@ Op4af0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4af8] tas $3333.w uses Op4af8 ----------
@@ -31387,7 +31387,7 @@ Op4af8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4af9] tas $33333333.l uses Op4af9 ----------
@@ -31419,7 +31419,7 @@ Op4af9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4c90] movem.w (a0), d0-d1/d4-d5/a0-a1/a4-a5 uses Op4c90 ----------
@@ -31468,7 +31468,7 @@ NoRegs4c90:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31524,7 +31524,7 @@ NoRegs4c98:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31576,7 +31576,7 @@ NoRegs4ca8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31637,7 +31637,7 @@ NoRegs4cb0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31686,7 +31686,7 @@ NoRegs4cb8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31737,7 +31737,7 @@ NoRegs4cb9:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31790,7 +31790,7 @@ NoRegs4cba:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31851,7 +31851,7 @@ NoRegs4cbb:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31900,7 +31900,7 @@ NoRegs4cd0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -31954,7 +31954,7 @@ NoRegs4cd8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -32004,7 +32004,7 @@ NoRegs4ce8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -32063,7 +32063,7 @@ NoRegs4cf0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -32110,7 +32110,7 @@ NoRegs4cf8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -32159,7 +32159,7 @@ NoRegs4cf9:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -32210,7 +32210,7 @@ NoRegs4cfa:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -32269,7 +32269,7 @@ NoRegs4cfb:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
   .ltorg
@@ -32286,7 +32286,7 @@ Op4e40:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#38 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e50] link a0,#$3333 uses Op4e50 ----------
@@ -32325,7 +32325,7 @@ Op4e50:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e57] link a7,#$3333 uses Op4e57 ----------
@@ -32355,7 +32355,7 @@ Op4e57:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e58] unlk a0 uses Op4e58 ----------
@@ -32386,7 +32386,7 @@ Op4e58:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e60] move a0, usp uses Op4e60 ----------
@@ -32405,7 +32405,7 @@ Op4e60:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e68] move usp, a0 uses Op4e68 ----------
@@ -32423,7 +32423,7 @@ Op4e68:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e70] reset uses Op4e70 ----------
@@ -32434,14 +32434,14 @@ Op4e70:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#132 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e71] nop uses Op4e71 ----------
 Op4e71:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e72] stop uses Op4e72 ----------
@@ -32480,7 +32480,7 @@ no_sp_swap4e72:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e73] rte uses Op4e73 ----------
@@ -32549,7 +32549,7 @@ no_sp_swap4e73:
   tst r1,#0x80
   bne CycloneDoTraceWithChecks
   cmp r5,#0
-  blt CycloneEnd
+  ble CycloneEnd
 ;@ CheckInterrupt:
   movs r0,r1,lsr #24 ;@ Get IRQ level
   ldreq pc,[r6,r8,asl #2] ;@ Jump to next opcode handler
@@ -32585,7 +32585,7 @@ Op4e75:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e76] trapv uses Op4e76 ----------
@@ -32602,7 +32602,7 @@ Op4e76:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   add r5,r0,r5
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e77] rtr uses Op4e77 ----------
@@ -32646,7 +32646,7 @@ Op4e77:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4e90] jsr (a0) uses Op4e90 ----------
@@ -32682,7 +32682,7 @@ Op4e90:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ea8] jsr ($3333,a0) uses Op4ea8 ----------
@@ -32719,7 +32719,7 @@ Op4ea8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4eb0] jsr ($33,a0,d3.w*2) uses Op4eb0 ----------
@@ -32765,7 +32765,7 @@ Op4eb0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4eb8] jsr $3333.w uses Op4eb8 ----------
@@ -32799,7 +32799,7 @@ Op4eb8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4eb9] jsr $33333333.l uses Op4eb9 ----------
@@ -32835,7 +32835,7 @@ Op4eb9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4eba] jsr ($3333,pc); =3335 uses Op4eba ----------
@@ -32873,7 +32873,7 @@ Op4eba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ebb] jsr ($33,pc,d3.w*2); =35 uses Op4ebb ----------
@@ -32919,7 +32919,7 @@ Op4ebb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ed0] jmp (a0) uses Op4ed0 ----------
@@ -32942,7 +32942,7 @@ Op4ed0:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ee8] jmp ($3333,a0) uses Op4ee8 ----------
@@ -32966,7 +32966,7 @@ Op4ee8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ef0] jmp ($33,a0,d3.w*2) uses Op4ef0 ----------
@@ -32999,7 +32999,7 @@ Op4ef0:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ef8] jmp $3333.w uses Op4ef8 ----------
@@ -33020,7 +33020,7 @@ Op4ef8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4ef9] jmp $33333333.l uses Op4ef9 ----------
@@ -33043,7 +33043,7 @@ Op4ef9:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4efa] jmp ($3333,pc); =3335 uses Op4efa ----------
@@ -33068,7 +33068,7 @@ Op4efa:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [4efb] jmp ($33,pc,d3.w*2); =35 uses Op4efb ----------
@@ -33101,7 +33101,7 @@ Op4efb:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5000] addq.b #8, d0 uses Op5000 ----------
@@ -33123,7 +33123,7 @@ Op5000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5010] addq.b #8, (a0) uses Op5010 ----------
@@ -33156,7 +33156,7 @@ Op5010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5018] addq.b #8, (a0)+ uses Op5018 ----------
@@ -33190,7 +33190,7 @@ Op5018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [501f] addq.b #8, (a7)+ uses Op501f ----------
@@ -33223,7 +33223,7 @@ Op501f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5020] addq.b #8, -(a0) uses Op5020 ----------
@@ -33258,7 +33258,7 @@ Op5020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5027] addq.b #8, -(a7) uses Op5027 ----------
@@ -33291,7 +33291,7 @@ Op5027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5028] addq.b #8, ($3333,a0) uses Op5028 ----------
@@ -33325,7 +33325,7 @@ Op5028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5030] addq.b #8, ($33,a0,d3.w*2) uses Op5030 ----------
@@ -33368,7 +33368,7 @@ Op5030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5038] addq.b #8, $3333.w uses Op5038 ----------
@@ -33399,7 +33399,7 @@ Op5038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5039] addq.b #8, $33333333.l uses Op5039 ----------
@@ -33432,7 +33432,7 @@ Op5039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5040] addq.w #8, d0 uses Op5040 ----------
@@ -33455,7 +33455,7 @@ Op5040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5048] addq.w #8, a0 uses Op5048 ----------
@@ -33472,7 +33472,7 @@ Op5048:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5050] addq.w #8, (a0) uses Op5050 ----------
@@ -33505,7 +33505,7 @@ Op5050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5058] addq.w #8, (a0)+ uses Op5058 ----------
@@ -33539,7 +33539,7 @@ Op5058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5060] addq.w #8, -(a0) uses Op5060 ----------
@@ -33574,7 +33574,7 @@ Op5060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5068] addq.w #8, ($3333,a0) uses Op5068 ----------
@@ -33608,7 +33608,7 @@ Op5068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5070] addq.w #8, ($33,a0,d3.w*2) uses Op5070 ----------
@@ -33651,7 +33651,7 @@ Op5070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5078] addq.w #8, $3333.w uses Op5078 ----------
@@ -33682,7 +33682,7 @@ Op5078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5079] addq.w #8, $33333333.l uses Op5079 ----------
@@ -33715,7 +33715,7 @@ Op5079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5080] addq.l #8, d0 uses Op5080 ----------
@@ -33734,7 +33734,7 @@ Op5080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5088] addq.l #8, a0 uses Op5088 ----------
@@ -33751,7 +33751,7 @@ Op5088:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5090] addq.l #8, (a0) uses Op5090 ----------
@@ -33781,7 +33781,7 @@ Op5090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5098] addq.l #8, (a0)+ uses Op5098 ----------
@@ -33812,7 +33812,7 @@ Op5098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50a0] addq.l #8, -(a0) uses Op50a0 ----------
@@ -33844,7 +33844,7 @@ Op50a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50a8] addq.l #8, ($3333,a0) uses Op50a8 ----------
@@ -33875,7 +33875,7 @@ Op50a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50b0] addq.l #8, ($33,a0,d3.w*2) uses Op50b0 ----------
@@ -33915,7 +33915,7 @@ Op50b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50b8] addq.l #8, $3333.w uses Op50b8 ----------
@@ -33943,7 +33943,7 @@ Op50b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50b9] addq.l #8, $33333333.l uses Op50b9 ----------
@@ -33973,7 +33973,7 @@ Op50b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50c0] st d0 uses Op50c0 ----------
@@ -33987,7 +33987,7 @@ Op50c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50c8] dbt d0, 3335 uses Op50c8 ----------
@@ -33998,7 +33998,7 @@ DbraTrue:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50d0] st (a0) uses Op50d0 ----------
@@ -34021,7 +34021,7 @@ Op50d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50d8] st (a0)+ uses Op50d8 ----------
@@ -34045,7 +34045,7 @@ Op50d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50df] st (a7)+ uses Op50df ----------
@@ -34068,7 +34068,7 @@ Op50df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50e0] st -(a0) uses Op50e0 ----------
@@ -34093,7 +34093,7 @@ Op50e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50e7] st -(a7) uses Op50e7 ----------
@@ -34116,7 +34116,7 @@ Op50e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50e8] st ($3333,a0) uses Op50e8 ----------
@@ -34140,7 +34140,7 @@ Op50e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50f0] st ($33,a0,d3.w*2) uses Op50f0 ----------
@@ -34173,7 +34173,7 @@ Op50f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50f8] st $3333.w uses Op50f8 ----------
@@ -34194,7 +34194,7 @@ Op50f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [50f9] st $33333333.l uses Op50f9 ----------
@@ -34217,7 +34217,7 @@ Op50f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5100] subq.b #8, d0 uses Op5100 ----------
@@ -34240,7 +34240,7 @@ Op5100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5110] subq.b #8, (a0) uses Op5110 ----------
@@ -34274,7 +34274,7 @@ Op5110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5118] subq.b #8, (a0)+ uses Op5118 ----------
@@ -34309,7 +34309,7 @@ Op5118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [511f] subq.b #8, (a7)+ uses Op511f ----------
@@ -34343,7 +34343,7 @@ Op511f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5120] subq.b #8, -(a0) uses Op5120 ----------
@@ -34379,7 +34379,7 @@ Op5120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5127] subq.b #8, -(a7) uses Op5127 ----------
@@ -34413,7 +34413,7 @@ Op5127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5128] subq.b #8, ($3333,a0) uses Op5128 ----------
@@ -34448,7 +34448,7 @@ Op5128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5130] subq.b #8, ($33,a0,d3.w*2) uses Op5130 ----------
@@ -34492,7 +34492,7 @@ Op5130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5138] subq.b #8, $3333.w uses Op5138 ----------
@@ -34524,7 +34524,7 @@ Op5138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5139] subq.b #8, $33333333.l uses Op5139 ----------
@@ -34558,7 +34558,7 @@ Op5139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5140] subq.w #8, d0 uses Op5140 ----------
@@ -34582,7 +34582,7 @@ Op5140:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5148] subq.w #8, a0 uses Op5148 ----------
@@ -34599,7 +34599,7 @@ Op5148:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5150] subq.w #8, (a0) uses Op5150 ----------
@@ -34633,7 +34633,7 @@ Op5150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5158] subq.w #8, (a0)+ uses Op5158 ----------
@@ -34668,7 +34668,7 @@ Op5158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5160] subq.w #8, -(a0) uses Op5160 ----------
@@ -34704,7 +34704,7 @@ Op5160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5168] subq.w #8, ($3333,a0) uses Op5168 ----------
@@ -34739,7 +34739,7 @@ Op5168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5170] subq.w #8, ($33,a0,d3.w*2) uses Op5170 ----------
@@ -34783,7 +34783,7 @@ Op5170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5178] subq.w #8, $3333.w uses Op5178 ----------
@@ -34815,7 +34815,7 @@ Op5178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5179] subq.w #8, $33333333.l uses Op5179 ----------
@@ -34849,7 +34849,7 @@ Op5179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5180] subq.l #8, d0 uses Op5180 ----------
@@ -34869,7 +34869,7 @@ Op5180:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5188] subq.l #8, a0 uses Op5188 ----------
@@ -34886,7 +34886,7 @@ Op5188:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5190] subq.l #8, (a0) uses Op5190 ----------
@@ -34917,7 +34917,7 @@ Op5190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5198] subq.l #8, (a0)+ uses Op5198 ----------
@@ -34949,7 +34949,7 @@ Op5198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51a0] subq.l #8, -(a0) uses Op51a0 ----------
@@ -34982,7 +34982,7 @@ Op51a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51a8] subq.l #8, ($3333,a0) uses Op51a8 ----------
@@ -35014,7 +35014,7 @@ Op51a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51b0] subq.l #8, ($33,a0,d3.w*2) uses Op51b0 ----------
@@ -35055,7 +35055,7 @@ Op51b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51b8] subq.l #8, $3333.w uses Op51b8 ----------
@@ -35084,7 +35084,7 @@ Op51b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51b9] subq.l #8, $33333333.l uses Op51b9 ----------
@@ -35115,7 +35115,7 @@ Op51b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51c0] sf d0 uses Op51c0 ----------
@@ -35129,7 +35129,7 @@ Op51c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51c8] dbra d0, 3335 uses Op51c8 ----------
@@ -35157,7 +35157,7 @@ Op51c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ Dn.w is -1:
@@ -35166,7 +35166,7 @@ DbraMin1:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51d0] sf (a0) uses Op51d0 ----------
@@ -35189,7 +35189,7 @@ Op51d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51d8] sf (a0)+ uses Op51d8 ----------
@@ -35213,7 +35213,7 @@ Op51d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51df] sf (a7)+ uses Op51df ----------
@@ -35236,7 +35236,7 @@ Op51df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51e0] sf -(a0) uses Op51e0 ----------
@@ -35261,7 +35261,7 @@ Op51e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51e7] sf -(a7) uses Op51e7 ----------
@@ -35284,7 +35284,7 @@ Op51e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51e8] sf ($3333,a0) uses Op51e8 ----------
@@ -35308,7 +35308,7 @@ Op51e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51f0] sf ($33,a0,d3.w*2) uses Op51f0 ----------
@@ -35341,7 +35341,7 @@ Op51f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51f8] sf $3333.w uses Op51f8 ----------
@@ -35362,7 +35362,7 @@ Op51f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [51f9] sf $33333333.l uses Op51f9 ----------
@@ -35385,7 +35385,7 @@ Op51f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52c0] shi d0 uses Op52c0 ----------
@@ -35402,7 +35402,7 @@ Op52c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52c8] dbhi d0, 3335 uses Op52c8 ----------
@@ -35433,7 +35433,7 @@ Op52c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52d0] shi (a0) uses Op52d0 ----------
@@ -35458,7 +35458,7 @@ Op52d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52d8] shi (a0)+ uses Op52d8 ----------
@@ -35484,7 +35484,7 @@ Op52d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52df] shi (a7)+ uses Op52df ----------
@@ -35509,7 +35509,7 @@ Op52df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52e0] shi -(a0) uses Op52e0 ----------
@@ -35536,7 +35536,7 @@ Op52e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52e7] shi -(a7) uses Op52e7 ----------
@@ -35561,7 +35561,7 @@ Op52e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52e8] shi ($3333,a0) uses Op52e8 ----------
@@ -35587,7 +35587,7 @@ Op52e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52f0] shi ($33,a0,d3.w*2) uses Op52f0 ----------
@@ -35622,7 +35622,7 @@ Op52f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52f8] shi $3333.w uses Op52f8 ----------
@@ -35645,7 +35645,7 @@ Op52f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [52f9] shi $33333333.l uses Op52f9 ----------
@@ -35670,7 +35670,7 @@ Op52f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53c0] sls d0 uses Op53c0 ----------
@@ -35687,7 +35687,7 @@ Op53c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53c8] dbls d0, 3335 uses Op53c8 ----------
@@ -35718,7 +35718,7 @@ Op53c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53d0] sls (a0) uses Op53d0 ----------
@@ -35743,7 +35743,7 @@ Op53d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53d8] sls (a0)+ uses Op53d8 ----------
@@ -35769,7 +35769,7 @@ Op53d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53df] sls (a7)+ uses Op53df ----------
@@ -35794,7 +35794,7 @@ Op53df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53e0] sls -(a0) uses Op53e0 ----------
@@ -35821,7 +35821,7 @@ Op53e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53e7] sls -(a7) uses Op53e7 ----------
@@ -35846,7 +35846,7 @@ Op53e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53e8] sls ($3333,a0) uses Op53e8 ----------
@@ -35872,7 +35872,7 @@ Op53e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53f0] sls ($33,a0,d3.w*2) uses Op53f0 ----------
@@ -35907,7 +35907,7 @@ Op53f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53f8] sls $3333.w uses Op53f8 ----------
@@ -35930,7 +35930,7 @@ Op53f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [53f9] sls $33333333.l uses Op53f9 ----------
@@ -35955,7 +35955,7 @@ Op53f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54c0] scc d0 uses Op54c0 ----------
@@ -35973,7 +35973,7 @@ Op54c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54c8] dbcc d0, 3335 uses Op54c8 ----------
@@ -36006,7 +36006,7 @@ Op54c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54d0] scc (a0) uses Op54d0 ----------
@@ -36032,7 +36032,7 @@ Op54d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54d8] scc (a0)+ uses Op54d8 ----------
@@ -36059,7 +36059,7 @@ Op54d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54df] scc (a7)+ uses Op54df ----------
@@ -36085,7 +36085,7 @@ Op54df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54e0] scc -(a0) uses Op54e0 ----------
@@ -36113,7 +36113,7 @@ Op54e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54e7] scc -(a7) uses Op54e7 ----------
@@ -36139,7 +36139,7 @@ Op54e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54e8] scc ($3333,a0) uses Op54e8 ----------
@@ -36166,7 +36166,7 @@ Op54e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54f0] scc ($33,a0,d3.w*2) uses Op54f0 ----------
@@ -36202,7 +36202,7 @@ Op54f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54f8] scc $3333.w uses Op54f8 ----------
@@ -36226,7 +36226,7 @@ Op54f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [54f9] scc $33333333.l uses Op54f9 ----------
@@ -36252,7 +36252,7 @@ Op54f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55c0] scs d0 uses Op55c0 ----------
@@ -36270,7 +36270,7 @@ Op55c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55c8] dbcs d0, 3335 uses Op55c8 ----------
@@ -36303,7 +36303,7 @@ Op55c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55d0] scs (a0) uses Op55d0 ----------
@@ -36329,7 +36329,7 @@ Op55d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55d8] scs (a0)+ uses Op55d8 ----------
@@ -36356,7 +36356,7 @@ Op55d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55df] scs (a7)+ uses Op55df ----------
@@ -36382,7 +36382,7 @@ Op55df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55e0] scs -(a0) uses Op55e0 ----------
@@ -36410,7 +36410,7 @@ Op55e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55e7] scs -(a7) uses Op55e7 ----------
@@ -36436,7 +36436,7 @@ Op55e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55e8] scs ($3333,a0) uses Op55e8 ----------
@@ -36463,7 +36463,7 @@ Op55e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55f0] scs ($33,a0,d3.w*2) uses Op55f0 ----------
@@ -36499,7 +36499,7 @@ Op55f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55f8] scs $3333.w uses Op55f8 ----------
@@ -36523,7 +36523,7 @@ Op55f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [55f9] scs $33333333.l uses Op55f9 ----------
@@ -36549,7 +36549,7 @@ Op55f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56c0] sne d0 uses Op56c0 ----------
@@ -36567,7 +36567,7 @@ Op56c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56c8] dbne d0, 3335 uses Op56c8 ----------
@@ -36600,7 +36600,7 @@ Op56c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56d0] sne (a0) uses Op56d0 ----------
@@ -36626,7 +36626,7 @@ Op56d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56d8] sne (a0)+ uses Op56d8 ----------
@@ -36653,7 +36653,7 @@ Op56d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56df] sne (a7)+ uses Op56df ----------
@@ -36679,7 +36679,7 @@ Op56df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56e0] sne -(a0) uses Op56e0 ----------
@@ -36707,7 +36707,7 @@ Op56e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56e7] sne -(a7) uses Op56e7 ----------
@@ -36733,7 +36733,7 @@ Op56e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56e8] sne ($3333,a0) uses Op56e8 ----------
@@ -36760,7 +36760,7 @@ Op56e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56f0] sne ($33,a0,d3.w*2) uses Op56f0 ----------
@@ -36796,7 +36796,7 @@ Op56f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56f8] sne $3333.w uses Op56f8 ----------
@@ -36820,7 +36820,7 @@ Op56f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [56f9] sne $33333333.l uses Op56f9 ----------
@@ -36846,7 +36846,7 @@ Op56f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57c0] seq d0 uses Op57c0 ----------
@@ -36864,7 +36864,7 @@ Op57c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57c8] dbeq d0, 3335 uses Op57c8 ----------
@@ -36897,7 +36897,7 @@ Op57c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57d0] seq (a0) uses Op57d0 ----------
@@ -36923,7 +36923,7 @@ Op57d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57d8] seq (a0)+ uses Op57d8 ----------
@@ -36950,7 +36950,7 @@ Op57d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57df] seq (a7)+ uses Op57df ----------
@@ -36976,7 +36976,7 @@ Op57df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57e0] seq -(a0) uses Op57e0 ----------
@@ -37004,7 +37004,7 @@ Op57e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57e7] seq -(a7) uses Op57e7 ----------
@@ -37030,7 +37030,7 @@ Op57e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57e8] seq ($3333,a0) uses Op57e8 ----------
@@ -37057,7 +37057,7 @@ Op57e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57f0] seq ($33,a0,d3.w*2) uses Op57f0 ----------
@@ -37093,7 +37093,7 @@ Op57f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57f8] seq $3333.w uses Op57f8 ----------
@@ -37117,7 +37117,7 @@ Op57f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [57f9] seq $33333333.l uses Op57f9 ----------
@@ -37143,7 +37143,7 @@ Op57f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58c0] svc d0 uses Op58c0 ----------
@@ -37161,7 +37161,7 @@ Op58c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58c8] dbvc d0, 3335 uses Op58c8 ----------
@@ -37194,7 +37194,7 @@ Op58c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58d0] svc (a0) uses Op58d0 ----------
@@ -37220,7 +37220,7 @@ Op58d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58d8] svc (a0)+ uses Op58d8 ----------
@@ -37247,7 +37247,7 @@ Op58d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58df] svc (a7)+ uses Op58df ----------
@@ -37273,7 +37273,7 @@ Op58df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58e0] svc -(a0) uses Op58e0 ----------
@@ -37301,7 +37301,7 @@ Op58e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58e7] svc -(a7) uses Op58e7 ----------
@@ -37327,7 +37327,7 @@ Op58e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58e8] svc ($3333,a0) uses Op58e8 ----------
@@ -37354,7 +37354,7 @@ Op58e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58f0] svc ($33,a0,d3.w*2) uses Op58f0 ----------
@@ -37390,7 +37390,7 @@ Op58f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58f8] svc $3333.w uses Op58f8 ----------
@@ -37414,7 +37414,7 @@ Op58f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [58f9] svc $33333333.l uses Op58f9 ----------
@@ -37440,7 +37440,7 @@ Op58f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59c0] svs d0 uses Op59c0 ----------
@@ -37458,7 +37458,7 @@ Op59c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59c8] dbvs d0, 3335 uses Op59c8 ----------
@@ -37491,7 +37491,7 @@ Op59c8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59d0] svs (a0) uses Op59d0 ----------
@@ -37517,7 +37517,7 @@ Op59d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59d8] svs (a0)+ uses Op59d8 ----------
@@ -37544,7 +37544,7 @@ Op59d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59df] svs (a7)+ uses Op59df ----------
@@ -37570,7 +37570,7 @@ Op59df:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59e0] svs -(a0) uses Op59e0 ----------
@@ -37598,7 +37598,7 @@ Op59e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59e7] svs -(a7) uses Op59e7 ----------
@@ -37624,7 +37624,7 @@ Op59e7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59e8] svs ($3333,a0) uses Op59e8 ----------
@@ -37651,7 +37651,7 @@ Op59e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59f0] svs ($33,a0,d3.w*2) uses Op59f0 ----------
@@ -37687,7 +37687,7 @@ Op59f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59f8] svs $3333.w uses Op59f8 ----------
@@ -37711,7 +37711,7 @@ Op59f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [59f9] svs $33333333.l uses Op59f9 ----------
@@ -37737,7 +37737,7 @@ Op59f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ac0] spl d0 uses Op5ac0 ----------
@@ -37755,7 +37755,7 @@ Op5ac0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ac8] dbpl d0, 3335 uses Op5ac8 ----------
@@ -37788,7 +37788,7 @@ Op5ac8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ad0] spl (a0) uses Op5ad0 ----------
@@ -37814,7 +37814,7 @@ Op5ad0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ad8] spl (a0)+ uses Op5ad8 ----------
@@ -37841,7 +37841,7 @@ Op5ad8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5adf] spl (a7)+ uses Op5adf ----------
@@ -37867,7 +37867,7 @@ Op5adf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ae0] spl -(a0) uses Op5ae0 ----------
@@ -37895,7 +37895,7 @@ Op5ae0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ae7] spl -(a7) uses Op5ae7 ----------
@@ -37921,7 +37921,7 @@ Op5ae7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ae8] spl ($3333,a0) uses Op5ae8 ----------
@@ -37948,7 +37948,7 @@ Op5ae8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5af0] spl ($33,a0,d3.w*2) uses Op5af0 ----------
@@ -37984,7 +37984,7 @@ Op5af0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5af8] spl $3333.w uses Op5af8 ----------
@@ -38008,7 +38008,7 @@ Op5af8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5af9] spl $33333333.l uses Op5af9 ----------
@@ -38034,7 +38034,7 @@ Op5af9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bc0] smi d0 uses Op5bc0 ----------
@@ -38052,7 +38052,7 @@ Op5bc0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bc8] dbmi d0, 3335 uses Op5bc8 ----------
@@ -38085,7 +38085,7 @@ Op5bc8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bd0] smi (a0) uses Op5bd0 ----------
@@ -38111,7 +38111,7 @@ Op5bd0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bd8] smi (a0)+ uses Op5bd8 ----------
@@ -38138,7 +38138,7 @@ Op5bd8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bdf] smi (a7)+ uses Op5bdf ----------
@@ -38164,7 +38164,7 @@ Op5bdf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5be0] smi -(a0) uses Op5be0 ----------
@@ -38192,7 +38192,7 @@ Op5be0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5be7] smi -(a7) uses Op5be7 ----------
@@ -38218,7 +38218,7 @@ Op5be7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5be8] smi ($3333,a0) uses Op5be8 ----------
@@ -38245,7 +38245,7 @@ Op5be8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bf0] smi ($33,a0,d3.w*2) uses Op5bf0 ----------
@@ -38281,7 +38281,7 @@ Op5bf0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bf8] smi $3333.w uses Op5bf8 ----------
@@ -38305,7 +38305,7 @@ Op5bf8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5bf9] smi $33333333.l uses Op5bf9 ----------
@@ -38331,7 +38331,7 @@ Op5bf9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cc0] sge d0 uses Op5cc0 ----------
@@ -38349,7 +38349,7 @@ Op5cc0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cc8] dbge d0, 3335 uses Op5cc8 ----------
@@ -38382,7 +38382,7 @@ Op5cc8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cd0] sge (a0) uses Op5cd0 ----------
@@ -38408,7 +38408,7 @@ Op5cd0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cd8] sge (a0)+ uses Op5cd8 ----------
@@ -38435,7 +38435,7 @@ Op5cd8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cdf] sge (a7)+ uses Op5cdf ----------
@@ -38461,7 +38461,7 @@ Op5cdf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ce0] sge -(a0) uses Op5ce0 ----------
@@ -38489,7 +38489,7 @@ Op5ce0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ce7] sge -(a7) uses Op5ce7 ----------
@@ -38515,7 +38515,7 @@ Op5ce7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ce8] sge ($3333,a0) uses Op5ce8 ----------
@@ -38542,7 +38542,7 @@ Op5ce8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cf0] sge ($33,a0,d3.w*2) uses Op5cf0 ----------
@@ -38578,7 +38578,7 @@ Op5cf0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cf8] sge $3333.w uses Op5cf8 ----------
@@ -38602,7 +38602,7 @@ Op5cf8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5cf9] sge $33333333.l uses Op5cf9 ----------
@@ -38628,7 +38628,7 @@ Op5cf9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5dc0] slt d0 uses Op5dc0 ----------
@@ -38646,7 +38646,7 @@ Op5dc0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5dc8] dblt d0, 3335 uses Op5dc8 ----------
@@ -38679,7 +38679,7 @@ Op5dc8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5dd0] slt (a0) uses Op5dd0 ----------
@@ -38705,7 +38705,7 @@ Op5dd0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5dd8] slt (a0)+ uses Op5dd8 ----------
@@ -38732,7 +38732,7 @@ Op5dd8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ddf] slt (a7)+ uses Op5ddf ----------
@@ -38758,7 +38758,7 @@ Op5ddf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5de0] slt -(a0) uses Op5de0 ----------
@@ -38786,7 +38786,7 @@ Op5de0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5de7] slt -(a7) uses Op5de7 ----------
@@ -38812,7 +38812,7 @@ Op5de7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5de8] slt ($3333,a0) uses Op5de8 ----------
@@ -38839,7 +38839,7 @@ Op5de8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5df0] slt ($33,a0,d3.w*2) uses Op5df0 ----------
@@ -38875,7 +38875,7 @@ Op5df0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5df8] slt $3333.w uses Op5df8 ----------
@@ -38899,7 +38899,7 @@ Op5df8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5df9] slt $33333333.l uses Op5df9 ----------
@@ -38925,7 +38925,7 @@ Op5df9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e00] addq.b #7, d0 uses Op5e00 ----------
@@ -38949,7 +38949,7 @@ Op5e00:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e10] addq.b #7, (a0) uses Op5e10 ----------
@@ -38984,7 +38984,7 @@ Op5e10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e18] addq.b #7, (a0)+ uses Op5e18 ----------
@@ -39020,7 +39020,7 @@ Op5e18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e1f] addq.b #7, (a7)+ uses Op5e1f ----------
@@ -39055,7 +39055,7 @@ Op5e1f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e20] addq.b #7, -(a0) uses Op5e20 ----------
@@ -39092,7 +39092,7 @@ Op5e20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e27] addq.b #7, -(a7) uses Op5e27 ----------
@@ -39127,7 +39127,7 @@ Op5e27:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e28] addq.b #7, ($3333,a0) uses Op5e28 ----------
@@ -39163,7 +39163,7 @@ Op5e28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e30] addq.b #7, ($33,a0,d3.w*2) uses Op5e30 ----------
@@ -39208,7 +39208,7 @@ Op5e30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e38] addq.b #7, $3333.w uses Op5e38 ----------
@@ -39241,7 +39241,7 @@ Op5e38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e39] addq.b #7, $33333333.l uses Op5e39 ----------
@@ -39276,7 +39276,7 @@ Op5e39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e40] addq.w #7, d0 uses Op5e40 ----------
@@ -39301,7 +39301,7 @@ Op5e40:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e48] addq.w #7, a0 uses Op5e48 ----------
@@ -39320,7 +39320,7 @@ Op5e48:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e50] addq.w #7, (a0) uses Op5e50 ----------
@@ -39355,7 +39355,7 @@ Op5e50:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e58] addq.w #7, (a0)+ uses Op5e58 ----------
@@ -39391,7 +39391,7 @@ Op5e58:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e60] addq.w #7, -(a0) uses Op5e60 ----------
@@ -39428,7 +39428,7 @@ Op5e60:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e68] addq.w #7, ($3333,a0) uses Op5e68 ----------
@@ -39464,7 +39464,7 @@ Op5e68:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e70] addq.w #7, ($33,a0,d3.w*2) uses Op5e70 ----------
@@ -39509,7 +39509,7 @@ Op5e70:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e78] addq.w #7, $3333.w uses Op5e78 ----------
@@ -39542,7 +39542,7 @@ Op5e78:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e79] addq.w #7, $33333333.l uses Op5e79 ----------
@@ -39577,7 +39577,7 @@ Op5e79:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e80] addq.l #7, d0 uses Op5e80 ----------
@@ -39598,7 +39598,7 @@ Op5e80:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e88] addq.l #7, a0 uses Op5e88 ----------
@@ -39617,7 +39617,7 @@ Op5e88:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e90] addq.l #7, (a0) uses Op5e90 ----------
@@ -39649,7 +39649,7 @@ Op5e90:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5e98] addq.l #7, (a0)+ uses Op5e98 ----------
@@ -39682,7 +39682,7 @@ Op5e98:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ea0] addq.l #7, -(a0) uses Op5ea0 ----------
@@ -39716,7 +39716,7 @@ Op5ea0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ea8] addq.l #7, ($3333,a0) uses Op5ea8 ----------
@@ -39749,7 +39749,7 @@ Op5ea8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5eb0] addq.l #7, ($33,a0,d3.w*2) uses Op5eb0 ----------
@@ -39791,7 +39791,7 @@ Op5eb0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5eb8] addq.l #7, $3333.w uses Op5eb8 ----------
@@ -39821,7 +39821,7 @@ Op5eb8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5eb9] addq.l #7, $33333333.l uses Op5eb9 ----------
@@ -39853,7 +39853,7 @@ Op5eb9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ec0] sgt d0 uses Op5ec0 ----------
@@ -39871,7 +39871,7 @@ Op5ec0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ec8] dbgt d0, 3335 uses Op5ec8 ----------
@@ -39904,7 +39904,7 @@ Op5ec8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ed0] sgt (a0) uses Op5ed0 ----------
@@ -39930,7 +39930,7 @@ Op5ed0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ed8] sgt (a0)+ uses Op5ed8 ----------
@@ -39957,7 +39957,7 @@ Op5ed8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5edf] sgt (a7)+ uses Op5edf ----------
@@ -39983,7 +39983,7 @@ Op5edf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ee0] sgt -(a0) uses Op5ee0 ----------
@@ -40011,7 +40011,7 @@ Op5ee0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ee7] sgt -(a7) uses Op5ee7 ----------
@@ -40037,7 +40037,7 @@ Op5ee7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ee8] sgt ($3333,a0) uses Op5ee8 ----------
@@ -40064,7 +40064,7 @@ Op5ee8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ef0] sgt ($33,a0,d3.w*2) uses Op5ef0 ----------
@@ -40100,7 +40100,7 @@ Op5ef0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ef8] sgt $3333.w uses Op5ef8 ----------
@@ -40124,7 +40124,7 @@ Op5ef8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ef9] sgt $33333333.l uses Op5ef9 ----------
@@ -40150,7 +40150,7 @@ Op5ef9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f00] subq.b #7, d0 uses Op5f00 ----------
@@ -40175,7 +40175,7 @@ Op5f00:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f10] subq.b #7, (a0) uses Op5f10 ----------
@@ -40211,7 +40211,7 @@ Op5f10:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f18] subq.b #7, (a0)+ uses Op5f18 ----------
@@ -40248,7 +40248,7 @@ Op5f18:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f1f] subq.b #7, (a7)+ uses Op5f1f ----------
@@ -40284,7 +40284,7 @@ Op5f1f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f20] subq.b #7, -(a0) uses Op5f20 ----------
@@ -40322,7 +40322,7 @@ Op5f20:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f27] subq.b #7, -(a7) uses Op5f27 ----------
@@ -40358,7 +40358,7 @@ Op5f27:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f28] subq.b #7, ($3333,a0) uses Op5f28 ----------
@@ -40395,7 +40395,7 @@ Op5f28:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f30] subq.b #7, ($33,a0,d3.w*2) uses Op5f30 ----------
@@ -40441,7 +40441,7 @@ Op5f30:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f38] subq.b #7, $3333.w uses Op5f38 ----------
@@ -40475,7 +40475,7 @@ Op5f38:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f39] subq.b #7, $33333333.l uses Op5f39 ----------
@@ -40511,7 +40511,7 @@ Op5f39:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f40] subq.w #7, d0 uses Op5f40 ----------
@@ -40537,7 +40537,7 @@ Op5f40:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f48] subq.w #7, a0 uses Op5f48 ----------
@@ -40556,7 +40556,7 @@ Op5f48:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f50] subq.w #7, (a0) uses Op5f50 ----------
@@ -40592,7 +40592,7 @@ Op5f50:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f58] subq.w #7, (a0)+ uses Op5f58 ----------
@@ -40629,7 +40629,7 @@ Op5f58:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f60] subq.w #7, -(a0) uses Op5f60 ----------
@@ -40667,7 +40667,7 @@ Op5f60:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f68] subq.w #7, ($3333,a0) uses Op5f68 ----------
@@ -40704,7 +40704,7 @@ Op5f68:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f70] subq.w #7, ($33,a0,d3.w*2) uses Op5f70 ----------
@@ -40750,7 +40750,7 @@ Op5f70:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f78] subq.w #7, $3333.w uses Op5f78 ----------
@@ -40784,7 +40784,7 @@ Op5f78:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f79] subq.w #7, $33333333.l uses Op5f79 ----------
@@ -40820,7 +40820,7 @@ Op5f79:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f80] subq.l #7, d0 uses Op5f80 ----------
@@ -40842,7 +40842,7 @@ Op5f80:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f88] subq.l #7, a0 uses Op5f88 ----------
@@ -40861,7 +40861,7 @@ Op5f88:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f90] subq.l #7, (a0) uses Op5f90 ----------
@@ -40894,7 +40894,7 @@ Op5f90:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5f98] subq.l #7, (a0)+ uses Op5f98 ----------
@@ -40928,7 +40928,7 @@ Op5f98:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fa0] subq.l #7, -(a0) uses Op5fa0 ----------
@@ -40963,7 +40963,7 @@ Op5fa0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fa8] subq.l #7, ($3333,a0) uses Op5fa8 ----------
@@ -40997,7 +40997,7 @@ Op5fa8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fb0] subq.l #7, ($33,a0,d3.w*2) uses Op5fb0 ----------
@@ -41040,7 +41040,7 @@ Op5fb0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fb8] subq.l #7, $3333.w uses Op5fb8 ----------
@@ -41071,7 +41071,7 @@ Op5fb8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fb9] subq.l #7, $33333333.l uses Op5fb9 ----------
@@ -41104,7 +41104,7 @@ Op5fb9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fc0] sle d0 uses Op5fc0 ----------
@@ -41122,7 +41122,7 @@ Op5fc0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fc8] dble d0, 3335 uses Op5fc8 ----------
@@ -41155,7 +41155,7 @@ Op5fc8:
   bne ExceptionAddressError_r_prg_r4
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fd0] sle (a0) uses Op5fd0 ----------
@@ -41181,7 +41181,7 @@ Op5fd0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fd8] sle (a0)+ uses Op5fd8 ----------
@@ -41208,7 +41208,7 @@ Op5fd8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fdf] sle (a7)+ uses Op5fdf ----------
@@ -41234,7 +41234,7 @@ Op5fdf:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fe0] sle -(a0) uses Op5fe0 ----------
@@ -41262,7 +41262,7 @@ Op5fe0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fe7] sle -(a7) uses Op5fe7 ----------
@@ -41288,7 +41288,7 @@ Op5fe7:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5fe8] sle ($3333,a0) uses Op5fe8 ----------
@@ -41315,7 +41315,7 @@ Op5fe8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ff0] sle ($33,a0,d3.w*2) uses Op5ff0 ----------
@@ -41351,7 +41351,7 @@ Op5ff0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ff8] sle $3333.w uses Op5ff8 ----------
@@ -41375,7 +41375,7 @@ Op5ff8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [5ff9] sle $33333333.l uses Op5ff9 ----------
@@ -41401,7 +41401,7 @@ Op5ff9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6000] bra 3335 uses Op6000 ----------
@@ -41423,7 +41423,7 @@ Op6000:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6001] bra 3 uses Op6001 ----------
@@ -41438,7 +41438,7 @@ Op6001:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6100] bsr 3335 uses Op6100 ----------
@@ -41474,7 +41474,7 @@ Op6100:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6101] bsr 3 uses Op6101 ----------
@@ -41502,7 +41502,7 @@ Op6101:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6200] bhi 3335 uses Op6200 ----------
@@ -41527,14 +41527,14 @@ Op6200:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 BccDontBranch16:
   add r4,r4,#2
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6201] bhi 3 uses Op6201 ----------
@@ -41552,13 +41552,13 @@ Op6201:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 BccDontBranch8:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6300] bls 3335 uses Op6300 ----------
@@ -41583,7 +41583,7 @@ Op6300:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6301] bls 3 uses Op6301 ----------
@@ -41601,7 +41601,7 @@ Op6301:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6400] bcc 3335 uses Op6400 ----------
@@ -41627,7 +41627,7 @@ Op6400:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6401] bcc 3 uses Op6401 ----------
@@ -41646,7 +41646,7 @@ Op6401:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6500] bcs 3335 uses Op6500 ----------
@@ -41672,7 +41672,7 @@ Op6500:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6501] bcs 3 uses Op6501 ----------
@@ -41691,7 +41691,7 @@ Op6501:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6600] bne 3335 uses Op6600 ----------
@@ -41717,7 +41717,7 @@ Op6600:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6601] bne 3 uses Op6601 ----------
@@ -41736,7 +41736,7 @@ Op6601:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6700] beq 3335 uses Op6700 ----------
@@ -41762,7 +41762,7 @@ Op6700:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6701] beq 3 uses Op6701 ----------
@@ -41781,7 +41781,7 @@ Op6701:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6800] bvc 3335 uses Op6800 ----------
@@ -41807,7 +41807,7 @@ Op6800:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6801] bvc 3 uses Op6801 ----------
@@ -41826,7 +41826,7 @@ Op6801:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6900] bvs 3335 uses Op6900 ----------
@@ -41852,7 +41852,7 @@ Op6900:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6901] bvs 3 uses Op6901 ----------
@@ -41871,7 +41871,7 @@ Op6901:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6a00] bpl 3335 uses Op6a00 ----------
@@ -41897,7 +41897,7 @@ Op6a00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6a01] bpl 3 uses Op6a01 ----------
@@ -41916,7 +41916,7 @@ Op6a01:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6b00] bmi 3335 uses Op6b00 ----------
@@ -41942,7 +41942,7 @@ Op6b00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6b01] bmi 3 uses Op6b01 ----------
@@ -41961,7 +41961,7 @@ Op6b01:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6c00] bge 3335 uses Op6c00 ----------
@@ -41987,7 +41987,7 @@ Op6c00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6c01] bge 3 uses Op6c01 ----------
@@ -42006,7 +42006,7 @@ Op6c01:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6d00] blt 3335 uses Op6d00 ----------
@@ -42032,7 +42032,7 @@ Op6d00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6d01] blt 3 uses Op6d01 ----------
@@ -42051,7 +42051,7 @@ Op6d01:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6e00] bgt 3335 uses Op6e00 ----------
@@ -42077,7 +42077,7 @@ Op6e00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6e01] bgt 3 uses Op6e01 ----------
@@ -42096,7 +42096,7 @@ Op6e01:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6f00] ble 3335 uses Op6f00 ----------
@@ -42122,7 +42122,7 @@ Op6f00:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [6f01] ble 3 uses Op6f01 ----------
@@ -42141,7 +42141,7 @@ Op6f01:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [7000] moveq #$0, d0 uses Op7000 ----------
@@ -42154,7 +42154,7 @@ Op7000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8000] or.b d0, d0 uses Op8000 ----------
@@ -42182,7 +42182,7 @@ Op8000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8010] or.b (a0), d0 uses Op8010 ----------
@@ -42219,7 +42219,7 @@ Op8010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8018] or.b (a0)+, d0 uses Op8018 ----------
@@ -42257,7 +42257,7 @@ Op8018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [801f] or.b (a7)+, d0 uses Op801f ----------
@@ -42294,7 +42294,7 @@ Op801f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8020] or.b -(a0), d0 uses Op8020 ----------
@@ -42333,7 +42333,7 @@ Op8020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8027] or.b -(a7), d0 uses Op8027 ----------
@@ -42370,7 +42370,7 @@ Op8027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8028] or.b ($3333,a0), d0 uses Op8028 ----------
@@ -42408,7 +42408,7 @@ Op8028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8030] or.b ($33,a0,d3.w*2), d0 uses Op8030 ----------
@@ -42455,7 +42455,7 @@ Op8030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8038] or.b $3333.w, d0 uses Op8038 ----------
@@ -42490,7 +42490,7 @@ Op8038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8039] or.b $33333333.l, d0 uses Op8039 ----------
@@ -42527,7 +42527,7 @@ Op8039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [803a] or.b ($3333,pc), d0; =3335 uses Op803a ----------
@@ -42566,7 +42566,7 @@ Op803a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [803b] or.b ($33,pc,d3.w*2), d0; =35 uses Op803b ----------
@@ -42613,7 +42613,7 @@ Op803b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [803c] or.b #$33, d0 uses Op803c ----------
@@ -42640,7 +42640,7 @@ Op803c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8040] or.w d0, d0 uses Op8040 ----------
@@ -42669,7 +42669,7 @@ Op8040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8050] or.w (a0), d0 uses Op8050 ----------
@@ -42707,7 +42707,7 @@ Op8050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8058] or.w (a0)+, d0 uses Op8058 ----------
@@ -42746,7 +42746,7 @@ Op8058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8060] or.w -(a0), d0 uses Op8060 ----------
@@ -42786,7 +42786,7 @@ Op8060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8068] or.w ($3333,a0), d0 uses Op8068 ----------
@@ -42825,7 +42825,7 @@ Op8068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8070] or.w ($33,a0,d3.w*2), d0 uses Op8070 ----------
@@ -42873,7 +42873,7 @@ Op8070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8078] or.w $3333.w, d0 uses Op8078 ----------
@@ -42909,7 +42909,7 @@ Op8078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8079] or.w $33333333.l, d0 uses Op8079 ----------
@@ -42947,7 +42947,7 @@ Op8079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [807a] or.w ($3333,pc), d0; =3335 uses Op807a ----------
@@ -42987,7 +42987,7 @@ Op807a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [807b] or.w ($33,pc,d3.w*2), d0; =35 uses Op807b ----------
@@ -43035,7 +43035,7 @@ Op807b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [807c] or.w #$3333, d0 uses Op807c ----------
@@ -43063,7 +43063,7 @@ Op807c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8080] or.l d0, d0 uses Op8080 ----------
@@ -43089,7 +43089,7 @@ Op8080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8090] or.l (a0), d0 uses Op8090 ----------
@@ -43124,7 +43124,7 @@ Op8090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8098] or.l (a0)+, d0 uses Op8098 ----------
@@ -43160,7 +43160,7 @@ Op8098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80a0] or.l -(a0), d0 uses Op80a0 ----------
@@ -43197,7 +43197,7 @@ Op80a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80a8] or.l ($3333,a0), d0 uses Op80a8 ----------
@@ -43233,7 +43233,7 @@ Op80a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80b0] or.l ($33,a0,d3.w*2), d0 uses Op80b0 ----------
@@ -43278,7 +43278,7 @@ Op80b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80b8] or.l $3333.w, d0 uses Op80b8 ----------
@@ -43311,7 +43311,7 @@ Op80b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80b9] or.l $33333333.l, d0 uses Op80b9 ----------
@@ -43346,7 +43346,7 @@ Op80b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80ba] or.l ($3333,pc), d0; =3335 uses Op80ba ----------
@@ -43383,7 +43383,7 @@ Op80ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80bb] or.l ($33,pc,d3.w*2), d0; =35 uses Op80bb ----------
@@ -43428,7 +43428,7 @@ Op80bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80bc] or.l #$33333333, d0 uses Op80bc ----------
@@ -43455,7 +43455,7 @@ Op80bc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [80c0] divu.w d0, d0 uses Op80c0 ----------
@@ -43510,7 +43510,7 @@ Divide80c0:
 endofop80c0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#140 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80c0:
@@ -43518,7 +43518,7 @@ divzero80c0:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#178 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -43583,7 +43583,7 @@ endofop80d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#144 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80d0:
@@ -43592,7 +43592,7 @@ divzero80d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#182 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -43658,7 +43658,7 @@ endofop80d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#144 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80d8:
@@ -43667,7 +43667,7 @@ divzero80d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#182 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -43734,7 +43734,7 @@ endofop80e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#146 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80e0:
@@ -43743,7 +43743,7 @@ divzero80e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#184 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -43809,7 +43809,7 @@ endofop80e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#148 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80e8:
@@ -43818,7 +43818,7 @@ divzero80e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#186 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -43893,7 +43893,7 @@ endofop80f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#150 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80f0:
@@ -43902,7 +43902,7 @@ divzero80f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#188 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -43965,7 +43965,7 @@ endofop80f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#148 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80f8:
@@ -43974,7 +43974,7 @@ divzero80f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#186 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -44039,7 +44039,7 @@ endofop80f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#152 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80f9:
@@ -44048,7 +44048,7 @@ divzero80f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#190 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -44115,7 +44115,7 @@ endofop80fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#148 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80fa:
@@ -44124,7 +44124,7 @@ divzero80fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#186 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -44199,7 +44199,7 @@ endofop80fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#150 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80fb:
@@ -44208,7 +44208,7 @@ divzero80fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#188 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -44263,7 +44263,7 @@ Divide80fc:
 endofop80fc:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#144 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero80fc:
@@ -44271,7 +44271,7 @@ divzero80fc:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#182 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -44318,7 +44318,7 @@ Op8100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8108] sbcd -(a0), -(a0) uses Op8108 ----------
@@ -44382,7 +44382,7 @@ Op8108:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [810f] sbcd -(a7), -(a0) uses Op810f ----------
@@ -44445,7 +44445,7 @@ Op810f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8110] or.b d0, (a0) uses Op8110 ----------
@@ -44484,7 +44484,7 @@ Op8110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8118] or.b d0, (a0)+ uses Op8118 ----------
@@ -44524,7 +44524,7 @@ Op8118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [811f] or.b d0, (a7)+ uses Op811f ----------
@@ -44563,7 +44563,7 @@ Op811f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8120] or.b d0, -(a0) uses Op8120 ----------
@@ -44604,7 +44604,7 @@ Op8120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8127] or.b d0, -(a7) uses Op8127 ----------
@@ -44643,7 +44643,7 @@ Op8127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8128] or.b d0, ($3333,a0) uses Op8128 ----------
@@ -44683,7 +44683,7 @@ Op8128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8130] or.b d0, ($33,a0,d3.w*2) uses Op8130 ----------
@@ -44732,7 +44732,7 @@ Op8130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8138] or.b d0, $3333.w uses Op8138 ----------
@@ -44769,7 +44769,7 @@ Op8138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8139] or.b d0, $33333333.l uses Op8139 ----------
@@ -44808,7 +44808,7 @@ Op8139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8150] or.w d0, (a0) uses Op8150 ----------
@@ -44847,7 +44847,7 @@ Op8150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8158] or.w d0, (a0)+ uses Op8158 ----------
@@ -44887,7 +44887,7 @@ Op8158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8160] or.w d0, -(a0) uses Op8160 ----------
@@ -44928,7 +44928,7 @@ Op8160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8168] or.w d0, ($3333,a0) uses Op8168 ----------
@@ -44968,7 +44968,7 @@ Op8168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8170] or.w d0, ($33,a0,d3.w*2) uses Op8170 ----------
@@ -45017,7 +45017,7 @@ Op8170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8178] or.w d0, $3333.w uses Op8178 ----------
@@ -45054,7 +45054,7 @@ Op8178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8179] or.w d0, $33333333.l uses Op8179 ----------
@@ -45093,7 +45093,7 @@ Op8179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8190] or.l d0, (a0) uses Op8190 ----------
@@ -45130,7 +45130,7 @@ Op8190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8198] or.l d0, (a0)+ uses Op8198 ----------
@@ -45168,7 +45168,7 @@ Op8198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [81a0] or.l d0, -(a0) uses Op81a0 ----------
@@ -45207,7 +45207,7 @@ Op81a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [81a8] or.l d0, ($3333,a0) uses Op81a8 ----------
@@ -45245,7 +45245,7 @@ Op81a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [81b0] or.l d0, ($33,a0,d3.w*2) uses Op81b0 ----------
@@ -45292,7 +45292,7 @@ Op81b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [81b8] or.l d0, $3333.w uses Op81b8 ----------
@@ -45327,7 +45327,7 @@ Op81b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [81b9] or.l d0, $33333333.l uses Op81b9 ----------
@@ -45364,7 +45364,7 @@ Op81b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [81c0] divs.w d0, d0 uses Op81c0 ----------
@@ -45439,7 +45439,7 @@ wrendofop81c0:
 endofop81c0:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#158 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81c0:
@@ -45447,7 +45447,7 @@ divzero81c0:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#196 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -45532,7 +45532,7 @@ endofop81d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#162 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81d0:
@@ -45541,7 +45541,7 @@ divzero81d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#200 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -45627,7 +45627,7 @@ endofop81d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#162 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81d8:
@@ -45636,7 +45636,7 @@ divzero81d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#200 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -45723,7 +45723,7 @@ endofop81e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#164 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81e0:
@@ -45732,7 +45732,7 @@ divzero81e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#202 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -45818,7 +45818,7 @@ endofop81e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#166 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81e8:
@@ -45827,7 +45827,7 @@ divzero81e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#204 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -45922,7 +45922,7 @@ endofop81f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#168 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81f0:
@@ -45931,7 +45931,7 @@ divzero81f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#206 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -46014,7 +46014,7 @@ endofop81f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#166 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81f8:
@@ -46023,7 +46023,7 @@ divzero81f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#204 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -46108,7 +46108,7 @@ endofop81f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#170 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81f9:
@@ -46117,7 +46117,7 @@ divzero81f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#208 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -46204,7 +46204,7 @@ endofop81fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#166 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81fa:
@@ -46213,7 +46213,7 @@ divzero81fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#204 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -46308,7 +46308,7 @@ endofop81fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#168 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81fb:
@@ -46317,7 +46317,7 @@ divzero81fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#206 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -46392,7 +46392,7 @@ wrendofop81fc:
 endofop81fc:
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#162 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 divzero81fc:
@@ -46400,7 +46400,7 @@ divzero81fc:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#200 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 
@@ -46463,7 +46463,7 @@ Op8f08:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [8f0f] sbcd -(a7), -(a7) uses Op8f0f ----------
@@ -46524,7 +46524,7 @@ Op8f0f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9000] sub.b d0, d0 uses Op9000 ----------
@@ -46553,7 +46553,7 @@ Op9000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9010] sub.b (a0), d0 uses Op9010 ----------
@@ -46591,7 +46591,7 @@ Op9010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9018] sub.b (a0)+, d0 uses Op9018 ----------
@@ -46630,7 +46630,7 @@ Op9018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [901f] sub.b (a7)+, d0 uses Op901f ----------
@@ -46668,7 +46668,7 @@ Op901f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9020] sub.b -(a0), d0 uses Op9020 ----------
@@ -46708,7 +46708,7 @@ Op9020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9027] sub.b -(a7), d0 uses Op9027 ----------
@@ -46746,7 +46746,7 @@ Op9027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9028] sub.b ($3333,a0), d0 uses Op9028 ----------
@@ -46785,7 +46785,7 @@ Op9028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9030] sub.b ($33,a0,d3.w*2), d0 uses Op9030 ----------
@@ -46833,7 +46833,7 @@ Op9030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9038] sub.b $3333.w, d0 uses Op9038 ----------
@@ -46869,7 +46869,7 @@ Op9038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9039] sub.b $33333333.l, d0 uses Op9039 ----------
@@ -46907,7 +46907,7 @@ Op9039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [903a] sub.b ($3333,pc), d0; =3335 uses Op903a ----------
@@ -46947,7 +46947,7 @@ Op903a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [903b] sub.b ($33,pc,d3.w*2), d0; =35 uses Op903b ----------
@@ -46995,7 +46995,7 @@ Op903b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [903c] sub.b #$33, d0 uses Op903c ----------
@@ -47023,7 +47023,7 @@ Op903c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9040] sub.w d0, d0 uses Op9040 ----------
@@ -47053,7 +47053,7 @@ Op9040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9050] sub.w (a0), d0 uses Op9050 ----------
@@ -47092,7 +47092,7 @@ Op9050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9058] sub.w (a0)+, d0 uses Op9058 ----------
@@ -47132,7 +47132,7 @@ Op9058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9060] sub.w -(a0), d0 uses Op9060 ----------
@@ -47173,7 +47173,7 @@ Op9060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9068] sub.w ($3333,a0), d0 uses Op9068 ----------
@@ -47213,7 +47213,7 @@ Op9068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9070] sub.w ($33,a0,d3.w*2), d0 uses Op9070 ----------
@@ -47262,7 +47262,7 @@ Op9070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9078] sub.w $3333.w, d0 uses Op9078 ----------
@@ -47299,7 +47299,7 @@ Op9078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9079] sub.w $33333333.l, d0 uses Op9079 ----------
@@ -47338,7 +47338,7 @@ Op9079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [907a] sub.w ($3333,pc), d0; =3335 uses Op907a ----------
@@ -47379,7 +47379,7 @@ Op907a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [907b] sub.w ($33,pc,d3.w*2), d0; =35 uses Op907b ----------
@@ -47428,7 +47428,7 @@ Op907b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [907c] sub.w #$3333, d0 uses Op907c ----------
@@ -47457,7 +47457,7 @@ Op907c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9080] sub.l d0, d0 uses Op9080 ----------
@@ -47484,7 +47484,7 @@ Op9080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9090] sub.l (a0), d0 uses Op9090 ----------
@@ -47520,7 +47520,7 @@ Op9090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9098] sub.l (a0)+, d0 uses Op9098 ----------
@@ -47557,7 +47557,7 @@ Op9098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90a0] sub.l -(a0), d0 uses Op90a0 ----------
@@ -47595,7 +47595,7 @@ Op90a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90a8] sub.l ($3333,a0), d0 uses Op90a8 ----------
@@ -47632,7 +47632,7 @@ Op90a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90b0] sub.l ($33,a0,d3.w*2), d0 uses Op90b0 ----------
@@ -47678,7 +47678,7 @@ Op90b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90b8] sub.l $3333.w, d0 uses Op90b8 ----------
@@ -47712,7 +47712,7 @@ Op90b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90b9] sub.l $33333333.l, d0 uses Op90b9 ----------
@@ -47748,7 +47748,7 @@ Op90b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90ba] sub.l ($3333,pc), d0; =3335 uses Op90ba ----------
@@ -47786,7 +47786,7 @@ Op90ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90bb] sub.l ($33,pc,d3.w*2), d0; =35 uses Op90bb ----------
@@ -47832,7 +47832,7 @@ Op90bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90bc] sub.l #$33333333, d0 uses Op90bc ----------
@@ -47860,7 +47860,7 @@ Op90bc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90c0] suba.w d0, a0 uses Op90c0 ----------
@@ -47884,7 +47884,7 @@ Op90c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90d0] suba.w (a0), a0 uses Op90d0 ----------
@@ -47917,7 +47917,7 @@ Op90d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90d8] suba.w (a0)+, a0 uses Op90d8 ----------
@@ -47951,7 +47951,7 @@ Op90d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90e0] suba.w -(a0), a0 uses Op90e0 ----------
@@ -47986,7 +47986,7 @@ Op90e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90e8] suba.w ($3333,a0), a0 uses Op90e8 ----------
@@ -48020,7 +48020,7 @@ Op90e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90f0] suba.w ($33,a0,d3.w*2), a0 uses Op90f0 ----------
@@ -48063,7 +48063,7 @@ Op90f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90f8] suba.w $3333.w, a0 uses Op90f8 ----------
@@ -48094,7 +48094,7 @@ Op90f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90f9] suba.w $33333333.l, a0 uses Op90f9 ----------
@@ -48127,7 +48127,7 @@ Op90f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90fa] suba.w ($3333,pc), a0; =3335 uses Op90fa ----------
@@ -48162,7 +48162,7 @@ Op90fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90fb] suba.w ($33,pc,d3.w*2), a0; =35 uses Op90fb ----------
@@ -48205,7 +48205,7 @@ Op90fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [90fc] suba.w #$3333, a0 uses Op90fc ----------
@@ -48228,7 +48228,7 @@ Op90fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9100] subx.b d0, d0 uses Op9100 ----------
@@ -48268,7 +48268,7 @@ Op9100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9108] subx.b -(a0), -(a0) uses Op9108 ----------
@@ -48324,7 +48324,7 @@ Op9108:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [910f] subx.b -(a7), -(a0) uses Op910f ----------
@@ -48379,7 +48379,7 @@ Op910f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9110] sub.b d0, (a0) uses Op9110 ----------
@@ -48419,7 +48419,7 @@ Op9110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9118] sub.b d0, (a0)+ uses Op9118 ----------
@@ -48460,7 +48460,7 @@ Op9118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [911f] sub.b d0, (a7)+ uses Op911f ----------
@@ -48500,7 +48500,7 @@ Op911f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9120] sub.b d0, -(a0) uses Op9120 ----------
@@ -48542,7 +48542,7 @@ Op9120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9127] sub.b d0, -(a7) uses Op9127 ----------
@@ -48582,7 +48582,7 @@ Op9127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9128] sub.b d0, ($3333,a0) uses Op9128 ----------
@@ -48623,7 +48623,7 @@ Op9128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9130] sub.b d0, ($33,a0,d3.w*2) uses Op9130 ----------
@@ -48673,7 +48673,7 @@ Op9130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9138] sub.b d0, $3333.w uses Op9138 ----------
@@ -48711,7 +48711,7 @@ Op9138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9139] sub.b d0, $33333333.l uses Op9139 ----------
@@ -48751,7 +48751,7 @@ Op9139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9140] subx.w d0, d0 uses Op9140 ----------
@@ -48792,7 +48792,7 @@ Op9140:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9148] subx.w -(a0), -(a0) uses Op9148 ----------
@@ -48848,7 +48848,7 @@ Op9148:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9150] sub.w d0, (a0) uses Op9150 ----------
@@ -48888,7 +48888,7 @@ Op9150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9158] sub.w d0, (a0)+ uses Op9158 ----------
@@ -48929,7 +48929,7 @@ Op9158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9160] sub.w d0, -(a0) uses Op9160 ----------
@@ -48971,7 +48971,7 @@ Op9160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9168] sub.w d0, ($3333,a0) uses Op9168 ----------
@@ -49012,7 +49012,7 @@ Op9168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9170] sub.w d0, ($33,a0,d3.w*2) uses Op9170 ----------
@@ -49062,7 +49062,7 @@ Op9170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9178] sub.w d0, $3333.w uses Op9178 ----------
@@ -49100,7 +49100,7 @@ Op9178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9179] sub.w d0, $33333333.l uses Op9179 ----------
@@ -49140,7 +49140,7 @@ Op9179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9180] subx.l d0, d0 uses Op9180 ----------
@@ -49175,7 +49175,7 @@ Op9180:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9188] subx.l -(a0), -(a0) uses Op9188 ----------
@@ -49228,7 +49228,7 @@ Op9188:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9190] sub.l d0, (a0) uses Op9190 ----------
@@ -49266,7 +49266,7 @@ Op9190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9198] sub.l d0, (a0)+ uses Op9198 ----------
@@ -49305,7 +49305,7 @@ Op9198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91a0] sub.l d0, -(a0) uses Op91a0 ----------
@@ -49345,7 +49345,7 @@ Op91a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91a8] sub.l d0, ($3333,a0) uses Op91a8 ----------
@@ -49384,7 +49384,7 @@ Op91a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91b0] sub.l d0, ($33,a0,d3.w*2) uses Op91b0 ----------
@@ -49432,7 +49432,7 @@ Op91b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91b8] sub.l d0, $3333.w uses Op91b8 ----------
@@ -49468,7 +49468,7 @@ Op91b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91b9] sub.l d0, $33333333.l uses Op91b9 ----------
@@ -49506,7 +49506,7 @@ Op91b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91c0] suba.l d0, a0 uses Op91c0 ----------
@@ -49528,7 +49528,7 @@ Op91c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91d0] suba.l (a0), a0 uses Op91d0 ----------
@@ -49559,7 +49559,7 @@ Op91d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91d8] suba.l (a0)+, a0 uses Op91d8 ----------
@@ -49591,7 +49591,7 @@ Op91d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91e0] suba.l -(a0), a0 uses Op91e0 ----------
@@ -49624,7 +49624,7 @@ Op91e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91e8] suba.l ($3333,a0), a0 uses Op91e8 ----------
@@ -49656,7 +49656,7 @@ Op91e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91f0] suba.l ($33,a0,d3.w*2), a0 uses Op91f0 ----------
@@ -49697,7 +49697,7 @@ Op91f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91f8] suba.l $3333.w, a0 uses Op91f8 ----------
@@ -49726,7 +49726,7 @@ Op91f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91f9] suba.l $33333333.l, a0 uses Op91f9 ----------
@@ -49757,7 +49757,7 @@ Op91f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91fa] suba.l ($3333,pc), a0; =3335 uses Op91fa ----------
@@ -49790,7 +49790,7 @@ Op91fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91fb] suba.l ($33,pc,d3.w*2), a0; =35 uses Op91fb ----------
@@ -49831,7 +49831,7 @@ Op91fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [91fc] suba.l #$33333333, a0 uses Op91fc ----------
@@ -49854,7 +49854,7 @@ Op91fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9f08] subx.b -(a0), -(a7) uses Op9f08 ----------
@@ -49909,7 +49909,7 @@ Op9f08:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [9f0f] subx.b -(a7), -(a7) uses Op9f0f ----------
@@ -49963,7 +49963,7 @@ Op9f0f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b000] cmp.b d0, d0 uses Opb000 ----------
@@ -49989,7 +49989,7 @@ Opb000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b010] cmp.b (a0), d0 uses Opb010 ----------
@@ -50024,7 +50024,7 @@ Opb010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b018] cmp.b (a0)+, d0 uses Opb018 ----------
@@ -50060,7 +50060,7 @@ Opb018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b01f] cmp.b (a7)+, d0 uses Opb01f ----------
@@ -50095,7 +50095,7 @@ Opb01f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b020] cmp.b -(a0), d0 uses Opb020 ----------
@@ -50132,7 +50132,7 @@ Opb020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b027] cmp.b -(a7), d0 uses Opb027 ----------
@@ -50167,7 +50167,7 @@ Opb027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b028] cmp.b ($3333,a0), d0 uses Opb028 ----------
@@ -50203,7 +50203,7 @@ Opb028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b030] cmp.b ($33,a0,d3.w*2), d0 uses Opb030 ----------
@@ -50248,7 +50248,7 @@ Opb030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b038] cmp.b $3333.w, d0 uses Opb038 ----------
@@ -50281,7 +50281,7 @@ Opb038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b039] cmp.b $33333333.l, d0 uses Opb039 ----------
@@ -50316,7 +50316,7 @@ Opb039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b03a] cmp.b ($3333,pc), d0; =3335 uses Opb03a ----------
@@ -50353,7 +50353,7 @@ Opb03a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b03b] cmp.b ($33,pc,d3.w*2), d0; =35 uses Opb03b ----------
@@ -50398,7 +50398,7 @@ Opb03b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b03c] cmp.b #$33, d0 uses Opb03c ----------
@@ -50423,7 +50423,7 @@ Opb03c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b040] cmp.w d0, d0 uses Opb040 ----------
@@ -50449,7 +50449,7 @@ Opb040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b050] cmp.w (a0), d0 uses Opb050 ----------
@@ -50484,7 +50484,7 @@ Opb050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b058] cmp.w (a0)+, d0 uses Opb058 ----------
@@ -50520,7 +50520,7 @@ Opb058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b060] cmp.w -(a0), d0 uses Opb060 ----------
@@ -50557,7 +50557,7 @@ Opb060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b068] cmp.w ($3333,a0), d0 uses Opb068 ----------
@@ -50593,7 +50593,7 @@ Opb068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b070] cmp.w ($33,a0,d3.w*2), d0 uses Opb070 ----------
@@ -50638,7 +50638,7 @@ Opb070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b078] cmp.w $3333.w, d0 uses Opb078 ----------
@@ -50671,7 +50671,7 @@ Opb078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b079] cmp.w $33333333.l, d0 uses Opb079 ----------
@@ -50706,7 +50706,7 @@ Opb079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b07a] cmp.w ($3333,pc), d0; =3335 uses Opb07a ----------
@@ -50743,7 +50743,7 @@ Opb07a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b07b] cmp.w ($33,pc,d3.w*2), d0; =35 uses Opb07b ----------
@@ -50788,7 +50788,7 @@ Opb07b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b07c] cmp.w #$3333, d0 uses Opb07c ----------
@@ -50813,7 +50813,7 @@ Opb07c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b080] cmp.l d0, d0 uses Opb080 ----------
@@ -50837,7 +50837,7 @@ Opb080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b090] cmp.l (a0), d0 uses Opb090 ----------
@@ -50870,7 +50870,7 @@ Opb090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b098] cmp.l (a0)+, d0 uses Opb098 ----------
@@ -50904,7 +50904,7 @@ Opb098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0a0] cmp.l -(a0), d0 uses Opb0a0 ----------
@@ -50939,7 +50939,7 @@ Opb0a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0a8] cmp.l ($3333,a0), d0 uses Opb0a8 ----------
@@ -50973,7 +50973,7 @@ Opb0a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0b0] cmp.l ($33,a0,d3.w*2), d0 uses Opb0b0 ----------
@@ -51016,7 +51016,7 @@ Opb0b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0b8] cmp.l $3333.w, d0 uses Opb0b8 ----------
@@ -51047,7 +51047,7 @@ Opb0b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0b9] cmp.l $33333333.l, d0 uses Opb0b9 ----------
@@ -51080,7 +51080,7 @@ Opb0b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0ba] cmp.l ($3333,pc), d0; =3335 uses Opb0ba ----------
@@ -51115,7 +51115,7 @@ Opb0ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0bb] cmp.l ($33,pc,d3.w*2), d0; =35 uses Opb0bb ----------
@@ -51158,7 +51158,7 @@ Opb0bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0bc] cmp.l #$33333333, d0 uses Opb0bc ----------
@@ -51183,7 +51183,7 @@ Opb0bc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0c0] cmpa.w d0, a0 uses Opb0c0 ----------
@@ -51206,7 +51206,7 @@ Opb0c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0d0] cmpa.w (a0), a0 uses Opb0d0 ----------
@@ -51238,7 +51238,7 @@ Opb0d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0d8] cmpa.w (a0)+, a0 uses Opb0d8 ----------
@@ -51271,7 +51271,7 @@ Opb0d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0e0] cmpa.w -(a0), a0 uses Opb0e0 ----------
@@ -51305,7 +51305,7 @@ Opb0e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0e8] cmpa.w ($3333,a0), a0 uses Opb0e8 ----------
@@ -51338,7 +51338,7 @@ Opb0e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0f0] cmpa.w ($33,a0,d3.w*2), a0 uses Opb0f0 ----------
@@ -51380,7 +51380,7 @@ Opb0f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0f8] cmpa.w $3333.w, a0 uses Opb0f8 ----------
@@ -51410,7 +51410,7 @@ Opb0f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0f9] cmpa.w $33333333.l, a0 uses Opb0f9 ----------
@@ -51442,7 +51442,7 @@ Opb0f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0fa] cmpa.w ($3333,pc), a0; =3335 uses Opb0fa ----------
@@ -51476,7 +51476,7 @@ Opb0fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0fb] cmpa.w ($33,pc,d3.w*2), a0; =35 uses Opb0fb ----------
@@ -51518,7 +51518,7 @@ Opb0fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b0fc] cmpa.w #$3333, a0 uses Opb0fc ----------
@@ -51540,7 +51540,7 @@ Opb0fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b100] eor.b d0, d0 uses Opb100 ----------
@@ -51570,7 +51570,7 @@ Opb100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b108] cmpm.b (a0)+, (a0)+ uses Opb108 ----------
@@ -51609,7 +51609,7 @@ Opb108:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b10f] cmpm.b (a7)+, (a0)+ uses Opb10f ----------
@@ -51647,7 +51647,7 @@ Opb10f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b110] eor.b d0, (a0) uses Opb110 ----------
@@ -51688,7 +51688,7 @@ Opb110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b118] eor.b d0, (a0)+ uses Opb118 ----------
@@ -51730,7 +51730,7 @@ Opb118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b11f] eor.b d0, (a7)+ uses Opb11f ----------
@@ -51771,7 +51771,7 @@ Opb11f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b120] eor.b d0, -(a0) uses Opb120 ----------
@@ -51814,7 +51814,7 @@ Opb120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b127] eor.b d0, -(a7) uses Opb127 ----------
@@ -51855,7 +51855,7 @@ Opb127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b128] eor.b d0, ($3333,a0) uses Opb128 ----------
@@ -51897,7 +51897,7 @@ Opb128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b130] eor.b d0, ($33,a0,d3.w*2) uses Opb130 ----------
@@ -51948,7 +51948,7 @@ Opb130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b138] eor.b d0, $3333.w uses Opb138 ----------
@@ -51987,7 +51987,7 @@ Opb138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b139] eor.b d0, $33333333.l uses Opb139 ----------
@@ -52028,7 +52028,7 @@ Opb139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b140] eor.w d0, d0 uses Opb140 ----------
@@ -52059,7 +52059,7 @@ Opb140:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b148] cmpm.w (a0)+, (a0)+ uses Opb148 ----------
@@ -52098,7 +52098,7 @@ Opb148:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b150] eor.w d0, (a0) uses Opb150 ----------
@@ -52139,7 +52139,7 @@ Opb150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b158] eor.w d0, (a0)+ uses Opb158 ----------
@@ -52181,7 +52181,7 @@ Opb158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b160] eor.w d0, -(a0) uses Opb160 ----------
@@ -52224,7 +52224,7 @@ Opb160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b168] eor.w d0, ($3333,a0) uses Opb168 ----------
@@ -52266,7 +52266,7 @@ Opb168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b170] eor.w d0, ($33,a0,d3.w*2) uses Opb170 ----------
@@ -52317,7 +52317,7 @@ Opb170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b178] eor.w d0, $3333.w uses Opb178 ----------
@@ -52356,7 +52356,7 @@ Opb178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b179] eor.w d0, $33333333.l uses Opb179 ----------
@@ -52397,7 +52397,7 @@ Opb179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b180] eor.l d0, d0 uses Opb180 ----------
@@ -52424,7 +52424,7 @@ Opb180:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b188] cmpm.l (a0)+, (a0)+ uses Opb188 ----------
@@ -52463,7 +52463,7 @@ Opb188:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b190] eor.l d0, (a0) uses Opb190 ----------
@@ -52501,7 +52501,7 @@ Opb190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b198] eor.l d0, (a0)+ uses Opb198 ----------
@@ -52540,7 +52540,7 @@ Opb198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1a0] eor.l d0, -(a0) uses Opb1a0 ----------
@@ -52580,7 +52580,7 @@ Opb1a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1a8] eor.l d0, ($3333,a0) uses Opb1a8 ----------
@@ -52619,7 +52619,7 @@ Opb1a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1b0] eor.l d0, ($33,a0,d3.w*2) uses Opb1b0 ----------
@@ -52667,7 +52667,7 @@ Opb1b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1b8] eor.l d0, $3333.w uses Opb1b8 ----------
@@ -52703,7 +52703,7 @@ Opb1b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1b9] eor.l d0, $33333333.l uses Opb1b9 ----------
@@ -52741,7 +52741,7 @@ Opb1b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1c0] cmpa.l d0, a0 uses Opb1c0 ----------
@@ -52762,7 +52762,7 @@ Opb1c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1d0] cmpa.l (a0), a0 uses Opb1d0 ----------
@@ -52792,7 +52792,7 @@ Opb1d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1d8] cmpa.l (a0)+, a0 uses Opb1d8 ----------
@@ -52823,7 +52823,7 @@ Opb1d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1e0] cmpa.l -(a0), a0 uses Opb1e0 ----------
@@ -52855,7 +52855,7 @@ Opb1e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1e8] cmpa.l ($3333,a0), a0 uses Opb1e8 ----------
@@ -52886,7 +52886,7 @@ Opb1e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1f0] cmpa.l ($33,a0,d3.w*2), a0 uses Opb1f0 ----------
@@ -52926,7 +52926,7 @@ Opb1f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1f8] cmpa.l $3333.w, a0 uses Opb1f8 ----------
@@ -52954,7 +52954,7 @@ Opb1f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1f9] cmpa.l $33333333.l, a0 uses Opb1f9 ----------
@@ -52984,7 +52984,7 @@ Opb1f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1fa] cmpa.l ($3333,pc), a0; =3335 uses Opb1fa ----------
@@ -53016,7 +53016,7 @@ Opb1fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1fb] cmpa.l ($33,pc,d3.w*2), a0; =35 uses Opb1fb ----------
@@ -53056,7 +53056,7 @@ Opb1fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [b1fc] cmpa.l #$33333333, a0 uses Opb1fc ----------
@@ -53078,7 +53078,7 @@ Opb1fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [bf08] cmpm.b (a0)+, (a7)+ uses Opbf08 ----------
@@ -53116,7 +53116,7 @@ Opbf08:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [bf0f] cmpm.b (a7)+, (a7)+ uses Opbf0f ----------
@@ -53153,7 +53153,7 @@ Opbf0f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c000] and.b d0, d0 uses Opc000 ----------
@@ -53181,7 +53181,7 @@ Opc000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c010] and.b (a0), d0 uses Opc010 ----------
@@ -53218,7 +53218,7 @@ Opc010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c018] and.b (a0)+, d0 uses Opc018 ----------
@@ -53256,7 +53256,7 @@ Opc018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c01f] and.b (a7)+, d0 uses Opc01f ----------
@@ -53293,7 +53293,7 @@ Opc01f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c020] and.b -(a0), d0 uses Opc020 ----------
@@ -53332,7 +53332,7 @@ Opc020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c027] and.b -(a7), d0 uses Opc027 ----------
@@ -53369,7 +53369,7 @@ Opc027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c028] and.b ($3333,a0), d0 uses Opc028 ----------
@@ -53407,7 +53407,7 @@ Opc028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c030] and.b ($33,a0,d3.w*2), d0 uses Opc030 ----------
@@ -53454,7 +53454,7 @@ Opc030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c038] and.b $3333.w, d0 uses Opc038 ----------
@@ -53489,7 +53489,7 @@ Opc038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c039] and.b $33333333.l, d0 uses Opc039 ----------
@@ -53526,7 +53526,7 @@ Opc039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c03a] and.b ($3333,pc), d0; =3335 uses Opc03a ----------
@@ -53565,7 +53565,7 @@ Opc03a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c03b] and.b ($33,pc,d3.w*2), d0; =35 uses Opc03b ----------
@@ -53612,7 +53612,7 @@ Opc03b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c03c] and.b #$33, d0 uses Opc03c ----------
@@ -53639,7 +53639,7 @@ Opc03c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c040] and.w d0, d0 uses Opc040 ----------
@@ -53668,7 +53668,7 @@ Opc040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c050] and.w (a0), d0 uses Opc050 ----------
@@ -53706,7 +53706,7 @@ Opc050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c058] and.w (a0)+, d0 uses Opc058 ----------
@@ -53745,7 +53745,7 @@ Opc058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c060] and.w -(a0), d0 uses Opc060 ----------
@@ -53785,7 +53785,7 @@ Opc060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c068] and.w ($3333,a0), d0 uses Opc068 ----------
@@ -53824,7 +53824,7 @@ Opc068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c070] and.w ($33,a0,d3.w*2), d0 uses Opc070 ----------
@@ -53872,7 +53872,7 @@ Opc070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c078] and.w $3333.w, d0 uses Opc078 ----------
@@ -53908,7 +53908,7 @@ Opc078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c079] and.w $33333333.l, d0 uses Opc079 ----------
@@ -53946,7 +53946,7 @@ Opc079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c07a] and.w ($3333,pc), d0; =3335 uses Opc07a ----------
@@ -53986,7 +53986,7 @@ Opc07a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c07b] and.w ($33,pc,d3.w*2), d0; =35 uses Opc07b ----------
@@ -54034,7 +54034,7 @@ Opc07b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c07c] and.w #$3333, d0 uses Opc07c ----------
@@ -54062,7 +54062,7 @@ Opc07c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c080] and.l d0, d0 uses Opc080 ----------
@@ -54088,7 +54088,7 @@ Opc080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c090] and.l (a0), d0 uses Opc090 ----------
@@ -54123,7 +54123,7 @@ Opc090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c098] and.l (a0)+, d0 uses Opc098 ----------
@@ -54159,7 +54159,7 @@ Opc098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0a0] and.l -(a0), d0 uses Opc0a0 ----------
@@ -54196,7 +54196,7 @@ Opc0a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0a8] and.l ($3333,a0), d0 uses Opc0a8 ----------
@@ -54232,7 +54232,7 @@ Opc0a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0b0] and.l ($33,a0,d3.w*2), d0 uses Opc0b0 ----------
@@ -54277,7 +54277,7 @@ Opc0b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0b8] and.l $3333.w, d0 uses Opc0b8 ----------
@@ -54310,7 +54310,7 @@ Opc0b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0b9] and.l $33333333.l, d0 uses Opc0b9 ----------
@@ -54345,7 +54345,7 @@ Opc0b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0ba] and.l ($3333,pc), d0; =3335 uses Opc0ba ----------
@@ -54382,7 +54382,7 @@ Opc0ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0bb] and.l ($33,pc,d3.w*2), d0; =35 uses Opc0bb ----------
@@ -54427,7 +54427,7 @@ Opc0bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0bc] and.l #$33333333, d0 uses Opc0bc ----------
@@ -54454,7 +54454,7 @@ Opc0bc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0c0] mulu.w d0, d0 uses Opc0c0 ----------
@@ -54484,7 +54484,7 @@ Opc0c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#54 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0d0] mulu.w (a0), d0 uses Opc0d0 ----------
@@ -54523,7 +54523,7 @@ Opc0d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0d8] mulu.w (a0)+, d0 uses Opc0d8 ----------
@@ -54563,7 +54563,7 @@ Opc0d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0e0] mulu.w -(a0), d0 uses Opc0e0 ----------
@@ -54604,7 +54604,7 @@ Opc0e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#60 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0e8] mulu.w ($3333,a0), d0 uses Opc0e8 ----------
@@ -54644,7 +54644,7 @@ Opc0e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#62 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0f0] mulu.w ($33,a0,d3.w*2), d0 uses Opc0f0 ----------
@@ -54693,7 +54693,7 @@ Opc0f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#64 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0f8] mulu.w $3333.w, d0 uses Opc0f8 ----------
@@ -54730,7 +54730,7 @@ Opc0f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#62 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0f9] mulu.w $33333333.l, d0 uses Opc0f9 ----------
@@ -54769,7 +54769,7 @@ Opc0f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#66 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0fa] mulu.w ($3333,pc), d0; =3335 uses Opc0fa ----------
@@ -54810,7 +54810,7 @@ Opc0fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#62 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0fb] mulu.w ($33,pc,d3.w*2), d0; =35 uses Opc0fb ----------
@@ -54859,7 +54859,7 @@ Opc0fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#64 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c0fc] mulu.w #$3333, d0 uses Opc0fc ----------
@@ -54888,7 +54888,7 @@ Opc0fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c100] abcd d0, d0 uses Opc100 ----------
@@ -54935,7 +54935,7 @@ Opc100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c108] abcd -(a0), -(a0) uses Opc108 ----------
@@ -55000,7 +55000,7 @@ Opc108:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c10f] abcd -(a7), -(a0) uses Opc10f ----------
@@ -55064,7 +55064,7 @@ Opc10f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c110] and.b d0, (a0) uses Opc110 ----------
@@ -55103,7 +55103,7 @@ Opc110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c118] and.b d0, (a0)+ uses Opc118 ----------
@@ -55143,7 +55143,7 @@ Opc118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c11f] and.b d0, (a7)+ uses Opc11f ----------
@@ -55182,7 +55182,7 @@ Opc11f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c120] and.b d0, -(a0) uses Opc120 ----------
@@ -55223,7 +55223,7 @@ Opc120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c127] and.b d0, -(a7) uses Opc127 ----------
@@ -55262,7 +55262,7 @@ Opc127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c128] and.b d0, ($3333,a0) uses Opc128 ----------
@@ -55302,7 +55302,7 @@ Opc128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c130] and.b d0, ($33,a0,d3.w*2) uses Opc130 ----------
@@ -55351,7 +55351,7 @@ Opc130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c138] and.b d0, $3333.w uses Opc138 ----------
@@ -55388,7 +55388,7 @@ Opc138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c139] and.b d0, $33333333.l uses Opc139 ----------
@@ -55427,7 +55427,7 @@ Opc139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c140] exg d0, d0 uses Opc140 ----------
@@ -55443,7 +55443,7 @@ Opc140:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c148] exg a0, a0 uses Opc148 ----------
@@ -55460,7 +55460,7 @@ Opc148:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c150] and.w d0, (a0) uses Opc150 ----------
@@ -55499,7 +55499,7 @@ Opc150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c158] and.w d0, (a0)+ uses Opc158 ----------
@@ -55539,7 +55539,7 @@ Opc158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c160] and.w d0, -(a0) uses Opc160 ----------
@@ -55580,7 +55580,7 @@ Opc160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c168] and.w d0, ($3333,a0) uses Opc168 ----------
@@ -55620,7 +55620,7 @@ Opc168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c170] and.w d0, ($33,a0,d3.w*2) uses Opc170 ----------
@@ -55669,7 +55669,7 @@ Opc170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c178] and.w d0, $3333.w uses Opc178 ----------
@@ -55706,7 +55706,7 @@ Opc178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c179] and.w d0, $33333333.l uses Opc179 ----------
@@ -55745,7 +55745,7 @@ Opc179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c188] exg a0, d0 uses Opc188 ----------
@@ -55761,7 +55761,7 @@ Opc188:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c190] and.l d0, (a0) uses Opc190 ----------
@@ -55798,7 +55798,7 @@ Opc190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c198] and.l d0, (a0)+ uses Opc198 ----------
@@ -55836,7 +55836,7 @@ Opc198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1a0] and.l d0, -(a0) uses Opc1a0 ----------
@@ -55875,7 +55875,7 @@ Opc1a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1a8] and.l d0, ($3333,a0) uses Opc1a8 ----------
@@ -55913,7 +55913,7 @@ Opc1a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1b0] and.l d0, ($33,a0,d3.w*2) uses Opc1b0 ----------
@@ -55960,7 +55960,7 @@ Opc1b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1b8] and.l d0, $3333.w uses Opc1b8 ----------
@@ -55995,7 +55995,7 @@ Opc1b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1b9] and.l d0, $33333333.l uses Opc1b9 ----------
@@ -56032,7 +56032,7 @@ Opc1b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1c0] muls.w d0, d0 uses Opc1c0 ----------
@@ -56062,7 +56062,7 @@ Opc1c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#54 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1d0] muls.w (a0), d0 uses Opc1d0 ----------
@@ -56101,7 +56101,7 @@ Opc1d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1d8] muls.w (a0)+, d0 uses Opc1d8 ----------
@@ -56141,7 +56141,7 @@ Opc1d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1e0] muls.w -(a0), d0 uses Opc1e0 ----------
@@ -56182,7 +56182,7 @@ Opc1e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#60 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1e8] muls.w ($3333,a0), d0 uses Opc1e8 ----------
@@ -56222,7 +56222,7 @@ Opc1e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#62 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1f0] muls.w ($33,a0,d3.w*2), d0 uses Opc1f0 ----------
@@ -56271,7 +56271,7 @@ Opc1f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#64 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1f8] muls.w $3333.w, d0 uses Opc1f8 ----------
@@ -56308,7 +56308,7 @@ Opc1f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#62 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1f9] muls.w $33333333.l, d0 uses Opc1f9 ----------
@@ -56347,7 +56347,7 @@ Opc1f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#66 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1fa] muls.w ($3333,pc), d0; =3335 uses Opc1fa ----------
@@ -56388,7 +56388,7 @@ Opc1fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#62 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1fb] muls.w ($33,pc,d3.w*2), d0; =35 uses Opc1fb ----------
@@ -56437,7 +56437,7 @@ Opc1fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#64 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [c1fc] muls.w #$3333, d0 uses Opc1fc ----------
@@ -56466,7 +56466,7 @@ Opc1fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#58 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [cf08] abcd -(a0), -(a7) uses Opcf08 ----------
@@ -56529,7 +56529,7 @@ Opcf08:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [cf0f] abcd -(a7), -(a7) uses Opcf0f ----------
@@ -56591,7 +56591,7 @@ Opcf0f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d000] add.b d0, d0 uses Opd000 ----------
@@ -56619,7 +56619,7 @@ Opd000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d010] add.b (a0), d0 uses Opd010 ----------
@@ -56656,7 +56656,7 @@ Opd010:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d018] add.b (a0)+, d0 uses Opd018 ----------
@@ -56694,7 +56694,7 @@ Opd018:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d01f] add.b (a7)+, d0 uses Opd01f ----------
@@ -56731,7 +56731,7 @@ Opd01f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d020] add.b -(a0), d0 uses Opd020 ----------
@@ -56770,7 +56770,7 @@ Opd020:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d027] add.b -(a7), d0 uses Opd027 ----------
@@ -56807,7 +56807,7 @@ Opd027:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d028] add.b ($3333,a0), d0 uses Opd028 ----------
@@ -56845,7 +56845,7 @@ Opd028:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d030] add.b ($33,a0,d3.w*2), d0 uses Opd030 ----------
@@ -56892,7 +56892,7 @@ Opd030:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d038] add.b $3333.w, d0 uses Opd038 ----------
@@ -56927,7 +56927,7 @@ Opd038:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d039] add.b $33333333.l, d0 uses Opd039 ----------
@@ -56964,7 +56964,7 @@ Opd039:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d03a] add.b ($3333,pc), d0; =3335 uses Opd03a ----------
@@ -57003,7 +57003,7 @@ Opd03a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d03b] add.b ($33,pc,d3.w*2), d0; =35 uses Opd03b ----------
@@ -57050,7 +57050,7 @@ Opd03b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d03c] add.b #$33, d0 uses Opd03c ----------
@@ -57077,7 +57077,7 @@ Opd03c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d040] add.w d0, d0 uses Opd040 ----------
@@ -57106,7 +57106,7 @@ Opd040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d050] add.w (a0), d0 uses Opd050 ----------
@@ -57144,7 +57144,7 @@ Opd050:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d058] add.w (a0)+, d0 uses Opd058 ----------
@@ -57183,7 +57183,7 @@ Opd058:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d060] add.w -(a0), d0 uses Opd060 ----------
@@ -57223,7 +57223,7 @@ Opd060:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d068] add.w ($3333,a0), d0 uses Opd068 ----------
@@ -57262,7 +57262,7 @@ Opd068:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d070] add.w ($33,a0,d3.w*2), d0 uses Opd070 ----------
@@ -57310,7 +57310,7 @@ Opd070:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d078] add.w $3333.w, d0 uses Opd078 ----------
@@ -57346,7 +57346,7 @@ Opd078:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d079] add.w $33333333.l, d0 uses Opd079 ----------
@@ -57384,7 +57384,7 @@ Opd079:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d07a] add.w ($3333,pc), d0; =3335 uses Opd07a ----------
@@ -57424,7 +57424,7 @@ Opd07a:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d07b] add.w ($33,pc,d3.w*2), d0; =35 uses Opd07b ----------
@@ -57472,7 +57472,7 @@ Opd07b:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d07c] add.w #$3333, d0 uses Opd07c ----------
@@ -57500,7 +57500,7 @@ Opd07c:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d080] add.l d0, d0 uses Opd080 ----------
@@ -57526,7 +57526,7 @@ Opd080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d090] add.l (a0), d0 uses Opd090 ----------
@@ -57561,7 +57561,7 @@ Opd090:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d098] add.l (a0)+, d0 uses Opd098 ----------
@@ -57597,7 +57597,7 @@ Opd098:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0a0] add.l -(a0), d0 uses Opd0a0 ----------
@@ -57634,7 +57634,7 @@ Opd0a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0a8] add.l ($3333,a0), d0 uses Opd0a8 ----------
@@ -57670,7 +57670,7 @@ Opd0a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0b0] add.l ($33,a0,d3.w*2), d0 uses Opd0b0 ----------
@@ -57715,7 +57715,7 @@ Opd0b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0b8] add.l $3333.w, d0 uses Opd0b8 ----------
@@ -57748,7 +57748,7 @@ Opd0b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0b9] add.l $33333333.l, d0 uses Opd0b9 ----------
@@ -57783,7 +57783,7 @@ Opd0b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0ba] add.l ($3333,pc), d0; =3335 uses Opd0ba ----------
@@ -57820,7 +57820,7 @@ Opd0ba:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0bb] add.l ($33,pc,d3.w*2), d0; =35 uses Opd0bb ----------
@@ -57865,7 +57865,7 @@ Opd0bb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0bc] add.l #$33333333, d0 uses Opd0bc ----------
@@ -57892,7 +57892,7 @@ Opd0bc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0c0] adda.w d0, a0 uses Opd0c0 ----------
@@ -57916,7 +57916,7 @@ Opd0c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0d0] adda.w (a0), a0 uses Opd0d0 ----------
@@ -57949,7 +57949,7 @@ Opd0d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0d8] adda.w (a0)+, a0 uses Opd0d8 ----------
@@ -57983,7 +57983,7 @@ Opd0d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0e0] adda.w -(a0), a0 uses Opd0e0 ----------
@@ -58018,7 +58018,7 @@ Opd0e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0e8] adda.w ($3333,a0), a0 uses Opd0e8 ----------
@@ -58052,7 +58052,7 @@ Opd0e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0f0] adda.w ($33,a0,d3.w*2), a0 uses Opd0f0 ----------
@@ -58095,7 +58095,7 @@ Opd0f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0f8] adda.w $3333.w, a0 uses Opd0f8 ----------
@@ -58126,7 +58126,7 @@ Opd0f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0f9] adda.w $33333333.l, a0 uses Opd0f9 ----------
@@ -58159,7 +58159,7 @@ Opd0f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0fa] adda.w ($3333,pc), a0; =3335 uses Opd0fa ----------
@@ -58194,7 +58194,7 @@ Opd0fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0fb] adda.w ($33,pc,d3.w*2), a0; =35 uses Opd0fb ----------
@@ -58237,7 +58237,7 @@ Opd0fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d0fc] adda.w #$3333, a0 uses Opd0fc ----------
@@ -58260,7 +58260,7 @@ Opd0fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d100] addx.b d0, d0 uses Opd100 ----------
@@ -58302,7 +58302,7 @@ Opd100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d108] addx.b -(a0), -(a0) uses Opd108 ----------
@@ -58360,7 +58360,7 @@ Opd108:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d10f] addx.b -(a7), -(a0) uses Opd10f ----------
@@ -58417,7 +58417,7 @@ Opd10f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d110] add.b d0, (a0) uses Opd110 ----------
@@ -58456,7 +58456,7 @@ Opd110:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d118] add.b d0, (a0)+ uses Opd118 ----------
@@ -58496,7 +58496,7 @@ Opd118:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d11f] add.b d0, (a7)+ uses Opd11f ----------
@@ -58535,7 +58535,7 @@ Opd11f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d120] add.b d0, -(a0) uses Opd120 ----------
@@ -58576,7 +58576,7 @@ Opd120:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d127] add.b d0, -(a7) uses Opd127 ----------
@@ -58615,7 +58615,7 @@ Opd127:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d128] add.b d0, ($3333,a0) uses Opd128 ----------
@@ -58655,7 +58655,7 @@ Opd128:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d130] add.b d0, ($33,a0,d3.w*2) uses Opd130 ----------
@@ -58704,7 +58704,7 @@ Opd130:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d138] add.b d0, $3333.w uses Opd138 ----------
@@ -58741,7 +58741,7 @@ Opd138:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d139] add.b d0, $33333333.l uses Opd139 ----------
@@ -58780,7 +58780,7 @@ Opd139:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d140] addx.w d0, d0 uses Opd140 ----------
@@ -58823,7 +58823,7 @@ Opd140:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#4 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d148] addx.w -(a0), -(a0) uses Opd148 ----------
@@ -58881,7 +58881,7 @@ Opd148:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d150] add.w d0, (a0) uses Opd150 ----------
@@ -58920,7 +58920,7 @@ Opd150:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d158] add.w d0, (a0)+ uses Opd158 ----------
@@ -58960,7 +58960,7 @@ Opd158:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d160] add.w d0, -(a0) uses Opd160 ----------
@@ -59001,7 +59001,7 @@ Opd160:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d168] add.w d0, ($3333,a0) uses Opd168 ----------
@@ -59041,7 +59041,7 @@ Opd168:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d170] add.w d0, ($33,a0,d3.w*2) uses Opd170 ----------
@@ -59090,7 +59090,7 @@ Opd170:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d178] add.w d0, $3333.w uses Opd178 ----------
@@ -59127,7 +59127,7 @@ Opd178:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d179] add.w d0, $33333333.l uses Opd179 ----------
@@ -59166,7 +59166,7 @@ Opd179:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d180] addx.l d0, d0 uses Opd180 ----------
@@ -59199,7 +59199,7 @@ Opd180:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d188] addx.l -(a0), -(a0) uses Opd188 ----------
@@ -59250,7 +59250,7 @@ Opd188:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#30 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d190] add.l d0, (a0) uses Opd190 ----------
@@ -59287,7 +59287,7 @@ Opd190:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d198] add.l d0, (a0)+ uses Opd198 ----------
@@ -59325,7 +59325,7 @@ Opd198:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1a0] add.l d0, -(a0) uses Opd1a0 ----------
@@ -59364,7 +59364,7 @@ Opd1a0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1a8] add.l d0, ($3333,a0) uses Opd1a8 ----------
@@ -59402,7 +59402,7 @@ Opd1a8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1b0] add.l d0, ($33,a0,d3.w*2) uses Opd1b0 ----------
@@ -59449,7 +59449,7 @@ Opd1b0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#26 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1b8] add.l d0, $3333.w uses Opd1b8 ----------
@@ -59484,7 +59484,7 @@ Opd1b8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1b9] add.l d0, $33333333.l uses Opd1b9 ----------
@@ -59521,7 +59521,7 @@ Opd1b9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#28 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1c0] adda.l d0, a0 uses Opd1c0 ----------
@@ -59543,7 +59543,7 @@ Opd1c0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1d0] adda.l (a0), a0 uses Opd1d0 ----------
@@ -59574,7 +59574,7 @@ Opd1d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1d8] adda.l (a0)+, a0 uses Opd1d8 ----------
@@ -59606,7 +59606,7 @@ Opd1d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1e0] adda.l -(a0), a0 uses Opd1e0 ----------
@@ -59639,7 +59639,7 @@ Opd1e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1e8] adda.l ($3333,a0), a0 uses Opd1e8 ----------
@@ -59671,7 +59671,7 @@ Opd1e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1f0] adda.l ($33,a0,d3.w*2), a0 uses Opd1f0 ----------
@@ -59712,7 +59712,7 @@ Opd1f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1f8] adda.l $3333.w, a0 uses Opd1f8 ----------
@@ -59741,7 +59741,7 @@ Opd1f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1f9] adda.l $33333333.l, a0 uses Opd1f9 ----------
@@ -59772,7 +59772,7 @@ Opd1f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1fa] adda.l ($3333,pc), a0; =3335 uses Opd1fa ----------
@@ -59805,7 +59805,7 @@ Opd1fa:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1fb] adda.l ($33,pc,d3.w*2), a0; =35 uses Opd1fb ----------
@@ -59846,7 +59846,7 @@ Opd1fb:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [d1fc] adda.l #$33333333, a0 uses Opd1fc ----------
@@ -59869,7 +59869,7 @@ Opd1fc:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [df08] addx.b -(a0), -(a7) uses Opdf08 ----------
@@ -59926,7 +59926,7 @@ Opdf08:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [df0f] addx.b -(a7), -(a7) uses Opdf0f ----------
@@ -59982,7 +59982,7 @@ Opdf0f:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e000] asr.b #8, d0 uses Ope000 ----------
@@ -60010,7 +60010,7 @@ Ope000:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e008] lsr.b #8, d0 uses Ope008 ----------
@@ -60039,7 +60039,7 @@ Ope008:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e010] roxr.b #8, d0 uses Ope010 ----------
@@ -60074,7 +60074,7 @@ Ope010:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e018] ror.b #8, d0 uses Ope018 ----------
@@ -60100,7 +60100,7 @@ Ope018:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e020] asr.b d0, d0 uses Ope020 ----------
@@ -60137,7 +60137,7 @@ Ope020:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e028] lsr.b d0, d0 uses Ope028 ----------
@@ -60175,7 +60175,7 @@ Ope028:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e030] roxr.b d0, d0 uses Ope030 ----------
@@ -60231,7 +60231,7 @@ nozeroxe030:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e038] ror.b d0, d0 uses Ope038 ----------
@@ -60264,7 +60264,7 @@ Ope038:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e040] asr.w #8, d0 uses Ope040 ----------
@@ -60293,7 +60293,7 @@ Ope040:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e048] lsr.w #8, d0 uses Ope048 ----------
@@ -60323,7 +60323,7 @@ Ope048:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e050] roxr.w #8, d0 uses Ope050 ----------
@@ -60359,7 +60359,7 @@ Ope050:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e058] ror.w #8, d0 uses Ope058 ----------
@@ -60385,7 +60385,7 @@ Ope058:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e060] asr.w d0, d0 uses Ope060 ----------
@@ -60423,7 +60423,7 @@ Ope060:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e068] lsr.w d0, d0 uses Ope068 ----------
@@ -60462,7 +60462,7 @@ Ope068:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e070] roxr.w d0, d0 uses Ope070 ----------
@@ -60519,7 +60519,7 @@ nozeroxe070:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e078] ror.w d0, d0 uses Ope078 ----------
@@ -60552,7 +60552,7 @@ Ope078:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e080] asr.l #8, d0 uses Ope080 ----------
@@ -60572,7 +60572,7 @@ Ope080:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e088] lsr.l #8, d0 uses Ope088 ----------
@@ -60592,7 +60592,7 @@ Ope088:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e090] roxr.l #8, d0 uses Ope090 ----------
@@ -60623,7 +60623,7 @@ Ope090:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e098] ror.l #8, d0 uses Ope098 ----------
@@ -60643,7 +60643,7 @@ Ope098:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0a0] asr.l d0, d0 uses Ope0a0 ----------
@@ -60672,7 +60672,7 @@ Ope0a0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0a8] lsr.l d0, d0 uses Ope0a8 ----------
@@ -60701,7 +60701,7 @@ Ope0a8:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0b0] roxr.l d0, d0 uses Ope0b0 ----------
@@ -60750,7 +60750,7 @@ nozeroxe0b0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0b8] ror.l d0, d0 uses Ope0b8 ----------
@@ -60777,7 +60777,7 @@ Ope0b8:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0d0] asr.w (a0) uses Ope0d0 ----------
@@ -60816,7 +60816,7 @@ Ope0d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0d8] asr.w (a0)+ uses Ope0d8 ----------
@@ -60856,7 +60856,7 @@ Ope0d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0e0] asr.w -(a0) uses Ope0e0 ----------
@@ -60897,7 +60897,7 @@ Ope0e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0e8] asr.w ($3333,a0) uses Ope0e8 ----------
@@ -60937,7 +60937,7 @@ Ope0e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0f0] asr.w ($33,a0,d3.w*2) uses Ope0f0 ----------
@@ -60986,7 +60986,7 @@ Ope0f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0f8] asr.w $3333.w uses Ope0f8 ----------
@@ -61023,7 +61023,7 @@ Ope0f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e0f9] asr.w $33333333.l uses Ope0f9 ----------
@@ -61062,7 +61062,7 @@ Ope0f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e100] asl.b #8, d0 uses Ope100 ----------
@@ -61093,7 +61093,7 @@ Ope100:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e108] lsl.b #8, d0 uses Ope108 ----------
@@ -61115,7 +61115,7 @@ Ope108:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e110] roxl.b #8, d0 uses Ope110 ----------
@@ -61150,7 +61150,7 @@ Ope110:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e118] rol.b #8, d0 uses Ope118 ----------
@@ -61179,7 +61179,7 @@ Ope118:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e120] asl.b d0, d0 uses Ope120 ----------
@@ -61219,7 +61219,7 @@ Ope120:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e128] lsl.b d0, d0 uses Ope128 ----------
@@ -61250,7 +61250,7 @@ Ope128:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e130] roxl.b d0, d0 uses Ope130 ----------
@@ -61307,7 +61307,7 @@ nozeroxe130:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e138] rol.b d0, d0 uses Ope138 ----------
@@ -61345,7 +61345,7 @@ Ope138:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e140] asl.w #8, d0 uses Ope140 ----------
@@ -61377,7 +61377,7 @@ Ope140:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e148] lsl.w #8, d0 uses Ope148 ----------
@@ -61400,7 +61400,7 @@ Ope148:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e150] roxl.w #8, d0 uses Ope150 ----------
@@ -61436,7 +61436,7 @@ Ope150:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e158] rol.w #8, d0 uses Ope158 ----------
@@ -61465,7 +61465,7 @@ Ope158:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#22 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e160] asl.w d0, d0 uses Ope160 ----------
@@ -61506,7 +61506,7 @@ Ope160:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e168] lsl.w d0, d0 uses Ope168 ----------
@@ -61538,7 +61538,7 @@ Ope168:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e170] roxl.w d0, d0 uses Ope170 ----------
@@ -61596,7 +61596,7 @@ nozeroxe170:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e178] rol.w d0, d0 uses Ope178 ----------
@@ -61634,7 +61634,7 @@ Ope178:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e180] asl.l #8, d0 uses Ope180 ----------
@@ -61663,7 +61663,7 @@ Ope180:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e188] lsl.l #8, d0 uses Ope188 ----------
@@ -61683,7 +61683,7 @@ Ope188:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e190] roxl.l #8, d0 uses Ope190 ----------
@@ -61714,7 +61714,7 @@ Ope190:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e198] rol.l #8, d0 uses Ope198 ----------
@@ -61737,7 +61737,7 @@ Ope198:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#24 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1a0] asl.l d0, d0 uses Ope1a0 ----------
@@ -61775,7 +61775,7 @@ Ope1a0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1a8] lsl.l d0, d0 uses Ope1a8 ----------
@@ -61804,7 +61804,7 @@ Ope1a8:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1b0] roxl.l d0, d0 uses Ope1b0 ----------
@@ -61854,7 +61854,7 @@ nozeroxe1b0:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1b8] rol.l d0, d0 uses Ope1b8 ----------
@@ -61886,7 +61886,7 @@ Ope1b8:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1d0] asl.w (a0) uses Ope1d0 ----------
@@ -61928,7 +61928,7 @@ Ope1d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1d8] asl.w (a0)+ uses Ope1d8 ----------
@@ -61971,7 +61971,7 @@ Ope1d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1e0] asl.w -(a0) uses Ope1e0 ----------
@@ -62015,7 +62015,7 @@ Ope1e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1e8] asl.w ($3333,a0) uses Ope1e8 ----------
@@ -62058,7 +62058,7 @@ Ope1e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1f0] asl.w ($33,a0,d3.w*2) uses Ope1f0 ----------
@@ -62110,7 +62110,7 @@ Ope1f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1f8] asl.w $3333.w uses Ope1f8 ----------
@@ -62150,7 +62150,7 @@ Ope1f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e1f9] asl.w $33333333.l uses Ope1f9 ----------
@@ -62192,7 +62192,7 @@ Ope1f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e210] roxr.b #1, d0 uses Ope210 ----------
@@ -62219,7 +62219,7 @@ Ope210:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e250] roxr.w #1, d0 uses Ope250 ----------
@@ -62247,7 +62247,7 @@ Ope250:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e290] roxr.l #1, d0 uses Ope290 ----------
@@ -62270,7 +62270,7 @@ Ope290:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e2d0] lsr.w (a0) uses Ope2d0 ----------
@@ -62310,7 +62310,7 @@ Ope2d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e2d8] lsr.w (a0)+ uses Ope2d8 ----------
@@ -62351,7 +62351,7 @@ Ope2d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e2e0] lsr.w -(a0) uses Ope2e0 ----------
@@ -62393,7 +62393,7 @@ Ope2e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e2e8] lsr.w ($3333,a0) uses Ope2e8 ----------
@@ -62434,7 +62434,7 @@ Ope2e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e2f0] lsr.w ($33,a0,d3.w*2) uses Ope2f0 ----------
@@ -62484,7 +62484,7 @@ Ope2f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e2f8] lsr.w $3333.w uses Ope2f8 ----------
@@ -62522,7 +62522,7 @@ Ope2f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e2f9] lsr.w $33333333.l uses Ope2f9 ----------
@@ -62562,7 +62562,7 @@ Ope2f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e310] roxl.b #1, d0 uses Ope310 ----------
@@ -62587,7 +62587,7 @@ Ope310:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e350] roxl.w #1, d0 uses Ope350 ----------
@@ -62613,7 +62613,7 @@ Ope350:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e390] roxl.l #1, d0 uses Ope390 ----------
@@ -62636,7 +62636,7 @@ Ope390:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#10 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e3d0] lsl.w (a0) uses Ope3d0 ----------
@@ -62669,7 +62669,7 @@ Ope3d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e3d8] lsl.w (a0)+ uses Ope3d8 ----------
@@ -62703,7 +62703,7 @@ Ope3d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e3e0] lsl.w -(a0) uses Ope3e0 ----------
@@ -62738,7 +62738,7 @@ Ope3e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e3e8] lsl.w ($3333,a0) uses Ope3e8 ----------
@@ -62772,7 +62772,7 @@ Ope3e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e3f0] lsl.w ($33,a0,d3.w*2) uses Ope3f0 ----------
@@ -62815,7 +62815,7 @@ Ope3f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e3f8] lsl.w $3333.w uses Ope3f8 ----------
@@ -62846,7 +62846,7 @@ Ope3f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e3f9] lsl.w $33333333.l uses Ope3f9 ----------
@@ -62879,7 +62879,7 @@ Ope3f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e4d0] roxr.w (a0) uses Ope4d0 ----------
@@ -62917,7 +62917,7 @@ Ope4d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e4d8] roxr.w (a0)+ uses Ope4d8 ----------
@@ -62956,7 +62956,7 @@ Ope4d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e4e0] roxr.w -(a0) uses Ope4e0 ----------
@@ -62996,7 +62996,7 @@ Ope4e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e4e8] roxr.w ($3333,a0) uses Ope4e8 ----------
@@ -63035,7 +63035,7 @@ Ope4e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e4f0] roxr.w ($33,a0,d3.w*2) uses Ope4f0 ----------
@@ -63083,7 +63083,7 @@ Ope4f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e4f8] roxr.w $3333.w uses Ope4f8 ----------
@@ -63119,7 +63119,7 @@ Ope4f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e4f9] roxr.w $33333333.l uses Ope4f9 ----------
@@ -63157,7 +63157,7 @@ Ope4f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e5d0] roxl.w (a0) uses Ope5d0 ----------
@@ -63193,7 +63193,7 @@ Ope5d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e5d8] roxl.w (a0)+ uses Ope5d8 ----------
@@ -63230,7 +63230,7 @@ Ope5d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e5e0] roxl.w -(a0) uses Ope5e0 ----------
@@ -63268,7 +63268,7 @@ Ope5e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e5e8] roxl.w ($3333,a0) uses Ope5e8 ----------
@@ -63305,7 +63305,7 @@ Ope5e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e5f0] roxl.w ($33,a0,d3.w*2) uses Ope5f0 ----------
@@ -63351,7 +63351,7 @@ Ope5f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e5f8] roxl.w $3333.w uses Ope5f8 ----------
@@ -63385,7 +63385,7 @@ Ope5f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e5f9] roxl.w $33333333.l uses Ope5f9 ----------
@@ -63421,7 +63421,7 @@ Ope5f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e6d0] ror.w (a0) uses Ope6d0 ----------
@@ -63457,7 +63457,7 @@ Ope6d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e6d8] ror.w (a0)+ uses Ope6d8 ----------
@@ -63494,7 +63494,7 @@ Ope6d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e6e0] ror.w -(a0) uses Ope6e0 ----------
@@ -63532,7 +63532,7 @@ Ope6e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e6e8] ror.w ($3333,a0) uses Ope6e8 ----------
@@ -63569,7 +63569,7 @@ Ope6e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e6f0] ror.w ($33,a0,d3.w*2) uses Ope6f0 ----------
@@ -63615,7 +63615,7 @@ Ope6f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e6f8] ror.w $3333.w uses Ope6f8 ----------
@@ -63649,7 +63649,7 @@ Ope6f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e6f9] ror.w $33333333.l uses Ope6f9 ----------
@@ -63685,7 +63685,7 @@ Ope6f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e7d0] rol.w (a0) uses Ope7d0 ----------
@@ -63724,7 +63724,7 @@ Ope7d0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e7d8] rol.w (a0)+ uses Ope7d8 ----------
@@ -63764,7 +63764,7 @@ Ope7d8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#12 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e7e0] rol.w -(a0) uses Ope7e0 ----------
@@ -63805,7 +63805,7 @@ Ope7e0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#14 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e7e8] rol.w ($3333,a0) uses Ope7e8 ----------
@@ -63845,7 +63845,7 @@ Ope7e8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e7f0] rol.w ($33,a0,d3.w*2) uses Ope7f0 ----------
@@ -63894,7 +63894,7 @@ Ope7f0:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#18 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e7f8] rol.w $3333.w uses Ope7f8 ----------
@@ -63931,7 +63931,7 @@ Ope7f8:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#16 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [e7f9] rol.w $33333333.l uses Ope7f9 ----------
@@ -63970,7 +63970,7 @@ Ope7f9:
   ldr r5,[r7,#0x5c] ;@ Load Cycles
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#20 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee00] asr.b #7, d0 uses Opee00 ----------
@@ -64003,7 +64003,7 @@ Opee00:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee08] lsr.b #7, d0 uses Opee08 ----------
@@ -64037,7 +64037,7 @@ Opee08:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee10] roxr.b #7, d0 uses Opee10 ----------
@@ -64076,7 +64076,7 @@ Opee10:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee18] ror.b #7, d0 uses Opee18 ----------
@@ -64107,7 +64107,7 @@ Opee18:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee40] asr.w #7, d0 uses Opee40 ----------
@@ -64141,7 +64141,7 @@ Opee40:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee48] lsr.w #7, d0 uses Opee48 ----------
@@ -64176,7 +64176,7 @@ Opee48:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee50] roxr.w #7, d0 uses Opee50 ----------
@@ -64216,7 +64216,7 @@ Opee50:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee58] ror.w #7, d0 uses Opee58 ----------
@@ -64247,7 +64247,7 @@ Opee58:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee80] asr.l #7, d0 uses Opee80 ----------
@@ -64272,7 +64272,7 @@ Opee80:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee88] lsr.l #7, d0 uses Opee88 ----------
@@ -64297,7 +64297,7 @@ Opee88:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee90] roxr.l #7, d0 uses Opee90 ----------
@@ -64332,7 +64332,7 @@ Opee90:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ee98] ror.l #7, d0 uses Opee98 ----------
@@ -64357,7 +64357,7 @@ Opee98:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef00] asl.b #7, d0 uses Opef00 ----------
@@ -64393,7 +64393,7 @@ Opef00:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef08] lsl.b #7, d0 uses Opef08 ----------
@@ -64420,7 +64420,7 @@ Opef08:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef10] roxl.b #7, d0 uses Opef10 ----------
@@ -64460,7 +64460,7 @@ Opef10:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef18] rol.b #7, d0 uses Opef18 ----------
@@ -64495,7 +64495,7 @@ Opef18:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef40] asl.w #7, d0 uses Opef40 ----------
@@ -64532,7 +64532,7 @@ Opef40:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef48] lsl.w #7, d0 uses Opef48 ----------
@@ -64560,7 +64560,7 @@ Opef48:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef50] roxl.w #7, d0 uses Opef50 ----------
@@ -64601,7 +64601,7 @@ Opef50:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef58] rol.w #7, d0 uses Opef58 ----------
@@ -64636,7 +64636,7 @@ Opef58:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#6 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef80] asl.l #7, d0 uses Opef80 ----------
@@ -64670,7 +64670,7 @@ Opef80:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef88] lsl.l #7, d0 uses Opef88 ----------
@@ -64695,7 +64695,7 @@ Opef88:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef90] roxl.l #7, d0 uses Opef90 ----------
@@ -64731,7 +64731,7 @@ Opef90:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ---------- [ef98] rol.l #7, d0 uses Opef98 ----------
@@ -64760,7 +64760,7 @@ Opef98:
 
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#8 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 ;@ ----------
@@ -64774,7 +64774,7 @@ WrongPrivilegeMode:
   bl Exception
   ldrh r8,[r4],#2 ;@ Fetch next opcode
   subs r5,r5,#34 ;@ Subtract cycles
-  ldrge pc,[r6,r8,asl #2] ;@ Jump to opcode handler
+  ldrgt pc,[r6,r8,asl #2] ;@ Jump to opcode handler
   b CycloneEnd
 
 

@@ -64,7 +64,7 @@ void cyclone_reset(void *param)
 {
    	CycloneInit();
 	memset(&cyclone, 0,sizeof(Cyclone_Regs));
-	cyclone.regs.checkpc=MyCheckPc;
+	cyclone.regs.checkpc = MyCheckPc;
 	cyclone.regs.read8  = (unsigned int (*)(unsigned int)) cpu_readmem24bew;
 	cyclone.regs.read16 = (unsigned int (*)(unsigned int)) cpu_readmem24bew_word;
 	cyclone.regs.read32 = (unsigned int (*)(unsigned int)) cpu_readmem24bew_dword;
@@ -74,7 +74,7 @@ void cyclone_reset(void *param)
 	cyclone.regs.fetch8  = (unsigned int (*)(unsigned int)) cpu_readmem24bew;
 	cyclone.regs.fetch16 = (unsigned int (*)(unsigned int)) cpu_readmem24bew_word;
 	cyclone.regs.fetch32 = (unsigned int (*)(unsigned int)) cpu_readmem24bew_dword;
-	cyclone.regs.IrqCallback=MyIrqCallback; /* 0 */
+	cyclone.regs.IrqCallback = MyIrqCallback; /* 0 */
   	cyclone.regs.srh=0x27; /* Set supervisor mode */
   	cyclone.regs.a[7]=cyclone.regs.read32(0); /* Get Stack Pointer */
   	cyclone.regs.membase=0;
@@ -257,7 +257,7 @@ const char *cyclone_info(void *context, int regnum)
 	{
 		case CPU_INFO_NAME: return "Cyclone 68000";
 		case CPU_INFO_FAMILY: return "Motorola 68K";
-		case CPU_INFO_VERSION: return "v0.0088";
+		case CPU_INFO_VERSION: return "v0.0089";
 		case CPU_INFO_FILE: return __FILE__;
 		case CPU_INFO_CREDITS: return "Copyright Copyright 2004-2007 Dave, Reesy and Notaz. All rights reserved";
 	}
