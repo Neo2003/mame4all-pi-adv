@@ -353,7 +353,7 @@ static struct MachineDriver GAMENAME = \
 		}, \
 		{ \
 			CPU_Z80 | CPU_AUDIO_CPU, \
-			4096000, \
+			5000000, /* Changed from 4.096000Mhz to 5Mhz */ \
 			sound_readmem_7759,sound_writemem,sound_readport,sound_writeport_7759, \
 			ignore_interrupt,1 \
 		}, \
@@ -645,8 +645,8 @@ static struct IOWritePort sound_writeport_7759[] =
 static struct UPD7759_interface upd7759_interface =
 {
 	1,			/* 1 chip */
-	UPD7759_STANDARD_CLOCK,
-	{ 60 }, 	/* volumes */
+	UPD7759_SLAVE_CLOCK_620K,
+	{ 30 }, 	/* volumes was 60 */
 	{ REGION_CPU2 },			/* memory region 3 contains the sample data */
     UPD7759_SLAVE_MODE,
 	{ sound_cause_nmi },
@@ -855,7 +855,7 @@ static struct GfxLayout charlayout =
 
 static struct GfxDecodeInfo gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &charlayout,	0, 256 },
+	{ REGION_GFX1, 0, &charlayout,	0, 1024 },
 	{ -1 } /* end of array */
 };
 

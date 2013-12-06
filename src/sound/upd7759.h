@@ -11,7 +11,8 @@
 #define UPD7759_STANDALONE_MODE     1
 #define UPD7759_SLAVE_MODE			0
 
-#define UPD7759_STANDARD_CLOCK 640000
+#define UPD7759_STANDARD_CLOCK      640000
+#define UPD7759_SLAVE_CLOCK_620K    620000
 
 struct UPD7759_interface
 {
@@ -25,6 +26,8 @@ struct UPD7759_interface
 
 int UPD7759_sh_start (const struct MachineSound *msound);
 void UPD7759_sh_stop (void);
+
+void UPD7759_set_bank_base(int which, offs_t base);
 
 void UPD7759_reset_w (int num, int data);
 void UPD7759_message_w (int num, int which);
