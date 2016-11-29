@@ -301,15 +301,22 @@ void gp2x_set_video_mode(struct osd_bitmap *bitmap, int bpp,int width,int height
 
 	 	// Work out the position and size on the display
 	 	display_ratio = (float)display_width/(float)display_height;
-	 	game_ratio = (float)width/(float)height;
+		game_ratio = (float)width/(float)height*options.pixel_aspect_ratio;
 	 
 		display_x = sx = display_adj_width;
 		display_y = sy = display_adj_height;
 
-	 	if (game_ratio>display_ratio) 
-			sy = (float)display_adj_width/(float)game_ratio;
-	 	else 
-			sx = (float)display_adj_height*(float)game_ratio;
+		float ratio_diff = game_ratio / display_ratio;
+		if (ratio_diff < 1.0)
+			ratio_diff = 1.0 / ratio_diff;
+
+		// we only adjust for game ratio if more then % diff
+		if (ratio_diff > options.ratio_threshold) {
+			if (game_ratio>display_ratio)
+				sy = (float)display_adj_width/(float)game_ratio;
+			else
+				sx = (float)display_adj_height*(float)game_ratio;
+		}
 	 
 		// Centre bitmap on screen
 	 	display_x = (display_x - sx) / 2;

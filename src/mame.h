@@ -105,6 +105,10 @@ struct GameOptions {
 	int display_border;
 	int display_smooth_stretch;
 	int display_effect;
+
+	/* spoek */
+	float pixel_aspect_ratio; /* for calculating the real screen ratio, like pixel_aspect_ratio * display_width / display_height */
+	float ratio_threshold; /* when ratio difference between game and screen is below this threshold, we just fill the complete screen */	
 };
 
 extern struct GameOptions options;

@@ -432,28 +432,18 @@ int osd_set_display(int width,int height,int depth,int attributes,int orientatio
 
 	vsync_frame_rate = video_fps;
 
-	if (video_sync)
+	if (video_sync) // you need to enable this in the mame.cfg ...
 	{
 		TICKER a,b;
 		float rate;
 
 
 		/* wait some time to let everything stabilize */
-		for (i = 0;i < 60;i++)
-		{
-			vsync();
-			a = ticker();
-		}
+		usleep(1000000);
 
-		/* small delay for really really fast machines */
-		for (i = 0;i < 100000;i++) ;
+		rate = (float)video_fps * 0.998; // underrun the sound
 
-		vsync();
-		b = ticker();
-
-		rate = ((float)TICKS_PER_SEC)/(b-a);
-
-		logerror("target frame rate = %ffps, video frame rate = %3.2fHz\n",video_fps,rate);
+		logerror("target frame rate = %dfps, video frame rate = %3.2fHz\n",video_fps,rate);
 
 		/* don't allow more than 8% difference between target and actual frame rate */
 		while (rate > video_fps * 108 / 100)
@@ -463,7 +453,7 @@ int osd_set_display(int width,int height,int depth,int attributes,int orientatio
 		{
 			osd_close_display();
 			logerror("-vsync option cannot be used with this display mode:\n"
-						"video refresh frequency = %dHz, target frame rate = %ffps\n",
+						"video refresh frequency = %dHz, target frame rate = %dfps\n",
 						(int)(TICKS_PER_SEC/(b-a)),video_fps);
 			return 0;
 		}
@@ -772,7 +762,7 @@ void osd_update_video_and_audio(struct osd_bitmap *bitmap)
 		{12,0,0,0,0,0,0,0,0,0,0,0 }
 	};
 	int i;
-	static int showfps,showfpstemp;
+	static int showfps = 0, showfpstemp = 0;
 	TICKER curr;
 	static TICKER prev_measure=0,this_frame_base,prev;
 	static int speed = 100;
@@ -825,12 +815,12 @@ void osd_update_video_and_audio(struct osd_bitmap *bitmap)
 			profiler_mark(PROFILER_IDLE);
 			if (video_sync)
 			{
-				static TICKER last;
+				static TICKER last = ticker();
 				do
 				{
-					vsync();
+					usleep(20);
 					curr = ticker();
-				} while (TICKS_PER_SEC / (curr - last) > video_fps * 11 /10);
+				} while (TICKS_PER_SEC / (curr - last) >= video_fps);
 				last = curr;
 			}
 			else

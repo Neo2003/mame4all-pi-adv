@@ -25,6 +25,14 @@ display_smooth_stretch=yes
 display_border=0
 # display effect postprocessing: 0 none, 1 scanlines
 display_effect=0
+# turn on vsync waiting
+vsync=yes
+waitvsync=yes
+dirty=yes
+# make pixels a bit taller
+pixel_aspect_ratio=1.0
+# fill screen when game is within aspect ratio limits (75% < ar < 125%)
+ratio_threshold=1.25
 
 [directory]
 inp=inp

@@ -296,7 +296,7 @@ void init_inpdir(void)
 
 void parse_cmdline (int argc, char **argv, int game_index)
 {
-	static float f_beam, f_flicker;
+	static float f_beam, f_flicker, f_pixelratio, f_threshold;
 	char *resolution;
 	char *joyname;
 	char tmpres[10];
@@ -485,6 +485,14 @@ void parse_cmdline (int argc, char **argv, int game_index)
 	options.display_smooth_stretch = get_bool ("config", "display_smooth_stretch", NULL, 1);
 	options.display_effect = get_int ("config", "display_effect", NULL, 0);
 
+	f_pixelratio = get_float  ("config", "pixel_aspect_ratio",      NULL, 1.0);
+	if (f_pixelratio > 2.0) f_pixelratio = 2.0;
+	if (f_pixelratio < 0.5) f_pixelratio = 0.5;
+	options.pixel_aspect_ratio = !(options.rol ^ options.ror) ? f_pixelratio : 1.0 / f_pixelratio;
+
+	f_threshold = get_float  ("config", "ratio_threshold",      NULL, 1.0);
+	if (f_threshold < 1.0) f_threshold = 1.0 / f_threshold;
+	options.ratio_threshold = f_threshold;
 	kiosk_mode = get_bool("config", "kioskmode", NULL, 0);
 
 	close_config_file();
