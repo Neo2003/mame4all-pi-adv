@@ -2576,8 +2576,8 @@ static int ap_interrupt( void ){
 static struct YM2413interface ym2413_interface=
 {
     1,
-    8000000,	/* ??? */
-    { 30 },
+    3579545,	/* ??? */
+    { 60 },
 };
 
 static struct MachineDriver machine_driver_atomicp =
