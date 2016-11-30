@@ -32,7 +32,7 @@ dirty=yes
 # make pixels a bit taller
 pixel_aspect_ratio=1.0
 # fill screen when game is within aspect ratio limits (75% < ar < 125%)
-ratio_threshold=1.25
+ratio_threshold=1.0
 
 [directory]
 inp=inp
