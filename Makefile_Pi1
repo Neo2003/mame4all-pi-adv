@@ -19,12 +19,12 @@ VPATH=src $(wildcard src/cpu/*)
 MD = @mkdir
 RM = rm -f
 # CC  = arm-linux-gnueabihf-gcc
-CC = /usr/bin/gcc-4.8
+CC = /usr/bin/gcc
 # CPP = arm-linux-gnueabihf-g++
-CPP = /usr/bin/g++-4.8
+CPP = /usr/bin/g++
 AS  = as
 # LD  = arm-linux-gnueabihf-g++
-LD = /usr/bin/g++-4.8
+LD = /usr/bin/g++
 STRIP = strip
 
 EMULATOR = $(TARGET)$(EXE)
@@ -76,7 +76,7 @@ $(OBJ)/%.o: src/%.c
 
 $(OBJ)/%.o: src/%.cpp
 	@echo Compiling $<...
-	$(CPP) $(CDEFS) $(CFLAGS) -fno-rtti -c $< -o $@
+	$(CPP) $(CDEFS) $(CFLAGS) -Wno-narrowing -Wno-cast-align -fno-rtti -c $< -o $@
 
 $(OBJ)/%.o: src/%.s
 	@echo Compiling $<...

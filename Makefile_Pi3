@@ -19,12 +19,12 @@ VPATH=src $(wildcard src/cpu/*)
 MD = @mkdir
 RM = rm -f
 # CC  = arm-linux-gnueabihf-gcc
-CC = /usr/bin/gcc-4.8
+CC = /usr/bin/gcc
 # CPP = arm-linux-gnueabihf-g++
-CPP = /usr/bin/g++-4.8
+CPP = /usr/bin/g++
 AS  = as
 # LD  = arm-linux-gnueabihf-g++
-LD = /usr/bin/g++-4.8
+LD = /usr/bin/g++
 STRIP = strip
 
 EMULATOR = $(TARGET)$(EXE)
@@ -38,7 +38,7 @@ CFLAGS = -fsigned-char $(DEVLIBS) \
 	-I$(SDKSTAGE)/opt/vc/include -I$(SDKSTAGE)/opt/vc/include/interface/vcos/pthreads \
 	-I$(SDKSTAGE)/opt/vc/include/interface/vmcs_host/linux \
 	-I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include \
-	-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=neon-fp-armv8 -mfloat-abi=hard -mvectorize-with-neon-quad \
+	-mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -mvectorize-with-neon-quad \
 	-O3 -funsafe-math-optimizations -fomit-frame-pointer -fstrict-aliasing \
 	-mstructure-size-boundary=32 -fexpensive-optimizations \
 	-fweb -frename-registers -falign-functions=16 -falign-loops -falign-labels -falign-jumps \
@@ -76,7 +76,7 @@ $(OBJ)/%.o: src/%.c
 
 $(OBJ)/%.o: src/%.cpp
 	@echo Compiling $<...
-	$(CPP) $(CDEFS) $(CFLAGS) -fno-rtti -c $< -o $@
+	$(CPP) $(CDEFS) $(CFLAGS) -Wno-narrowing -Wno-cast-align -fno-rtti -c $< -o $@
 
 $(OBJ)/%.o: src/%.s
 	@echo Compiling $<...

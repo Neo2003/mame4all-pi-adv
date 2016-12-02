@@ -4082,10 +4082,18 @@ opcode_0_7:
 ;@EX AF,AF'
 opcode_0_8:
 	add r1,cpucontext,#z80a2
-	swp z80a,z80a,[r1]
+opcode_0_8_try1:
+	ldrex z80a,[r1]
 	add r1,cpucontext,#z80f2
-	swp z80f,z80f,[r1]
+	strex r3,z80a,[r1]
+	cmp r3, #0
+	bne opcode_0_8_try1
+opcode_0_8_try2:
+	ldrex z80f,[r1]
 	fetch 4
+	strex r3,z80f,[r1]
+	cmp r3, #0
+	bne opcode_0_8_try2
 ;@ADD HL,BC
 opcode_0_9:
 	opADD16 z80hl z80bc
@@ -5138,12 +5146,24 @@ opcode_D_8:
 ;@EXX
 opcode_D_9:
 	add r1,cpucontext,#z80bc2
-	swp z80bc,z80bc,[r1]
+opcode_D_9_try1:
+	ldrex z80bc,[r1]
 	add r1,cpucontext,#z80de2
-	swp z80de,z80de,[r1]
+	strex r3,z80bc,[r1]
+	cmp r3, #0
+    bne opcode_D_9_try1
+opcode_D_9_try2:
+	ldrex z80de,[r1]
 	add r1,cpucontext,#z80hl2
-	swp z80hl,z80hl,[r1]
+	strex r3,z80de,[r1]
+	cmp r3, #0
+    bne opcode_D_9_try2
+opcode_D_9_try3:
+	ldrex z80hl,[r1]
 	fetch 4
+	strex z80hl,r3,[r1]
+	cmp r3, #0
+    bne opcode_D_9_try3
 ;@JP C,$+3
 opcode_D_A:
 	tst z80f,#1<<CFlag
