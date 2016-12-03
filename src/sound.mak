@@ -260,6 +260,12 @@ $(OBJ)/sound/5220intf.o: src/sound/tms5220.cpp src/sound/5220intf.cpp
 SOUNDOBJS += $(OBJ)/sound/5220intf.o
 endif
 
+SOUND=$(strip $(findstring IREMGA20@,$(SOUNDS)))
+ifneq ($(SOUND),)
+SOUNDDEFS += -DHAS_IREMGA20=1
+SOUNDOBJS += $(OBJ)/sound/iremga20.o
+endif
+
 SOUND=$(strip $(findstring SEGAPCM@,$(SOUNDS)))
 ifneq ($(SOUND),)
 SOUNDDEFS += -DHAS_SEGAPCM=1
