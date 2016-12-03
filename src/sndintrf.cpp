@@ -274,6 +274,9 @@ int speaker_num(const struct MachineSound *msound) { return ((struct Speaker_int
 #if (HAS_WAVE)
 int wave_num(const struct MachineSound *msound) { return ((struct Wave_interface*)msound->sound_interface)->num; }
 #endif
+#if (HAS_IREMGA20)
+int iremga20_clock(const struct MachineSound *msound) { return ((struct IremGA20_interface*)msound->sound_interface)->clock; }
+#endif
 
 struct snd_interface sndintf[] =
 {
@@ -739,6 +742,18 @@ struct snd_interface sndintf[] =
 		SEGAPCM_sh_start,
 		SEGAPCM_sh_stop,
 		SEGAPCM_sh_update,
+		0
+	},
+#endif
+#if (HAS_IREMGA20)
+	{
+		SOUND_IREMGA20,
+		"GA20",
+		0,
+		iremga20_clock,
+		IremGA20_sh_start,
+		IremGA20_sh_stop,
+		0,
 		0
 	},
 #endif

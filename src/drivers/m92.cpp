@@ -1,32 +1,31 @@
 #include "../vidhrdw/m92.cpp"
-
+#include "../machine/irem_cpu.cpp"
 /*****************************************************************************
 
 	Irem M92 system games:
 
-	Blademaster	(World)						(c) 1991 Irem Corp
 	Gunforce (World)				M92-A	(c) 1991 Irem Corp
 	Gunforce (USA)					M92-A	(c) 1991 Irem America Corp
+	Gunforce (Japan)				M92-A	(c) 1991 Irem Corp
+	Blademaster	(World)						(c) 1991 Irem Corp
 	Lethal Thunder (World)					(c) 1991 Irem Corp
 	Thunder Blaster (Japan)					(c) 1991 Irem Corp
-	Hook (World)							(c) 1992 Irem Corp
-	Hook (USA)								(c) 1992 Irem America Corp
-	Mystic Riders (World)					(c) 1992 Irem Corp
-	Gun Hohki (Japan)						(c) 1992 Irem Corp
 	Undercover Cops	(World)					(c) 1992 Irem Corp
 	Undercover Cops	(Japan)					(c) 1992 Irem Corp
-	R-Type Leo (Japan)						(c) 1992 Irem Corp
+	Mystic Riders (World)					(c) 1992 Irem Corp
+	Gun Hohki (Japan)						(c) 1992 Irem Corp
 	Major Title 2 (World)			M92-F	(c) 1992 Irem Corp
 	The Irem Skins Game (USA Set 1)	M92-F	(c) 1992 Irem America Corp
 	The Irem Skins Game (USA Set 2)	M92-F	(c) 1992 Irem America Corp
+	Hook (World)							(c) 1992 Irem Corp
+	Hook (USA)								(c) 1992 Irem America Corp
+	R-Type Leo (Japan)						(c) 1992 Irem Corp
 	In The Hunt	(World)				M92-E	(c) 1993 Irem Corp
 	In The Hunt	(USA)				M92-E	(c) 1993 Irem Corp
 	Kaitei Daisensou (Japan)		M92-E	(c) 1993 Irem Corp
 	Ninja Baseball Batman (USA)				(c) 1993 Irem America Corp
 	Yakyuu Kakutou League-Man (Japan)		(c) 1993 Irem Corp
 	Perfect Soldiers (Japan)		M92-G	(c) 1993 Irem Corp
-
-	Once decrypted, Irem M97 games will be very close to this hardware.
 
 System notes:
 	Each game has an encrypted sound cpu (see m97.c), the sound cpu and
@@ -43,7 +42,6 @@ System notes:
 	These are slow to emulate, and can be turned on/off by pressing
 	F1 - they are on by default.
 
-
 Glitch list!
 
 	Gunforce:
@@ -51,15 +49,17 @@ Glitch list!
 		always appears if you cheat and jump straight to the level).
 		Almost certainly a core bug.
 
-	R-Type Leo:
-		Title screen is incorrect, it uses mask sprites but I can't find
-		how the effect is turned on/off
-		Crashes fixed via a kludge - cpu bug.
+	Lethal Thunder:
+		Gives 99 credits.
 
 	Irem Skins:
-		Mask sprite on title screen?
-		Sprites & tiles written with bad colour values - cpu bug?
-		Eeprom load/save not yet implemented - when done, MT2EEP should
+		- The palette banking handling is surely wrong, but it seems to work
+		  during the game; the character test in service mode is wrong, though.
+		- Priority bug: you can't see the arrow on the top right map.
+		- Gfx problems at the players information during attract mode in
+		  Skins Game *only*, Major Title is fine (that part of attract mode
+		  is different).
+		- Eeprom load/save not yet implemented - when done, MT2EEP should
 		  be removed from the ROM definition.
 
 	Blade Master:
@@ -69,40 +69,46 @@ Glitch list!
 		Very picky about interrupts..
 		Doesn't work!
 
+	Perfect Soliders:
+		Shortly into the fight, the sound CPU enters a tight loop, conitnuously
+		writing to the status port and with interrupts disabled. I don't see how
+		it is supposed to get out of that loop. Maybe it's not supposed to enter
+		it at all?
+
+
 	Emulation by Bryan McPhail, mish@tendril.co.uk
 	Thanks to Chris Hardy and Olli Bergmann too!
 
 
-Irem Custom V33 CPU:
+Sound programs:
 
-Gunforce						Nanao 	08J27261A 011 9106KK701
-Quiz F-1 1,2 Finish          	Nanao	08J27291A4 014 9147KK700
-Skins Game						Nanao 	08J27291A7
-R-Type Leo						Irem 	D800001A1
-In The Hunt						Irem 	D8000011A1
-Gun Hohki									  16?
-Risky Challenge/Gussun Oyoyo 			D8000019A1
-Shisensho II                 			D8000020A1 023 9320NK700
-Perfect Soldiers						D8000022A1
+Game                          Year  ID string
+----------------------------  ----  ------------
+Gunforce					  1991  -
+Blade Master				  1991  -
+Lethal Thunder				  1991  -
+Undercover Cops				  1992  Rev 3.40 M92
+Mystic Riders				  1992  Rev 3.44 M92
+Major Title 2				  1992  Rev 3.44 M92
+Hook						  1992  Rev 3.45 M92
+R-Type Leo					  1992  Rev 3.45 M92
+In The Hunt					  1993  Rev 3.45 M92
+Ninja Baseball Batman		  1993  Rev 3.50 M92
+Perfect Soldiers			  1993  Rev 3.50 M92
+Fire Barrel                   1993  Rev 3.52 M92
+Dream Soccer '94              1994  Rev 3.53 M92
 
-Nanao Custom parts:
-
-GA20	Sample player
-GA21	Tilemaps } Used in combination
-GA22	Tilemaps }
-GA23	Sprites (Gun Force)
-GA30 	Tilemaps
-GA31	Tilemaps
-GA32	Sprites (Fire Barrel)
 
 *****************************************************************************/
 
 #include "driver.h"
 #include "vidhrdw/generic.h"
 #include "m92.h"
+#include "machine/irem_cpu.h"
 
 static int m92_irq_vectorbase,m92_vblank;
 static unsigned char *m92_eeprom,*m92_ram;
+
 
 #define M92_IRQ_0 ((m92_irq_vectorbase+0)/4)  /* VBL interrupt*/
 #define M92_IRQ_1 ((m92_irq_vectorbase+4)/4)  /* End of VBL interrupt?? */
@@ -112,6 +118,9 @@ static unsigned char *m92_eeprom,*m92_ram;
 /* From vidhrdw/m92.c */
 WRITE_HANDLER( m92_spritecontrol_w );
 WRITE_HANDLER( m92_spritebuffer_w );
+WRITE_HANDLER( majtitl2_spritebuffer_w );
+READ_HANDLER( majtitl2_paletteram_r );
+WRITE_HANDLER( majtitl2_paletteram_w );
 READ_HANDLER( m92_vram_r );
 WRITE_HANDLER( m92_vram_w );
 WRITE_HANDLER( m92_pf1_control_w );
@@ -119,6 +128,8 @@ WRITE_HANDLER( m92_pf2_control_w );
 WRITE_HANDLER( m92_pf3_control_w );
 WRITE_HANDLER( m92_master_control_w );
 int m92_vh_start(void);
+int majtitl2_vh_start(void);
+void majtitl2_vh_stop(void);
 void m92_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 void m92_vh_raster_partial_refresh(struct osd_bitmap *bitmap,int start_line,int end_line);
 
@@ -128,29 +139,6 @@ extern unsigned char *m92_vram_data,*m92_spritecontrol;
 extern int m92_game_kludge;
 
 /*****************************************************************************/
-
-static READ_HANDLER( status_port_r )
-{
-//logerror("%06x: status %04x\n",cpu_get_pc(),offset);
-
-/*
-
-	Gunforce waits on bit 1 (word) going high on bootup, just after
-	setting up interrupt controller.
-
-	Gunforce reads bit 2 (word) on every coin insert, doesn't seem to
-	do much though..
-
-	Ninja Batman polls this.
-
-	R-Type Leo reads it now & again..
-
-*/
-	if (m92_game_kludge==1)
-		m92_ram[0x53]=1; /* FIXES RTYPE LEO! */
-
-	return 0xff;
-}
 
 static READ_HANDLER( m92_eeprom_r )
 {
@@ -163,7 +151,7 @@ static READ_HANDLER( m92_eeprom_r )
 static WRITE_HANDLER( m92_eeprom_w )
 {
 	unsigned char *RAM = memory_region(REGION_USER1);
-//	logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(),offset);
+	logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(),offset);
 	RAM[offset/2]=data;
 }
 
@@ -173,13 +161,17 @@ static WRITE_HANDLER( m92_coincounter_w )
 		coin_counter_w(0,data & 0x01);
 		coin_counter_w(1,data & 0x02);
 
+#if 0
 		if (m92_game_kludge==2) {
 			unsigned char *RAM = memory_region(REGION_CPU1);
 			RAM[0x1840]=0x90; /* For Leagueman */
 			RAM[0x1841]=0x90;
 			RAM[0x830]=0x90;
 			RAM[0x831]=0x90;
+			RAM[0x666]=0x90;
+			RAM[0x667]=0x90;
 		}
+#endif
 
 		/* Bit 0x8 is Motor(?!), used in Hook, In The Hunt, UCops */
 		/* Bit 0x8 is Memcard related in RTypeLeo */
@@ -211,7 +203,7 @@ static WRITE_HANDLER( m92_bankswitch_w )
 {
 	unsigned char *RAM = memory_region(REGION_CPU1);
 
-	//logerror("%04x: Bank %04x (%02x)\n",cpu_get_pc(),data,offset);
+//	logerror("%04x: Bank %04x (%02x)\n",cpu_get_pc(),data,offset);
 	if (offset==1) return; /* Unused top byte */
 
 	cpu_setbank(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
@@ -223,11 +215,105 @@ static READ_HANDLER( m92_port_4_r )
 	return readinputport(4) | 0x80;
 }
 
+enum { VECTOR_INIT, YM2151_ASSERT, YM2151_CLEAR, V30_ASSERT, V30_CLEAR };
+
+static void setvector_callback(int param)
+{
+	static int irqvector;
+
+	switch(param)
+	{
+		case VECTOR_INIT:	irqvector = 0;		break;
+		case YM2151_ASSERT:	irqvector |= 0x2;	break;
+		case YM2151_CLEAR:	irqvector &= ~0x2;	break;
+		case V30_ASSERT:	irqvector |= 0x1;	break;
+		case V30_CLEAR:		irqvector &= ~0x1;	break;
+	}
+
+	if (irqvector & 0x2)		/* YM2151 has precedence */
+		cpu_irq_line_vector_w(1,0,0x18);
+	else if (irqvector & 0x1)	/* V30 */
+		cpu_irq_line_vector_w(1,0,0x19);
+
+	if (irqvector == 0)	/* no IRQs pending */
+		cpu_set_irq_line(1,0,CLEAR_LINE);
+	else	/* IRQ pending */
+		cpu_set_irq_line(1,0,ASSERT_LINE);
+}
+
 static WRITE_HANDLER( m92_soundlatch_w )
 {
-	if (offset==0) soundlatch_w(0,data);
-	/* Interrupt second V33 */
+	if (offset==0)
+	{
+		timer_set(TIME_NOW,V30_ASSERT,setvector_callback);
+		soundlatch_w(0,data);
+//		logerror("soundlatch_w %02x\n",data);
+	}
 }
+
+static int sound_status;
+
+static READ_HANDLER( m92_sound_status_r )
+{
+	if (offset == 0)
+	{
+//logerror("%06x: read sound status\n",cpu_get_pc());
+
+/*
+
+	Gunforce waits on bit 1 (word) going high on bootup, just after
+	setting up interrupt controller.
+
+	Gunforce reads bit 2 (word) on every coin insert, doesn't seem to
+	do much though..
+
+	Ninja Batman polls this.
+
+	R-Type Leo reads it now & again..
+
+*/
+		if (Machine->sample_rate)
+			return sound_status;
+		else
+		{
+			/* rtypeleo uses the sound answer for protection */
+			if (m92_game_kludge==1)
+				m92_ram[0x53]=1; /* FIXES RTYPE LEO! */
+
+			return 0xff;
+		}
+	}
+	else return 0xff;
+}
+
+static READ_HANDLER( m92_soundlatch_r )
+{
+	if (offset == 0)
+	{
+		int res = soundlatch_r(offset);
+//		logerror("soundlatch_r %02x\n",res);
+		return res;
+	}
+	else return 0xff;
+}
+
+static WRITE_HANDLER( m92_sound_irq_ack_w )
+{
+	if (offset == 0)
+	{
+		timer_set(TIME_NOW,V30_CLEAR,setvector_callback);
+	}
+}
+
+static WRITE_HANDLER( m92_sound_status_w )
+{
+	if (offset == 0)
+	{
+//		usrintf_showmessage("sound answer %02x",data);
+		sound_status = data;
+	}
+}
+
 
 /*****************************************************************************/
 
@@ -238,7 +324,6 @@ static struct MemoryReadAddress readmem[] =
 	{ 0xc0000, 0xcffff, MRA_BANK2 }, /* Mirror of rom:  Used by In The Hunt as protection */
 	{ 0xd0000, 0xdffff, m92_vram_r },
 	{ 0xe0000, 0xeffff, MRA_RAM },
-	{ 0xf0000, 0xf3fff, m92_eeprom_r }, /* Eeprom, Major Title 2 only */
 	{ 0xf8000, 0xf87ff, MRA_RAM },
 	{ 0xf8800, 0xf8fff, paletteram_r },
 	{ 0xffff0, 0xfffff, MRA_ROM },
@@ -250,7 +335,6 @@ static struct MemoryWriteAddress writemem[] =
 	{ 0x00000, 0xbffff, MWA_ROM },
 	{ 0xd0000, 0xdffff, m92_vram_w, &m92_vram_data },
 	{ 0xe0000, 0xeffff, MWA_RAM, &m92_ram }, /* System ram */
-	{ 0xf0000, 0xf3fff, m92_eeprom_w, &m92_eeprom }, /* Eeprom, Major Title 2 only */
 	{ 0xf8000, 0xf87ff, MWA_RAM, &spriteram, &spriteram_size },
 	{ 0xf8800, 0xf8fff, paletteram_xBBBBBGGGGGRRRRR_w, &paletteram },
 	{ 0xf9000, 0xf900f, m92_spritecontrol_w, &m92_spritecontrol },
@@ -283,17 +367,45 @@ static struct MemoryWriteAddress lethalth_writemem[] =
 	{ -1 }	/* end of table */
 };
 
+static struct MemoryReadAddress majtitl2_readmem[] =
+{
+	{ 0x00000, 0x9ffff, MRA_ROM },
+	{ 0xa0000, 0xbffff, MRA_BANK1 },
+	{ 0xc0000, 0xcffff, MRA_BANK2 }, /* Mirror of rom:  Used by In The Hunt as protection */
+	{ 0xd0000, 0xdffff, m92_vram_r },
+	{ 0xe0000, 0xeffff, MRA_RAM },
+	{ 0xf0000, 0xf3fff, m92_eeprom_r }, /* Eeprom, Major Title 2 only */
+	{ 0xf8000, 0xf87ff, MRA_RAM },
+	{ 0xf8800, 0xf8fff, majtitl2_paletteram_r },
+	{ 0xffff0, 0xfffff, MRA_ROM },
+	{ -1 }	/* end of table */
+};
+
+static struct MemoryWriteAddress majtitl2_writemem[] =
+{
+	{ 0x00000, 0xbffff, MWA_ROM },
+	{ 0xd0000, 0xdffff, m92_vram_w, &m92_vram_data },
+	{ 0xe0000, 0xeffff, MWA_RAM, &m92_ram }, /* System ram */
+	{ 0xf0000, 0xf3fff, m92_eeprom_w, &m92_eeprom }, /* Eeprom, Major Title 2 only */
+	{ 0xf8000, 0xf87ff, MWA_RAM, &spriteram, &spriteram_size },
+	{ 0xf8800, 0xf8fff, majtitl2_paletteram_w },
+	{ 0xf9000, 0xf900f, m92_spritecontrol_w, &m92_spritecontrol },
+	{ 0xf9800, 0xf9801, majtitl2_spritebuffer_w },
+	{ 0xffff0, 0xfffff, MWA_ROM },
+	{ -1 }	/* end of table */
+};
+
 static struct IOReadPort readport[] =
 {
-	{ 0x00, 0x00, input_port_0_r }, /* Player 1 */
+    { 0x00, 0x00, input_port_0_r }, /* Player 1 */
 	{ 0x01, 0x01, input_port_1_r }, /* Player 2 */
 	{ 0x02, 0x02, m92_port_4_r },   /* Coins & VBL */
 	{ 0x03, 0x03, input_port_7_r }, /* Dip 3 */
 	{ 0x04, 0x04, input_port_6_r }, /* Dip 2 */
 	{ 0x05, 0x05, input_port_5_r }, /* Dip 1 */
 	{ 0x06, 0x06, input_port_2_r }, /* Player 3 */
-	{ 0x07, 0x07, input_port_3_r }, /* Player 4 */
-	{ 0x08, 0x09, status_port_r },  /* ? */
+	{ 0x07, 0x07, input_port_3_r },	/* Player 4 */
+	{ 0x08, 0x09, m92_sound_status_r },	/* answer from sound CPU */
 	{ -1 }	/* end of table */
 };
 
@@ -313,10 +425,12 @@ static struct IOWritePort writeport[] =
 
 /******************************************************************************/
 
-#if 0
 static struct MemoryReadAddress sound_readmem[] =
 {
 	{ 0x00000, 0x1ffff, MRA_ROM },
+	{ 0xa0000, 0xa3fff, MRA_RAM },
+	{ 0xa8042, 0xa8043, YM2151_status_port_0_r },
+	{ 0xa8044, 0xa8045, m92_soundlatch_r },
 	{ 0xffff0, 0xfffff, MRA_ROM },
 	{ -1 }	/* end of table */
 };
@@ -324,10 +438,16 @@ static struct MemoryReadAddress sound_readmem[] =
 static struct MemoryWriteAddress sound_writemem[] =
 {
 	{ 0x00000, 0x1ffff, MWA_ROM },
+	{ 0x9ff00, 0x9ffff, MWA_NOP }, /* Irq controller? */
+	{ 0xa0000, 0xa3fff, MWA_RAM },
+	{ 0xa8000, 0xa803f, IremGA20_w },
+	{ 0xa8040, 0xa8041, YM2151_register_port_0_w },
+	{ 0xa8042, 0xa8043, YM2151_data_port_0_w },
+	{ 0xa8044, 0xa8045, m92_sound_irq_ack_w },
+	{ 0xa8046, 0xa8047, m92_sound_status_w },
 	{ 0xffff0, 0xfffff, MWA_ROM },
 	{ -1 }	/* end of table */
 };
-#endif
 
 /******************************************************************************/
 
@@ -340,7 +460,7 @@ INPUT_PORTS_START( bmaster )
 	PORT_SYSTEM_DIPSWITCH
 
 	PORT_START	/* Dip switch bank 1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
@@ -351,13 +471,13 @@ INPUT_PORTS_START( bmaster )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* One of these is continue */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Allow Continue" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -412,9 +532,9 @@ INPUT_PORTS_START( gunforce )
 	PORT_DIPSETTING(    0x00, "15000 35000 75000 120000" )
 	PORT_DIPSETTING(    0x10, "20000 40000 90000 150000" )
 	PORT_DIPNAME( 0x20, 0x20, "Allow Continue" )
-	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -441,13 +561,13 @@ INPUT_PORTS_START( lethalth )
 	PORT_DIPSETTING(    0x08, "Easy" )
 	PORT_DIPSETTING(    0x0c, "Normal" )
 	PORT_DIPSETTING(    0x04, "Hard" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* One of these is continue */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Allow Continue" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -569,7 +689,7 @@ INPUT_PORTS_START( majtitl2 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -621,13 +741,13 @@ INPUT_PORTS_START( mysticri )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* One of these is continue */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Allow Continue" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -668,7 +788,7 @@ INPUT_PORTS_START( uccops )
 	PORT_SYSTEM_DIPSWITCH
 
 	PORT_START	/* Dip switch bank 1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
@@ -679,13 +799,13 @@ INPUT_PORTS_START( uccops )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* One of these is continue */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -760,10 +880,10 @@ INPUT_PORTS_START( inthunt )
 
 	PORT_START	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x02, "4" )
-	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, "Very Easy" )
 	PORT_DIPSETTING(    0x08, "Easy" )
@@ -927,7 +1047,7 @@ INPUT_PORTS_START( psoldier )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -964,9 +1084,9 @@ INPUT_PORTS_END
 static struct GfxLayout charlayout =
 {
 	8,8,	/* 8*8 characters */
-	65536,	/* 65536 characters */
+	RGN_FRAC(1,4),
 	4,	/* 4 bits per pixel */
-	{ 0x180000*8, 0x100000*8, 0x80000*8, 0x000000*8 },	/* the bitplanes are separated */
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	/* every char takes 8 consecutive bytes */
@@ -975,9 +1095,9 @@ static struct GfxLayout charlayout =
 static struct GfxLayout spritelayout =
 {
 	16,16,
-	0x8000,
+	RGN_FRAC(1,4),
 	4,
-	{ 0x300000*8, 0x200000*8, 0x100000*8, 0x000000*8 },
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
@@ -988,10 +1108,10 @@ static struct GfxLayout spritelayout =
 static struct GfxLayout spritelayout2 =
 {
 	16,16,
-	0x10000,
+	RGN_FRAC(1,4),
 	4,
-	{ 0x600000*8, 0x400000*8, 0x200000*8, 0x000000*8 },
-	{ 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	32*8
@@ -1004,11 +1124,43 @@ static struct GfxDecodeInfo gfxdecodeinfo[] =
 	{ -1 } /* end of array */
 };
 
+static struct GfxDecodeInfo majtitl2_gfxdecodeinfo[] =
+{
+	{ REGION_GFX1, 0, &charlayout,      0, 64 },
+	{ REGION_GFX2, 0, &spritelayout, 1024, 64 },
+	{ -1 } /* end of array */
+};
+
 static struct GfxDecodeInfo gfxdecodeinfo2[] =
 {
 	{ REGION_GFX1, 0, &charlayout,    0, 64 },
 	{ REGION_GFX2, 0, &spritelayout2, 0, 64 },
 	{ -1 } /* end of array */
+};
+
+/***************************************************************************/
+
+static void sound_irq(int state)
+{
+	if (state)
+		timer_set(TIME_NOW,YM2151_ASSERT,setvector_callback);
+	else
+		timer_set(TIME_NOW,YM2151_CLEAR,setvector_callback);
+}
+
+static struct YM2151interface ym2151_interface =
+{
+	1,
+	14318180/4,
+	{ YM3012_VOL(40,MIXER_PAN_LEFT,40,MIXER_PAN_RIGHT) },
+	{ sound_irq }
+};
+
+static struct IremGA20_interface iremGA20_interface =
+{
+	14318180/4,
+	REGION_SOUND1,
+	{ MIXER(100,MIXER_PAN_LEFT), MIXER(100,MIXER_PAN_RIGHT) },
 };
 
 /***************************************************************************/
@@ -1075,14 +1227,12 @@ static struct MachineDriver machine_driver_raster =
 			readmem,writemem,readport,writeport,
 			m92_raster_interrupt,256 /* 8 prelines, 240 visible lines, 8 for vblank? */
 		},
-#if 0
 		{
-			CPU_V33 | CPU_AUDIO_CPU,
+			CPU_V30 | CPU_AUDIO_CPU,
 			14318180,	/* 14.31818 MHz */
 			sound_readmem,sound_writemem,0,0,
 			ignore_interrupt,0
 		}
-#endif
 	},
 	60, DEFAULT_60HZ_VBLANK_DURATION,	/* frames per second, vblank duration */
 	1,	/* 1 CPU slice per frame - interleaving is forced when a sound command is written */
@@ -1092,7 +1242,7 @@ static struct MachineDriver machine_driver_raster =
 	512, 512, { 80, 511-112, 128+8, 511-128-8 }, /* 320 x 240 */
 
 	gfxdecodeinfo,
-	1024,1024,
+	1024, 0,
 	0,
 
 	VIDEO_TYPE_RASTER | VIDEO_MODIFIES_PALETTE | VIDEO_BUFFERS_SPRITERAM,
@@ -1102,15 +1252,65 @@ static struct MachineDriver machine_driver_raster =
 	m92_vh_screenrefresh,
 
 	/* sound hardware */
-#if 0
 	SOUND_SUPPORTS_STEREO,0,0,0,
 	{
 		{
 			SOUND_YM2151,
 			&ym2151_interface
+		},
+		{
+			SOUND_IREMGA20,
+			&iremGA20_interface
 		}
 	}
-#endif
+};
+
+static struct MachineDriver machine_driver_majtitl2 =
+{
+	/* basic machine hardware */
+	{
+		{
+			CPU_V33,	/* NEC V33 */
+			18000000,	/* 18 MHz clock */
+			majtitl2_readmem,majtitl2_writemem,readport,writeport,
+			m92_raster_interrupt,256 /* 8 prelines, 240 visible lines, 8 for vblank? */
+		},
+		{
+			CPU_V30 | CPU_AUDIO_CPU,
+			14318180,	/* 14.31818 MHz */
+			sound_readmem,sound_writemem,0,0,
+			ignore_interrupt,0
+		}
+	},
+	60, DEFAULT_60HZ_VBLANK_DURATION,	/* frames per second, vblank duration */
+	1,	/* 1 CPU slice per frame - interleaving is forced when a sound command is written */
+	0,
+
+	/* video hardware */
+	512, 512, { 80, 511-112, 128+8, 511-128-8 }, /* 320 x 240 */
+
+	majtitl2_gfxdecodeinfo,
+	2048, 0,	/* twice the colors of the other games */
+	0,
+
+	VIDEO_TYPE_RASTER  | VIDEO_BUFFERS_SPRITERAM,
+	0,
+	majtitl2_vh_start,
+	majtitl2_vh_stop,
+	m92_vh_screenrefresh,
+
+	/* sound hardware */
+	SOUND_SUPPORTS_STEREO,0,0,0,
+	{
+		{
+			SOUND_YM2151,
+			&ym2151_interface
+		},
+		{
+			SOUND_IREMGA20,
+			&iremGA20_interface
+		}
+	}
 };
 
 static struct MachineDriver machine_driver_nonraster =
@@ -1123,14 +1323,12 @@ static struct MachineDriver machine_driver_nonraster =
 			readmem,writemem,readport,writeport,
 			m92_interrupt,1
 		},
-#if 0
 		{
-			CPU_V33 | CPU_AUDIO_CPU,
+			CPU_V30 | CPU_AUDIO_CPU,
 			14318180,	/* 14.31818 MHz */
 			sound_readmem,sound_writemem,0,0,
 			ignore_interrupt,0
 		}
-#endif
 	},
 	60, DEFAULT_60HZ_VBLANK_DURATION,	/* frames per second, vblank duration */
 	1,	/* 1 CPU slice per frame - interleaving is forced when a sound command is written */
@@ -1140,25 +1338,27 @@ static struct MachineDriver machine_driver_nonraster =
 	512, 512, { 80, 511-112, 128+8, 511-128-8 }, /* 320 x 240 */
 
 	gfxdecodeinfo,
-	1024,1024,
+	1024, 0,
 	0,
 
-	VIDEO_TYPE_RASTER | VIDEO_MODIFIES_PALETTE | VIDEO_BUFFERS_SPRITERAM,
+	VIDEO_TYPE_RASTER  | VIDEO_BUFFERS_SPRITERAM,
 	0,
 	m92_vh_start,
 	0,
 	m92_vh_screenrefresh,
 
 	/* sound hardware */
-#if 0
 	SOUND_SUPPORTS_STEREO,0,0,0,
 	{
 		{
 			SOUND_YM2151,
 			&ym2151_interface
+		},
+		{
+			SOUND_IREMGA20,
+			&iremGA20_interface
 		}
 	}
-#endif
 };
 
 static struct MachineDriver machine_driver_lethalth =
@@ -1171,14 +1371,12 @@ static struct MachineDriver machine_driver_lethalth =
 			lethalth_readmem,lethalth_writemem,readport,writeport,
 			m92_interrupt,1
 		},
-#if 0
 		{
-			CPU_V33 | CPU_AUDIO_CPU,
+			CPU_V30 | CPU_AUDIO_CPU,
 			14318180,	/* 14.31818 MHz */
 			sound_readmem,sound_writemem,0,0,
 			ignore_interrupt,0
 		}
-#endif
 	},
 	60, DEFAULT_60HZ_VBLANK_DURATION,	/* frames per second, vblank duration */
 	1,	/* 1 CPU slice per frame - interleaving is forced when a sound command is written */
@@ -1188,25 +1386,27 @@ static struct MachineDriver machine_driver_lethalth =
 	512, 512, { 80, 511-112, 128+8, 511-128-8 }, /* 320 x 240 */
 
 	gfxdecodeinfo,
-	1024,1024,
+	1024, 0,
 	0,
 
-	VIDEO_TYPE_RASTER | VIDEO_MODIFIES_PALETTE | VIDEO_BUFFERS_SPRITERAM,
+	VIDEO_TYPE_RASTER  | VIDEO_BUFFERS_SPRITERAM,
 	0,
 	m92_vh_start,
 	0,
 	m92_vh_screenrefresh,
 
 	/* sound hardware */
-#if 0
 	SOUND_SUPPORTS_STEREO,0,0,0,
 	{
 		{
 			SOUND_YM2151,
 			&ym2151_interface
+		},
+		{
+			SOUND_IREMGA20,
+			&iremGA20_interface
 		}
 	}
-#endif
 };
 
 static struct MachineDriver machine_driver_psoldier =
@@ -1219,14 +1419,12 @@ static struct MachineDriver machine_driver_psoldier =
 			readmem,writemem,readport,writeport,
 			m92_interrupt,1
 		},
-#if 0
 		{
-			CPU_V33 | CPU_AUDIO_CPU,
+			CPU_V30 | CPU_AUDIO_CPU,
 			14318180,	/* 14.31818 MHz */
 			sound_readmem,sound_writemem,0,0,
 			ignore_interrupt,0
 		}
-#endif
 	},
 	60, DEFAULT_60HZ_VBLANK_DURATION,	/* frames per second, vblank duration */
 	1,	/* 1 CPU slice per frame - interleaving is forced when a sound command is written */
@@ -1236,25 +1434,27 @@ static struct MachineDriver machine_driver_psoldier =
 	512, 512, { 80, 511-112, 128+8, 511-128-8 }, /* 320 x 240 */
 
 	gfxdecodeinfo2,
-	1024,1024,
+	1024, 0,
 	0,
 
-	VIDEO_TYPE_RASTER | VIDEO_MODIFIES_PALETTE | VIDEO_BUFFERS_SPRITERAM,
+	VIDEO_TYPE_RASTER  | VIDEO_BUFFERS_SPRITERAM,
 	0,
 	m92_vh_start,
 	0,
 	m92_vh_screenrefresh,
 
 	/* sound hardware */
-#if 0
 	SOUND_SUPPORTS_STEREO,0,0,0,
 	{
 		{
 			SOUND_YM2151,
 			&ym2151_interface
+		},
+		{
+			SOUND_IREMGA20,
+			&iremGA20_interface
 		}
 	}
-#endif
 };
 
 /***************************************************************************/
@@ -1653,7 +1853,7 @@ ROM_START( uccops )
 	ROM_LOAD_V20_EVEN( "uc_h1.rom",  0x080000, 0x020000, 0x8d29bcd6 )
 	ROM_LOAD_V20_ODD ( "uc_l1.rom",  0x080000, 0x020000, 0xa8a402d8 )
 
-	ROM_REGION( 0x100000, REGION_CPU2 )	/* 1MB for the audio CPU - encrypted V30 = NANAO custom D80001 (?) */
+	ROM_REGION( 0x100000 * 2, REGION_CPU2 )	/* 1MB for the audio CPU - encrypted V30 = NANAO custom D80001 (?) */
 	ROM_LOAD_V20_EVEN( "uc_sh0.rom", 0x000000, 0x010000, 0xdf90b198 )
 	ROM_LOAD_V20_ODD ( "uc_sl0.rom", 0x000000, 0x010000, 0x96c11aac )
 
@@ -1857,6 +2057,26 @@ static READ_HANDLER( hook_cycle_r )
 	return m92_ram[0x12 + offset];
 }
 
+static READ_HANDLER( bmaster_cycle_r )
+{
+	int d=cpu_geticount();
+
+	/* If possible skip this cpu segment - idle loop */
+	if (d>159 && d<0xf0000000) {
+		if (cpu_get_pc()==0x410 && m92_ram[0x6fde]==0 && m92_ram[0x6fdf]==0 && offset==0) {
+			/* Adjust in-game counter, based on cycles left to run */
+			int old;
+
+			old=m92_ram[0x74aa]+(m92_ram[0x74ab]<<8);
+			old=(old+d/25)&0xffff; /* 25 cycles per increment */
+			m92_ram[0x74aa]=old&0xff;
+			m92_ram[0x74ab]=old>>8;
+			cpu_spinuntil_int();
+		}
+	}
+	return m92_ram[0x6fde + offset];
+}
+
 static READ_HANDLER( psoldier_cycle_r )
 {
 	int a=m92_ram[0]+(m92_ram[1]<<8);
@@ -1965,46 +2185,48 @@ static void m92_startup(void)
 	m92_game_kludge=0;
 }
 
-static void init_m92(void)
+static void init_m92(unsigned char *decryption_table)
 {
-/*	m92_sound_decrypt();*/	/* Someday.. */
 	m92_startup();
+	setvector_callback(VECTOR_INIT);
+	irem_cpu_decrypt(1,decryption_table);
 }
 
 static void init_bmaster(void)
 {
-	init_m92();
+	install_mem_read_handler(0, 0xe6fde, 0xe6fdf, bmaster_cycle_r);
+	init_m92(bomberman_decryption_table);
 }
 
 static void init_gunforce(void)
 {
 	install_mem_read_handler(0, 0xe61d0, 0xe61d1, gunforce_cycle_r);
-	init_m92();
+	init_m92(gunforce_decryption_table);
 }
 
 static void init_hook(void)
 {
 	install_mem_read_handler(0, 0xe0012, 0xe0013, hook_cycle_r);
-	init_m92();
+	init_m92(hook_decryption_table);
 }
 
 static void init_mysticri(void)
 {
-	init_m92();
+	init_m92(mysticri_decryption_table);
 	m92_spritechip=1;
 }
 
 static void init_uccops(void)
 {
 	install_mem_read_handler(0, 0xe3a02, 0xe3a03, uccops_cycle_r);
-	init_m92();
+	init_m92(dynablaster_decryption_table);
 	m92_spritechip=1;
 }
 
 static void init_rtypeleo(void)
 {
 	install_mem_read_handler(0, 0xe0032, 0xe0033, rtypeleo_cycle_r);
-	init_m92();
+	init_m92(rtypeleo_decryption_table);
 	m92_game_kludge=1;
 	m92_spritechip=1;
 	m92_irq_vectorbase=0x20; /* M92-A-B motherboard */
@@ -2012,19 +2234,19 @@ static void init_rtypeleo(void)
 
 static void init_majtitl2(void)
 {
-	init_m92();
+	init_m92(majtitl2_decryption_table);
 }
 
 static void init_inthunt(void)
 {
 	install_mem_read_handler(0, 0xe025e, 0xe025f, inthunt_cycle_r);
-	init_m92();
+	init_m92(inthunt_decryption_table);
 }
 
 static void init_lethalth(void)
 {
 	install_mem_read_handler(0, 0xe001e, 0xe001f, lethalth_cycle_r);
-	init_m92();
+	init_m92(lethalth_decryption_table);
 	m92_spritechip=1;
 	m92_irq_vectorbase=0x20; /* M92-A-B motherboard */
 
@@ -2035,7 +2257,7 @@ static void init_lethalth(void)
 
 static void init_nbbatman(void)
 {
-	init_m92();
+	init_m92(leagueman_decryption_table);
 	m92_game_kludge=2;
 	m92_spritechip=1;
 }
@@ -2043,9 +2265,11 @@ static void init_nbbatman(void)
 static void init_psoldier(void)
 {
 	install_mem_read_handler(0, 0xe1aec, 0xe1aed, psoldier_cycle_r);
-	init_m92();
+	init_m92(psoldier_decryption_table);
 	m92_spritechip=1;
 	m92_irq_vectorbase=0x20; /* M92-A-B motherboard */
+	/* main CPU expects an answer even before writing the first command */
+	sound_status = 0x80;
 }
 
 /***************************************************************************/

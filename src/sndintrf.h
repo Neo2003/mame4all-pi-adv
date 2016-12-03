@@ -111,6 +111,9 @@ struct MachineSound
 #if (HAS_SEGAPCM)
 #include "sound/segapcm.h"
 #endif
+#if (HAS_IREMGA20)
+#include "sound/iremga20.h"
+#endif
 #if (HAS_RF5C68)
 #include "sound/rf5c68.h"
 #endif
@@ -251,6 +254,10 @@ enum
 #if (HAS_SEGAPCM)
 	SOUND_SEGAPCM,
 #endif
+#if (HAS_IREMGA20)
+	SOUND_IREMGA20,
+#endif
+
 #if (HAS_RF5C68)
 	SOUND_RF5C68,
 #endif

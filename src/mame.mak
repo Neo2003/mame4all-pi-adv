@@ -106,6 +106,7 @@ SOUNDS+=K051649@
 SOUNDS+=K053260@
 SOUNDS+=K054539@
 SOUNDS+=SEGAPCM@
+SOUNDS+=IREMGA20@
 SOUNDS+=RF5C68@
 SOUNDS+=CEM3394@
 SOUNDS+=C140@
@@ -197,7 +198,7 @@ $(OBJ)/drivers/m62.o: src/vidhrdw/m62.cpp src/drivers/m62.cpp
 $(OBJ)/drivers/vigilant.o: src/vidhrdw/vigilant.cpp src/drivers/vigilant.cpp
 $(OBJ)/vidhrdw/m72.o: src/vidhrdw/m72.cpp src/sndhrdw/m72.cpp src/drivers/m72.cpp
 $(OBJ)/drivers/shisen.o: src/vidhrdw/shisen.cpp src/drivers/shisen.cpp
-$(OBJ)/drivers/m92.o: src/vidhrdw/m92.cpp src/drivers/m92.cpp
+$(OBJ)/drivers/m92.o: src/vidhrdw/m92.cpp src/machine/irem_cpu.cpp src/drivers/m92.cpp
 $(OBJ)/drivers/m107.o: src/vidhrdw/m107.cpp src/drivers/m107.cpp
 OBJ_IREM = $(OBJ)/drivers/skychut.o $(OBJ)/drivers/olibochu.o $(OBJ)/sndhrdw/irem.o $(OBJ)/drivers/mpatrol.o $(OBJ)/drivers/troangel.o \
 	$(OBJ)/drivers/yard.o $(OBJ)/drivers/travrusa.o $(OBJ)/drivers/m62.o $(OBJ)/drivers/vigilant.o $(OBJ)/drivers/m72.o $(OBJ)/drivers/shisen.o \

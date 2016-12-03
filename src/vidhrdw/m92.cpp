@@ -78,12 +78,43 @@ WRITE_HANDLER( m92_spritecontrol_w )
 
 WRITE_HANDLER( m92_spritebuffer_w )
 {
-//	logerror("%04x: buffered spriteram %d %d\n",cpu_get_pc(),offset,data);
-	if (m92_spritechip==0 && offset==0) {
+//	logerror("%04x: m92_spritebuffer_w %d = %02x\n",cpu_get_pc(),offset,data);
+	if (m92_spritechip==0 && offset==0)
+	{
 		buffer_spriteram_w(0,0);
 		m92_sprite_interrupt();
 	}
 //	if (m92_spritechip==1)	memset(spriteram,0,0x800);
+}
+
+
+static int majtitl2_palette_bank;
+
+WRITE_HANDLER( majtitl2_spritebuffer_w )
+{
+//	logerror("%04x: m92_spritebuffer_w %d = %02x\n",cpu_get_pc(),offset,data);
+	if (offset == 0)
+	{
+		/* certainly wrong, but it seems to work */
+		if ((data & 0x7f) == 0x12) majtitl2_palette_bank = 1;
+		else                       majtitl2_palette_bank = 0;
+	}
+	if (m92_spritechip==0 && offset==0)
+	{
+		buffer_spriteram_w(0,0);
+		m92_sprite_interrupt();
+	}
+//	if (m92_spritechip==1)	memset(spriteram,0,0x800);
+}
+
+READ_HANDLER( majtitl2_paletteram_r )
+{
+	return paletteram_r(offset + 0x800*majtitl2_palette_bank);
+}
+
+WRITE_HANDLER( majtitl2_paletteram_w )
+{
+	paletteram_xBBBBBGGGGGRRRRR_w(offset + 0x800*majtitl2_palette_bank,data);
 }
 
 /*****************************************************************************/
@@ -415,6 +446,27 @@ int m92_vh_start(void)
 	m92_sprite_list=0;
 	memset(spriteram,0,0x800);
 	memset(buffered_spriteram,0,0x800);
+
+	return 0;
+}
+
+void majtitl2_vh_stop(void)
+{
+	free(paletteram);
+}
+
+int majtitl2_vh_start(void)
+{
+	paletteram = (unsigned char *)malloc(0x1000);
+
+	if (!paletteram)
+		return 1;
+
+	if (m92_vh_start())
+	{
+		majtitl2_vh_stop();
+		return 1;
+	}
 
 	return 0;
 }
