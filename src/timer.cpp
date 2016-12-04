@@ -95,7 +95,7 @@ timer_tm getabsolutetime(void)
 /*
  *		adjust the current CPU's timer so that a new event will fire at the right time
  */
-INLINE void timer_adjust(timer_entry *timer, timer_tm time, timer_tm period)
+INLINE void timer_adjust_icount(timer_entry *timer, timer_tm time, timer_tm period)
 {
 	int newicount, diff;
 
@@ -311,6 +311,68 @@ void timer_set_overclock(int cpunum, float overclock)
 	cpu->cycles_to_sec = cycles_to_sec[cpunum] = TIME_ONE_SEC / sec_to_cycles[cpunum];
 }
 
+/*-------------------------------------------------
+	timer_alloc - allocate a permament timer that
+	isn't primed yet
+-------------------------------------------------*/
+
+void *timer_alloc(void (*callback)(int))
+{
+	timer_entry *timer = timer_new();
+	double time = getabsolutetime();
+
+	/* fail if we can't allocate a new entry */
+	if (!timer)
+		return NULL;
+
+	/* fill in the record */
+	timer->callback = callback;
+	timer->callback_param = 0;
+	timer->enabled = 0;
+	timer->period = 0;
+
+	/* compute the time of the next firing and insert into the list */
+	timer->start = time;
+	timer->expire = TIME_NEVER;
+	timer_list_insert(timer);
+
+	/* return a handle */
+	return timer;
+}
+
+/*-------------------------------------------------
+	timer_adjust - adjust the time when this
+	timer will fire, and whether or not it will
+	fire periodically
+-------------------------------------------------*/
+
+void *timer_adjust(void *which, double duration, int param, double period)
+{
+	double time = getabsolutetime();
+	timer_entry *timer = (timer_entry*)which;
+
+	/* if this is the callback timer, mark it modified */
+	if (timer == callback_timer)
+		callback_timer_modified = 1;
+
+	/* compute the time of the next firing and insert into the list */
+	timer->callback_param = param;
+	timer->enabled = 1;
+
+	/* set the start and expire times */
+	timer->start = time;
+	timer->expire = time + duration;
+	timer->period = period;
+
+	/* remove and re-insert the timer in its new order */
+	timer_list_remove(timer);
+	timer_list_insert(timer);
+
+	/* if we're supposed to fire before the end of this cycle, adjust the counter */
+	if (activecpu && timer->expire < base_time)
+		timer_adjust_icount(timer, time, period);
+}
+
 /*
  *		allocate a pulse timer, which repeatedly calls the callback using the given period
  */
@@ -341,7 +403,7 @@ void *timer_pulse(timer_tm period, int param, void (*callback)(int))
 
 	/* if we're supposed to fire before the end of this cycle, adjust the counter */
 	if (activecpu && timer->expire < base_time)
-		timer_adjust(timer, time, period);
+		timer_adjust_icount(timer, time, period);
 
 	/* return a handle */
 	return timer;
@@ -376,7 +438,7 @@ void *timer_set(timer_tm duration, int param, void (*callback)(int))
 
 	/* if we're supposed to fire before the end of this cycle, adjust the counter */
 	if (activecpu && timer->expire < base_time)
-		timer_adjust(timer, time, duration);
+		timer_adjust_icount(timer, time, duration);
 
 	/* return a handle */
 	return timer;
@@ -403,7 +465,7 @@ void timer_reset(void *which, timer_tm duration)
 
 	/* if we're supposed to fire before the end of this cycle, adjust the counter */
 	if (activecpu && timer->expire < base_time)
-		timer_adjust(timer, time, duration);
+		timer_adjust_icount(timer, time, duration);
 
 	/* if this is the callback timer, mark it modified */
 	if (timer == callback_timer)

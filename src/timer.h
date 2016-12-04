@@ -48,9 +48,23 @@ extern timer_tm sec_to_cycles[];
 #define SUSPEND_REASON_DISABLE	0x0010
 #define SUSPEND_ANY_REASON		((UINT32)-1)
 
+typedef struct timer_entry
+{
+	struct timer_entry *next;
+	struct timer_entry *prev;
+	void (*callback)(int);
+	int callback_param;
+	int enabled;
+	timer_tm period;
+	timer_tm start;
+	timer_tm expire;
+} timer_entry;
+
 void timer_init(void);
 void *timer_pulse(timer_tm period, int param, void(*callback)(int));
 void *timer_set(timer_tm duration, int param, void(*callback)(int));
+void *timer_adjust(void *which, double duration, int param, double period);
+void *timer_alloc(void (*callback)(int));
 void timer_reset(void *which, timer_tm duration);
 void timer_remove(void *which);
 int timer_enable(void *which, int enable);
@@ -70,16 +84,5 @@ float timer_get_overclock(int cpunum);
 void timer_set_overclock(int cpunum, float overclock);
 
 timer_tm getabsolutetime(void);
-typedef struct timer_entry
-{
-	struct timer_entry *next;
-	struct timer_entry *prev;
-	void (*callback)(int);
-	int callback_param;
-	int enabled;
-	timer_tm period;
-	timer_tm start;
-	timer_tm expire;
-} timer_entry;
 
 #endif
