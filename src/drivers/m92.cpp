@@ -1242,7 +1242,7 @@ static struct MachineDriver machine_driver_raster =
 	512, 512, { 80, 511-112, 128+8, 511-128-8 }, /* 320 x 240 */
 
 	gfxdecodeinfo,
-	1024, 0,
+	1024, 1024,
 	0,
 
 	VIDEO_TYPE_RASTER | VIDEO_MODIFIES_PALETTE | VIDEO_BUFFERS_SPRITERAM,
@@ -1338,10 +1338,10 @@ static struct MachineDriver machine_driver_nonraster =
 	512, 512, { 80, 511-112, 128+8, 511-128-8 }, /* 320 x 240 */
 
 	gfxdecodeinfo,
-	1024, 0,
+	1024, 1024,
 	0,
 
-	VIDEO_TYPE_RASTER  | VIDEO_BUFFERS_SPRITERAM,
+	VIDEO_TYPE_RASTER | VIDEO_MODIFIES_PALETTE | VIDEO_BUFFERS_SPRITERAM,
 	0,
 	m92_vh_start,
 	0,
