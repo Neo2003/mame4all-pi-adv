@@ -55,6 +55,7 @@ unsigned char *m92_vram_data,*m92_spritecontrol;
 int m92_game_kludge;
 
 extern void m92_sprite_interrupt(void);
+int m92_sprite_buffer_busy;
 
 /* This is a kludgey speedup that I consider to be pretty ugly..  But -
 it gets a massive speed increase (~40fps -> ~65fps).  It works by avoiding
@@ -62,18 +63,56 @@ the need to dirty the top playfield twice a frame */
 #define RYPELEO_SPEEDUP m92_game_kludge==1
 
 /*****************************************************************************/
+static void spritebuffer_callback (int dummy)
+{
+	m92_sprite_buffer_busy=0x80;
+	if (m92_game_kludge!=2) /* Major Title 2 doesn't like this interrupt!? */
+		m92_sprite_interrupt();
+}
 
 WRITE_HANDLER( m92_spritecontrol_w )
 {
+	static int sprite_extent;
+
 	m92_spritecontrol[offset]=data;
 
+	/* Sprite list size register - used in spriteroutine */
+	if (offset==0)
+		sprite_extent=data;
+
+	/* Sprite control - display all sprites, or partial list */
+	if (offset==4) {
+		if (data==8)
+			m92_sprite_list=(((0x100 - sprite_extent)&0xff)*8);
+		else
+			m92_sprite_list=0x800;
+
+		/* Bit 0 is also significant */
+	}
+
+	/* Sprite buffer - the data written doesn't matter (confirmed by several games) */
+	if (offset==8) {
+		buffer_spriteram_w(0,0);
+		m92_sprite_buffer_busy=0;
+
+		/* Pixel clock is 26.6666 MHz, we have 0x800 bytes, or 0x400 words
+		to copy from spriteram to the buffer.  It seems safe to assume 1
+		word can be copied per clock.  So:
+
+			1 MHz clock would be 1 word every 0.000,001s = 1000ns
+			26.6666MHz clock would be 1 word every 0.000,000,037 = 37 ns
+			Buffer should copy in about 37888 ns.
+		*/
+		timer_set (TIME_IN_NSEC(37 * 0x400), 0, spritebuffer_callback);
+	}
+
 	/* The games using this sprite chip can autoclear spriteram */
-	if (offset==8 && m92_spritechip==1) {
+/*	if (offset==8 && m92_spritechip==1) {
 //		logerror("%04x: cleared spriteram\n",cpu_get_pc());
 		buffer_spriteram_w(0,0);
 		memset(spriteram,0,0x800);
 		m92_sprite_interrupt();
-	}
+	}*/
 }
 
 WRITE_HANDLER( m92_spritebuffer_w )
@@ -124,9 +163,9 @@ static void get_pf1_tile_info(int tile_index)
 	int tile,color,pri;
 	tile_index = 4*tile_index+pf1_vram_ptr;
 
-	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8);
+	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8)+((m92_vram_data[tile_index+3]&0x80)<<9);
 	color=m92_vram_data[tile_index+2];
-	SET_TILE_INFO(0,tile,color&0x3f)
+    SET_TILE_INFO(0,tile,color&0x7f)
 
 	if (m92_vram_data[tile_index+3]&1) pri = 2;
 	else if (color&0x80) pri = 1;
@@ -140,9 +179,9 @@ static void get_pf1_htile_info(int tile_index)
 	int tile,color,pri;
 	tile_index = 4*tile_index + 0xc000;
 
-	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8);
+	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8)+((m92_vram_data[tile_index+3]&0x80)<<9);
 	color=m92_vram_data[tile_index+2];
-	SET_TILE_INFO(0,tile,color&0x3f)
+	SET_TILE_INFO(0,tile,color&0x7f)
 
 	if (m92_vram_data[tile_index+3]&1) pri = 2;
 	else if (color&0x80) pri = 1;
@@ -158,9 +197,9 @@ static void get_pf1_ltile_info(int tile_index)
 	if (pf1_vram_ptr==0x4000) tile_index += 0x4000;
 	else if (pf1_vram_ptr==0x8000) tile_index += 0x8000;
 
-	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8);
+	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8)+((m92_vram_data[tile_index+3]&0x80)<<9);
 	color=m92_vram_data[tile_index+2];
-	SET_TILE_INFO(0,tile,color&0x3f)
+	SET_TILE_INFO(0,tile,color&0x7f)
 
 	if (m92_vram_data[tile_index+3]&1) pri = 2;
 	else if (color&0x80) pri = 1;
@@ -174,9 +213,9 @@ static void get_pf2_tile_info(int tile_index)
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf2_vram_ptr;
 
-	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8);
+	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8)+((m92_vram_data[tile_index+3]&0x80)<<9);
 	color=m92_vram_data[tile_index+2];
-	SET_TILE_INFO(0,tile,color&0x3f)
+	SET_TILE_INFO(0,tile,color&0x7f)
 
 	if (m92_vram_data[tile_index+3]&1) pri = 2;
 	else if (color&0x80) pri = 1;
@@ -189,13 +228,13 @@ static void get_pf3_tile_info(int tile_index)
 {
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf3_vram_ptr;
-	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8);
+	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8)+((m92_vram_data[tile_index+3]&0x80)<<9);
 	color=m92_vram_data[tile_index+2];
 
 	if (color&0x80) pri = 1;
 	else pri = 0;
 
-	SET_TILE_INFO(0,tile,color&0x3f)
+	SET_TILE_INFO(0,tile,color&0x7f)
 	tile_info.flags = TILE_FLIPYX((m92_vram_data[tile_index+3] & 0x6)>>1) | TILE_SPLIT(pri);
 }
 
@@ -204,9 +243,9 @@ static void get_pf1_wide_tile_info(int tile_index)
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf1_vram_ptr;
 
-	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8);
+	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8)+((m92_vram_data[tile_index+3]&0x80)<<9);
 	color=m92_vram_data[tile_index+2];
-	SET_TILE_INFO(0,tile,color&0x3f)
+	SET_TILE_INFO(0,tile,color&0x7f)
 
 	if (m92_vram_data[tile_index+3]&1) pri = 2;
 	else if (color&0x80) pri = 1;
@@ -220,13 +259,13 @@ static void get_pf3_wide_tile_info(int tile_index)
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf3_vram_ptr;
 
-	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8);
+	tile=m92_vram_data[tile_index]+(m92_vram_data[tile_index+1]<<8)+((m92_vram_data[tile_index+3]&0x80)<<9);
 	color=m92_vram_data[tile_index+2];
 
 	if (color&0x80) pri = 1;
 	else pri = 0;
 
-	SET_TILE_INFO(0,tile,color&0x3f)
+	SET_TILE_INFO(0,tile,color&0x7f)
 	tile_info.flags = TILE_FLIPYX((m92_vram_data[tile_index+3] & 0x6)>>1) | TILE_SPLIT(pri);
 }
 
@@ -413,7 +452,9 @@ int m92_vh_start(void)
 		128,64
 	);
 
-	if (!pf1_layer || !pf2_layer || !pf3_layer || !pf1_wide_layer || !pf3_wide_layer)
+	paletteram = (unsigned char *)malloc(0x1000);
+
+	if (!pf1_layer || !pf2_layer || !pf3_layer || !pf1_wide_layer || !pf3_wide_layer || !paletteram)
 		return 1;
 
 	pf1_layer->transparent_pen = 0;
@@ -657,14 +698,7 @@ static void m92_update_scroll_positions(void)
 		tilemap_set_scroll_rows(pf1_hlayer,1);
 		tilemap_set_scrollx( pf1_hlayer,0, (pf1_control[5]<<8)+pf1_control[4] );
 		tilemap_set_scrolly( pf1_hlayer,0, (pf1_control[1]<<8)+pf1_control[0] );
-//		pf1_hlayer->scrolled=1;
 	}
-
-//	pf1_wide_layer->scrolled=1;
-//	pf3_wide_layer->scrolled=1;
-//	pf3_layer->scrolled=1;
-//	pf2_layer->scrolled=1;
-//	pf1_layer->scrolled=1;
 }
 
 /*****************************************************************************/

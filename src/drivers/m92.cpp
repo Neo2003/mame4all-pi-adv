@@ -2235,6 +2235,12 @@ static void init_rtypeleo(void)
 static void init_majtitl2(void)
 {
 	init_m92(majtitl2_decryption_table);
+
+	/* This game has an eprom on the game board */
+	install_mem_read_handler(0, 0xf0000, 0xf3fff, m92_eeprom_r);
+	install_mem_write_handler(0, 0xf0000, 0xf3fff, m92_eeprom_w);
+
+	m92_game_kludge=2;
 }
 
 static void init_inthunt(void)
@@ -2275,24 +2281,24 @@ static void init_psoldier(void)
 /***************************************************************************/
 
 /* The 'nonraster' machine is for games that don't use the raster interrupt feature - slightly faster to emulate */
-GAMEX( 1991, bmaster,  0,        nonraster, bmaster,  bmaster,  ROT0,       "Irem",         "Blade Master (World)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1991, lethalth, 0,        lethalth,  lethalth, lethalth, ROT270,     "Irem",         "Lethal Thunder (World)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1991, thndblst, lethalth, lethalth,  lethalth, lethalth, ROT270,     "Irem",         "Thunder Blaster (Japan)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1991, gunforce, 0,        raster,    gunforce, gunforce, ROT0,       "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1991, gunforcu, gunforce, raster,    gunforce, gunforce, ROT0,       "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, hook,     0,        nonraster, hook,     hook,     ROT0,       "Irem",         "Hook (World)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, hooku,    hook,     nonraster, hook,     hook,     ROT0,       "Irem America", "Hook (US)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, mysticri, 0,        nonraster, mysticri, mysticri, ROT0,       "Irem",         "Mystic Riders (World)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, gunhohki, mysticri, nonraster, mysticri, mysticri, ROT0,       "Irem",         "Gun Hohki (Japan)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, uccops,   0,        raster,    uccops,   uccops,   ROT0_16BIT, "Irem",         "Undercover Cops (World)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, uccopsj,  uccops,   raster,    uccops,   uccops,   ROT0_16BIT, "Irem",         "Undercover Cops (Japan)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, rtypeleo, 0,        raster,    rtypeleo, rtypeleo, ROT0_16BIT, "Irem",         "R-Type Leo (Japan)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, majtitl2, 0,        raster,    majtitl2, majtitl2, ROT0_16BIT, "Irem",         "Major Title 2 (World)", GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL )
-GAMEX( 1992, skingame, majtitl2, raster,    majtitl2, majtitl2, ROT0_16BIT, "Irem America", "The Irem Skins Game (US set 1)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1992, skingam2, majtitl2, raster,    majtitl2, majtitl2, ROT0_16BIT, "Irem America", "The Irem Skins Game (US set 2)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1993, inthunt,  0,        raster,    inthunt,  inthunt,  ROT0_16BIT, "Irem",         "In The Hunt (World)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1993, inthuntu, inthunt,  raster,    inthunt,  inthunt,  ROT0_16BIT, "Irem America", "In The Hunt (US)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1993, kaiteids, inthunt,  raster,    inthunt,  inthunt,  ROT0_16BIT, "Irem",         "Kaitei Daisensou (Japan)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAMEX( 1993, nbbatman, 0,        raster,    nbbatman, nbbatman, ROT0,       "Irem America", "Ninja Baseball Batman (US)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAMEX( 1993, leaguemn, nbbatman, raster,    nbbatman, nbbatman, ROT0,       "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAMEX( 1993, psoldier, 0,        psoldier,  psoldier, psoldier, ROT0_16BIT, "Irem",         "Perfect Soldiers (Japan)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
+GAMEX( 1991, bmaster,  0,        nonraster, bmaster,  bmaster,  ROT0,       "Irem",         "Blade Master (World)", GAME_NO_COCKTAIL )
+GAMEX( 1991, lethalth, 0,        lethalth,  lethalth, lethalth, ROT270,     "Irem",         "Lethal Thunder (World)", GAME_NO_COCKTAIL )
+GAMEX( 1991, thndblst, lethalth, lethalth,  lethalth, lethalth, ROT270,     "Irem",         "Thunder Blaster (Japan)", GAME_NO_COCKTAIL )
+GAMEX( 1991, gunforce, 0,        raster,    gunforce, gunforce, ROT0,       "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", GAME_NO_COCKTAIL )
+GAMEX( 1991, gunforcu, gunforce, raster,    gunforce, gunforce, ROT0,       "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", GAME_NO_COCKTAIL )
+GAMEX( 1992, hook,     0,        nonraster, hook,     hook,     ROT0,       "Irem",         "Hook (World)", GAME_NO_COCKTAIL )
+GAMEX( 1992, hooku,    hook,     nonraster, hook,     hook,     ROT0,       "Irem America", "Hook (US)", GAME_NO_COCKTAIL )
+GAMEX( 1992, mysticri, 0,        nonraster, mysticri, mysticri, ROT0,       "Irem",         "Mystic Riders (World)", GAME_NO_COCKTAIL )
+GAMEX( 1992, gunhohki, mysticri, nonraster, mysticri, mysticri, ROT0,       "Irem",         "Gun Hohki (Japan)", GAME_NO_COCKTAIL )
+GAMEX( 1992, uccops,   0,        raster,    uccops,   uccops,   ROT0_16BIT, "Irem",         "Undercover Cops (World)", GAME_NO_COCKTAIL )
+GAMEX( 1992, uccopsj,  uccops,   raster,    uccops,   uccops,   ROT0_16BIT, "Irem",         "Undercover Cops (Japan)", GAME_NO_COCKTAIL )
+GAMEX( 1992, rtypeleo, 0,        raster,    rtypeleo, rtypeleo, ROT0_16BIT, "Irem",         "R-Type Leo (Japan)", GAME_NO_COCKTAIL )
+GAMEX( 1992, majtitl2, 0,        raster,    majtitl2, majtitl2, ROT0_16BIT, "Irem",         "Major Title 2 (World)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL )
+GAMEX( 1992, skingame, majtitl2, raster,    majtitl2, majtitl2, ROT0_16BIT, "Irem America", "The Irem Skins Game (US set 1)", GAME_NO_COCKTAIL )
+GAMEX( 1992, skingam2, majtitl2, raster,    majtitl2, majtitl2, ROT0_16BIT, "Irem America", "The Irem Skins Game (US set 2)", GAME_NO_COCKTAIL )
+GAMEX( 1993, inthunt,  0,        raster,    inthunt,  inthunt,  ROT0_16BIT, "Irem",         "In The Hunt (World)", GAME_NO_COCKTAIL )
+GAMEX( 1993, inthuntu, inthunt,  raster,    inthunt,  inthunt,  ROT0_16BIT, "Irem America", "In The Hunt (US)", GAME_NO_COCKTAIL )
+GAMEX( 1993, kaiteids, inthunt,  raster,    inthunt,  inthunt,  ROT0_16BIT, "Irem",         "Kaitei Daisensou (Japan)", GAME_NO_COCKTAIL )
+GAMEX( 1993, nbbatman, 0,        raster,    nbbatman, nbbatman, ROT0,       "Irem America", "Ninja Baseball Batman (US)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAMEX( 1993, leaguemn, nbbatman, raster,    nbbatman, nbbatman, ROT0,       "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAMEX( 1993, psoldier, 0,        psoldier,  psoldier, psoldier, ROT0_16BIT, "Irem",         "Perfect Soldiers (Japan)", GAME_NO_COCKTAIL )
