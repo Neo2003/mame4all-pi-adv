@@ -54,15 +54,17 @@ int m92_raster_irq_position,m92_spritechip,m92_raster_machine,m92_raster_enable;
 unsigned char *m92_vram_data,*m92_spritecontrol;
 int m92_game_kludge;
 
-extern void m92_sprite_interrupt(void);
-int m92_sprite_buffer_busy;
-
 /* This is a kludgey speedup that I consider to be pretty ugly..  But -
 it gets a massive speed increase (~40fps -> ~65fps).  It works by avoiding
 the need to dirty the top playfield twice a frame */
 #define RYPELEO_SPEEDUP m92_game_kludge==1
 
+extern void m92_sprite_interrupt(void);
+int m92_sprite_buffer_busy;
+static int m92_palette_bank;
+
 /*****************************************************************************/
+
 static void spritebuffer_callback (int dummy)
 {
 	m92_sprite_buffer_busy=0x80;
@@ -106,54 +108,40 @@ WRITE_HANDLER( m92_spritecontrol_w )
 		timer_set (TIME_IN_NSEC(37 * 0x400), 0, spritebuffer_callback);
 	}
 
-	/* The games using this sprite chip can autoclear spriteram */
-/*	if (offset==8 && m92_spritechip==1) {
-//		logerror("%04x: cleared spriteram\n",cpu_get_pc());
-		buffer_spriteram_w(0,0);
-		memset(spriteram,0,0x800);
-		m92_sprite_interrupt();
-	}*/
 }
 
 WRITE_HANDLER( m92_spritebuffer_w )
 {
-//	logerror("%04x: m92_spritebuffer_w %d = %02x\n",cpu_get_pc(),offset,data);
-	if (m92_spritechip==0 && offset==0)
+	/*
+		Many games write:
+			0x2000
+			0x201b in alternate frames.
+
+		Some games write to this both before and after the sprite buffer
+		register - perhaps some kind of acknowledge bit is in there?
+
+		Lethal Thunder fails it's RAM test with the upper palette bank
+		enabled.  This was one of the earlier games and could actually
+		be a different motherboard revision (most games use M92-A-B top
+		pcb, a M92-A-A revision could exist...).
+	*/
+	if (offset==0)
 	{
-		buffer_spriteram_w(0,0);
-		m92_sprite_interrupt();
+		/* Access to upper palette bank */
+		if ((data & 0x2) == 0x2 && m92_game_kludge!=3) m92_palette_bank = 1;
+		else                     m92_palette_bank = 0;
 	}
-//	if (m92_spritechip==1)	memset(spriteram,0,0x800);
+//	logerror("%04x: m92_videocontrol_w %d = %02x\n",activecpu_get_pc(),offset,data);
 }
 
-
-static int majtitl2_palette_bank;
-
-WRITE_HANDLER( majtitl2_spritebuffer_w )
+READ_HANDLER( m92_paletteram_r )
 {
-//	logerror("%04x: m92_spritebuffer_w %d = %02x\n",cpu_get_pc(),offset,data);
-	if (offset == 0)
-	{
-		/* certainly wrong, but it seems to work */
-		if ((data & 0x7f) == 0x12) majtitl2_palette_bank = 1;
-		else                       majtitl2_palette_bank = 0;
-	}
-	if (m92_spritechip==0 && offset==0)
-	{
-		buffer_spriteram_w(0,0);
-		m92_sprite_interrupt();
-	}
-//	if (m92_spritechip==1)	memset(spriteram,0,0x800);
+	return paletteram_r(offset + 0x800*m92_palette_bank);
 }
 
-READ_HANDLER( majtitl2_paletteram_r )
+WRITE_HANDLER( m92_paletteram_w )
 {
-	return paletteram_r(offset + 0x800*majtitl2_palette_bank);
-}
-
-WRITE_HANDLER( majtitl2_paletteram_w )
-{
-	paletteram_xBBBBBGGGGGRRRRR_w(offset + 0x800*majtitl2_palette_bank,data);
+	paletteram_xBBBBBGGGGGRRRRR_w(offset + 0x800*m92_palette_bank,data);
 }
 
 /*****************************************************************************/
@@ -484,34 +472,11 @@ int m92_vh_start(void)
 	pf1_rowscroll=pf2_rowscroll=pf3_rowscroll=0;
 	pf1_shape=pf2_shape=pf3_shape=0;
 
-	m92_sprite_list=0;
 	memset(spriteram,0,0x800);
 	memset(buffered_spriteram,0,0x800);
 
 	return 0;
 }
-
-void majtitl2_vh_stop(void)
-{
-	free(paletteram);
-}
-
-int majtitl2_vh_start(void)
-{
-	paletteram = (unsigned char *)malloc(0x1000);
-
-	if (!paletteram)
-		return 1;
-
-	if (m92_vh_start())
-	{
-		majtitl2_vh_stop();
-		return 1;
-	}
-
-	return 0;
-}
-
 
 /*****************************************************************************/
 
@@ -693,6 +658,7 @@ static void m92_update_scroll_positions(void)
 
 	if (m92_spritechip==1)
 		m92_sprite_list=0x800-8;
+
 
 	if (RYPELEO_SPEEDUP) {
 		tilemap_set_scroll_rows(pf1_hlayer,1);
