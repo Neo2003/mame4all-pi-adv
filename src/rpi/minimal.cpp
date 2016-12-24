@@ -47,6 +47,7 @@ extern void keyprocess(SDLKey inkey, SDL_bool pressed);
 extern void joyprocess(Uint8 button, SDL_bool pressed, Uint8 njoy);
 extern void mouse_motion_process(int x, int y);
 extern void mouse_button_process(Uint8 button, SDL_bool pressed);
+extern void hatprocess( Uint8 value, Uint8 joy_no );
 
 unsigned long gp2x_joystick_read()
 {
@@ -79,6 +80,9 @@ unsigned long gp2x_joystick_read()
 			case SDL_MOUSEBUTTONUP:
 				mouse_button_process(event.button.button, SDL_FALSE);
 				break;
+		 case SDL_JOYHATMOTION:
+		   hatprocess( event.jhat.value, event.jhat.which );
+		   break;
 
 			default:
 				break;
