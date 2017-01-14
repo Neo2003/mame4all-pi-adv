@@ -8,7 +8,7 @@ if [ "$HARDWARE" = "armv6l" ] ; then
     make
 elif [ "$HARDWARE" = "armv7l" ] ; then
     REVISION=`cat /proc/cpuinfo | grep Revision |  cut -d : -f2 | tr -d '[:space:]'`
-    if [ "$REVISION" = "a01041" ] || [ "$REVISION" = "a21041" ] ; then
+    if [[ $REVISION =~ 1*a[02]1041 ]]; then
         echo Building for Pi 2
         rm Makefile
         cp Makefile_Pi2 Makefile
