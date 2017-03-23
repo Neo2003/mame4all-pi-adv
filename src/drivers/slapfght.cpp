@@ -656,14 +656,13 @@ static struct MachineDriver machine_driver_tigerh =
 		},
 		{
 			CPU_Z80,
-			6000000,
+			3000000,  // From 0.123u1
 			sound_readmem,sound_writemem,0,0,
 			nmi_interrupt,6,    /* ??? */
 		}
 	},
 	60,				/* fps - frames per second */
-//	DEFAULT_REAL_60HZ_VBLANK_DURATION,
-	5000,	/* wrong, but fixes graphics glitches */
+	DEFAULT_REAL_60HZ_VBLANK_DURATION,
 	10,     /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 	slapfight_init_machine,
 
@@ -701,7 +700,7 @@ static struct MachineDriver machine_driver_slapfigh =
 		},
 		{
 			CPU_Z80,
-			6000000,
+			3000000,   // From 0.123u1
 			sound_readmem,sound_writemem,0,0,
 				getstar_interrupt/*nmi_interrupt*/, 3,    /* p'tit Seb 980926 this way it sound much better ! */
 			0,0                  /* I think music is not so far from correct speed */
@@ -710,8 +709,7 @@ static struct MachineDriver machine_driver_slapfigh =
 		}
 	},
 	60,				/* fps - frames per second */
-//	DEFAULT_REAL_60HZ_VBLANK_DURATION,
-	5000,	/* wrong, but fixes graphics glitches */
+	DEFAULT_REAL_60HZ_VBLANK_DURATION,
 	10,     /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 	slapfight_init_machine,
 
@@ -750,7 +748,7 @@ static struct MachineDriver machine_driver_slapbtuk =
 		},
 		{
 			CPU_Z80,
-			6000000,
+			3000000,   // From 0.123u1
 			sound_readmem,sound_writemem,0,0,
 			getstar_interrupt/*nmi_interrupt*/, 3,    /* p'tit Seb 980926 this way it sound much better ! */
 			0,0                  /* I think music is not so far from correct speed */
@@ -759,8 +757,7 @@ static struct MachineDriver machine_driver_slapbtuk =
 		}
 	},
 	60,				/* fps - frames per second */
-//	DEFAULT_REAL_60HZ_VBLANK_DURATION,
-	5000,	/* wrong, but fixes graphics glitches */
+	DEFAULT_REAL_60HZ_VBLANK_DURATION,
 	10,     /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 	slapfight_init_machine,
 
