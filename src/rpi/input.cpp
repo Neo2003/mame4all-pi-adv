@@ -197,19 +197,19 @@ static struct SDLtranslate sdlkeytranslate[] =
 	{	KEY_F12,					SDLK_F12 },
 	{	KEY_ESC,					SDLK_ESCAPE },
 	{	KEY_TILDE,					SDLK_BACKQUOTE },
-	{	KEY_MINUS,		          	SDLK_MINUS },
-	{	KEY_EQUALS,		         	SDLK_EQUALS },
-	{	KEY_BACKSPACE,				SDLK_BACKSPACE },
+	{	KEY_MINUS,			          	SDLK_MINUS },
+	{	KEY_EQUALS,					SDLK_EQUALS },
+	{	KEY_BACKSPACE,					SDLK_BACKSPACE },
 	{	KEY_TAB,					SDLK_TAB },
-	{	KEY_OPENBRACE,		      	SDLK_LEFTPAREN },
-	{	KEY_CLOSEBRACE,		     	SDLK_RIGHTPAREN },
+	{	KEY_OPENBRACE,					SDLK_LEFTBRACKET },
+	{	KEY_CLOSEBRACE,					SDLK_RIGHTBRACKET },
 	{	KEY_ENTER,					SDLK_RETURN },
-	{	KEY_COLON,		          	SDLK_COLON },
-	{	KEY_QUOTE,		          	SDLK_QUOTE },
-	{	KEY_BACKSLASH,		      	SDLK_BACKSLASH },
-	{	KEY_COMMA,                  SDLK_COMMA },
-	{	KEY_STOP,		           	SDLK_PERIOD },
-	{	KEY_SLASH,		          	SDLK_SLASH },
+	{	KEY_COLON,					SDLK_COLON },
+	{	KEY_QUOTE,					SDLK_QUOTE },
+	{	KEY_BACKSLASH,					SDLK_BACKSLASH },
+	{	KEY_COMMA,					SDLK_COMMA },
+	{	KEY_STOP,					SDLK_PERIOD },
+	{	KEY_SLASH,					SDLK_SLASH },
 	{	KEY_SPACE,					SDLK_SPACE },
 	{	KEY_INSERT,					SDLK_INSERT },
 	{	KEY_DEL,					SDLK_DELETE },
@@ -221,15 +221,15 @@ static struct SDLtranslate sdlkeytranslate[] =
 	{	KEY_RIGHT,					SDLK_RIGHT },
 	{	KEY_UP,						SDLK_UP },
 	{	KEY_DOWN,					SDLK_DOWN },
-	{  	KEY_SLASH_PAD,		      	SDLK_KP_DIVIDE },
-	{	KEY_ASTERISK,		       	SDLK_KP_MULTIPLY },
-	{	KEY_MINUS_PAD,		      	SDLK_KP_MINUS },
-	{  	KEY_PLUS_PAD,		       	SDLK_KP_PLUS },
-	{ 	KEY_ENTER_PAD,		      	SDLK_KP_ENTER },
+	{  	KEY_SLASH_PAD,					SDLK_KP_DIVIDE },
+	{	KEY_ASTERISK,					SDLK_KP_MULTIPLY },
+	{	KEY_MINUS_PAD,					SDLK_KP_MINUS },
+	{  	KEY_PLUS_PAD,					SDLK_KP_PLUS },
+	{ 	KEY_ENTER_PAD,					SDLK_KP_ENTER },
 	{	KEY_LSHIFT,					SDLK_LSHIFT },
 	{	KEY_RSHIFT,					SDLK_RSHIFT },
-	{	KEY_LCONTROL,				SDLK_LCTRL },
-	{	KEY_RCONTROL,				SDLK_RCTRL },
+	{	KEY_LCONTROL,					SDLK_LCTRL },
+	{	KEY_RCONTROL,					SDLK_RCTRL },
 	{	KEY_ALT,					SDLK_LALT },
 	{	KEY_ALTGR,					SDLK_RALT },
 	{ 0, 0 }	/* end of table */
@@ -252,7 +252,7 @@ void keyprocess(SDLKey inkey, SDL_bool pressed)
 	int i=0;
 
 	while(sdlkeytranslate[i].mamekey)
-	{	
+	{
 		if(inkey == sdlkeytranslate[i].sdlkey)
 		{
 			key[sdlkeytranslate[i].mamekey]=pressed;
@@ -275,6 +275,43 @@ int osd_is_sdlkey_pressed(int inkey)
 		i++;
 	}
 }
+
+// Array of buttons, four buttons per joystick, four joysticks.
+static const int hat_map[4][4] = 
+{//{SLD_HAT_UP, SDL_HAT_DOWN, SDL_HAT_LEFT, SDL_HAT_RIGHT},
+   {    KEY_UP,     KEY_DOWN,     KEY_LEFT,     KEY_RIGHT}, // Joystick 1
+   { KEY_8_PAD,    KEY_2_PAD,    KEY_4_PAD,     KEY_6_PAD}, // Joystick 2
+   {     KEY_W,        KEY_S,        KEY_A,         KEY_D}, // Joystick 3
+   {     KEY_T,        KEY_G,        KEY_F,         KEY_H}  // Joystick 4
+};
+
+extern void hatprocess( Uint8 value, Uint8 joy_no )
+{
+   
+   if(joy_no > 3) return; // Only 4 joysticks supported.
+   
+   if( value & SDL_HAT_UP )
+     key[ hat_map[joy_no][0] ] = SDL_TRUE;
+   else 
+     key[ hat_map[joy_no][0] ] = SDL_FALSE;
+
+   if( value & SDL_HAT_DOWN )
+     key[ hat_map[joy_no][1] ] = SDL_TRUE;
+   else 
+     key[ hat_map[joy_no][1] ] = SDL_FALSE;
+   
+   if( value & SDL_HAT_LEFT )
+     key[ hat_map[joy_no][2] ] = SDL_TRUE;
+   else 
+     key[ hat_map[joy_no][2] ] = SDL_FALSE;
+
+   if( value & SDL_HAT_RIGHT )
+     key[ hat_map[joy_no][3] ] = SDL_TRUE;
+   else 
+     key[ hat_map[joy_no][3] ] = SDL_FALSE;
+
+}
+
 
 void joyprocess(Uint8 button, SDL_bool pressed, Uint8 njoy)
 {

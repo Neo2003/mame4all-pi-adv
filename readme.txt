@@ -180,6 +180,11 @@ http://dl.openhandhelds.org/cgi-bin/gp2x.cgi?0,0,0,0,5,2512
 
 *CHANGE LOG*
 
+_December 2016:_
+
+  * Solve audio of Ghost'n goblins and Ghouls'n ghosts
+  * Supports for joystick hat and PS3 six axis.
+
 _September 02, 2013:_
   * Supports more joystick axis and up to 16 joystick buttons.
   * Frontend keys and joystick controls now configurable.
