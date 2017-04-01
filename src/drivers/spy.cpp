@@ -21,31 +21,57 @@ void spy_vh_stop(void);
 void spy_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 
 
+static data8_t *pmcram;
+static int rambank,pmcbank;;
+static unsigned char *ram;
 
 static int spy_interrupt(void)
 {
 	if (K052109_is_IRQ_enabled())
 	{
-		if (cpu_getiloops()) return M6809_INT_FIRQ;	/* ??? */
-		else return interrupt();
+		return interrupt();
 	}
 	else return ignore_interrupt();
 }
 
 
-static int rambank;
-static unsigned char *ram;
 
 static READ_HANDLER( spy_bankedram1_r )
 {
-	if (!rambank) return ram[offset];
-	else return paletteram_r(offset);
+	if (rambank & 1)
+	{
+	    return paletteram_r(offset);
+	}
+	else if (rambank & 2)
+	{
+	    if (pmcbank)
+	    {
+		return pmcram[offset];
+	    }
+	    else
+	    {
+		return 0;
+	    }
+	}
+	else
+	    return ram[offset];
 }
 
 static WRITE_HANDLER( spy_bankedram1_w )
 {
-	if (!rambank) ram[offset] = data;
-	else paletteram_xBBBBBGGGGGRRRRR_swap_w(offset,data);
+	if (rambank & 1)
+	{
+	    paletteram_xBBBBBGGGGGRRRRR_swap_w(offset,data);
+	}
+	else if (rambank & 2)
+	{
+	    if (pmcbank)
+	    {
+		pmcram[offset] = data;
+	    }
+	}
+	else
+	    ram[offset] = data;
 }
 
 static WRITE_HANDLER( bankswitch_w )
@@ -54,7 +80,7 @@ static WRITE_HANDLER( bankswitch_w )
 	int offs;
 
 	/* bit 0 = RAM bank? */
-if ((data & 1) == 0) usrintf_showmessage("bankswitch RAM bank 0");
+	//if ((data & 1) == 0) usrintf_showmessage("bankswitch RAM bank 0");
 
 	/* bit 1-4 = ROM bank */
 	if (data & 0x10) offs = 0x20000 + (data & 0x06) * 0x1000;
@@ -62,19 +88,112 @@ if ((data & 1) == 0) usrintf_showmessage("bankswitch RAM bank 0");
 	cpu_setbank(1,&rom[offs]);
 }
 
+void spy_collision(void)
+{
+#define MAX_SPRITES 64
+#define DEF_NEAR_PLANE 0x6400
+#define NEAR_PLANE_ZOOM 0x0100
+#define FAR_PLANE_ZOOM 0x0000
+
+	int op1, x1, w1, z1, d1, y1, h1;
+	int op2, x2, w2, z2, d2, y2, h2;
+	int mode, i, loopend, nearplane;
+
+	mode = pmcram[0x1];
+	op1 = pmcram[0x2];
+	if (op1 == 1)
+	{
+		x1 = (pmcram[0x3]<<8) + pmcram[0x4];
+		w1 = (pmcram[0x5]<<8) + pmcram[0x6];
+		z1 = (pmcram[0x7]<<8) + pmcram[0x8];
+		d1 = (pmcram[0x9]<<8) + pmcram[0xa];
+		y1 = (pmcram[0xb]<<8) + pmcram[0xc];
+		h1 = (pmcram[0xd]<<8) + pmcram[0xe];
+
+		for (i=16; i<14*MAX_SPRITES + 2; i+=14)
+		{
+			op2 = pmcram[i];
+			if (op2 || mode==0x0c)
+			{
+				x2 = (pmcram[i+0x1]<<8) + pmcram[i+0x2];
+				w2 = (pmcram[i+0x3]<<8) + pmcram[i+0x4];
+				z2 = (pmcram[i+0x5]<<8) + pmcram[i+0x6];
+				d2 = (pmcram[i+0x7]<<8) + pmcram[i+0x8];
+				y2 = (pmcram[i+0x9]<<8) + pmcram[i+0xa];
+				h2 = (pmcram[i+0xb]<<8) + pmcram[i+0xc];
+/*
+	The mad scientist's laser truck has both a high sprite center and a small height value.
+	It has to be measured from the ground to detect correctly.
+*/
+				if (w2==0x58 && d2==0x04 && h2==0x10 && y2==0x30) h2 = y2;
+
+				// what other sprites fall into:
+				if ( (abs(x1-x2)<w1+w2) && (abs(z1-z2)<d1+d2) && (abs(y1-y2)<h1+h2) )
+				{
+					pmcram[0xf] = 0;
+					pmcram[i+0xd] = 0;
+				}
+				else
+					pmcram[i+0xd] = 1;
+			}
+		}
+	}
+	else if (op1 > 1)
+	{
+/*
+	The PMCU also projects geometries to screen coordinates. Unfortunately I'm unable to figure
+	the scale factors from the PMCU code. Plugging 0 and 0x100 to the far and near planes seems
+	to do the trick though.
+*/
+		loopend = (pmcram[0]<<8) + pmcram[1];
+		nearplane = (pmcram[2]<<8) + pmcram[3];
+
+		// fail safe
+		if (loopend > MAX_SPRITES) loopend = MAX_SPRITES;
+		if (!nearplane) nearplane = DEF_NEAR_PLANE;
+
+		loopend = (loopend<<1) + 4;
+
+		for (i=4; i<loopend; i+=2)
+		{
+			op2 = (pmcram[i]<<8) + pmcram[i+1];
+			op2 = (op2 * (NEAR_PLANE_ZOOM - FAR_PLANE_ZOOM)) / nearplane + FAR_PLANE_ZOOM;
+			pmcram[i] = op2 >> 8;
+			pmcram[i+1] = op2 & 0xff;
+		}
+
+		memset(pmcram+loopend, 0, 0x800-loopend); // clean up for next frame
+	}
+}
 static WRITE_HANDLER( spy_3f90_w )
 {
-	/* bits 0/1 = coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+    extern int spy_video_enable;
+    static int old;
 
-	/* bit 2 = enable char ROM reading through the video RAM */
-	K052109_set_RMRD_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+    /* bits 0/1 = coin counters */
+    coin_counter_w(0,data & 0x01);
+    coin_counter_w(1,data & 0x02);
 
-	/* bit 4 = select RAM at 0000 */
-	rambank = data & 0x10;
+    /* bit 2 = enable char ROM reading through the video RAM */
+    K052109_set_RMRD_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* other bits unknown */
+    /* bit 3 = disable video */
+    spy_video_enable = ~(data & 0x08);
+
+    /* bit 4 = read RAM at 0000 (if set) else read color palette RAM */
+    /* bit 5 = PMCBK */
+    rambank = (data & 0x30) >> 4;
+    /* bit 7 = PMC-BK */
+    pmcbank = (data & 0x80) >> 7;
+
+    /* bit 6 = PMC-START */
+    if ((data & 0x40) && !(old & 0x40))
+    {
+	spy_collision();
+	cpu_set_irq_line(0,M6809_FIRQ_LINE,HOLD_LINE);
+    }
+
+    old = data;
 }
 
 
@@ -295,10 +414,10 @@ static struct MachineDriver machine_driver_spy =
 {
 	{
 		{
-			CPU_HD6309,
+			CPU_M6809,
 			3000000, /* ? */
 			spy_readmem,spy_writemem,0,0,
-			spy_interrupt,2
+			spy_interrupt,1
 		},
 		{
 			CPU_Z80 | CPU_AUDIO_CPU,
@@ -313,7 +432,7 @@ static struct MachineDriver machine_driver_spy =
 	0,
 
 	/* video hardware */
-	64*8, 32*8, { 14*8, (64-14)*8-1, 2*8, 30*8-1 },
+	64*8, 32*8, { 13*8, (64-13)*8-1, 2*8, 30*8-1 },
 	0,	/* gfx decoded by konamiic.c */
 	1024, 1024,
 	0,
@@ -346,7 +465,7 @@ static struct MachineDriver machine_driver_spy =
 ***************************************************************************/
 
 ROM_START( spy )
-	ROM_REGION( 0x28800, REGION_CPU1 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x29000, REGION_CPU1 ) /* code + banked roms + space for banked ram */
 	ROM_LOAD( "857m03.bin",   0x10000, 0x10000, 0x3bd87fa4 )
     ROM_LOAD( "857m02.bin",   0x20000, 0x08000, 0x306cc659 )
     ROM_CONTINUE(             0x08000, 0x08000 )
@@ -383,9 +502,10 @@ static void gfx_untangle(void)
 static void init_spy(void)
 {
 	paletteram = &memory_region(REGION_CPU1)[0x28000];
+	pmcram =     &memory_region(REGION_CPU1)[0x28800];
 	gfx_untangle();
 }
 
 
 
-GAMEX( 1989, spy, 0, spy, spy, spy, ROT0, "Konami", "S.P.Y. - Special Project Y (US)", GAME_NOT_WORKING )
+GAME ( 1989, spy, 0, spy, spy, spy, ROT0, "Konami", "S.P.Y. - Special Project Y (US)" )

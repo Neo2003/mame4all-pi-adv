@@ -37,7 +37,7 @@ WRITE_HANDLER( battlane_video_ctrl_w )
 	/*
     Video control register
 
-        0x80    = ????
+        0x80    = low bit of blue component (taken when writing to palette)
         0x0e    = Bitmap plane (bank?) select  (0-7)
         0x01    = Scroll MSB
 	*/
@@ -50,6 +50,30 @@ READ_HANDLER( battlane_video_ctrl_r )
 	return battlane_video_ctrl;
 }
 
+WRITE_HANDLER( battlane_palette_w )
+{
+	int r,g,b;
+	int bit0,bit1,bit2;
+
+
+	/* red component */
+	bit0 = (~data >> 0) & 0x01;
+	bit1 = (~data >> 1) & 0x01;
+	bit2 = (~data >> 2) & 0x01;
+	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	/* green component */
+	bit0 = (~data >> 3) & 0x01;
+	bit1 = (~data >> 4) & 0x01;
+	bit2 = (~data >> 5) & 0x01;
+	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	/* blue component */
+	bit0 = (~battlane_video_ctrl >> 7) & 0x01;
+	bit1 = (~data >> 6) & 0x01;
+	bit2 = (~data >> 7) & 0x01;
+	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+	palette_change_color(offset,r,g,b);
+}
 void battlane_set_video_flip(int flip)
 {
 
@@ -184,38 +208,6 @@ void battlane_vh_stop(void)
 
 /***************************************************************************
 
-  Build palette from palette RAM
-
-***************************************************************************/
-
-INLINE void battlane_build_palette(void)
-{
-	int offset;
-    unsigned char *PALETTE =
-        memory_region(REGION_PROMS);
-
-    for (offset = 0; offset < 0x40; offset++)
-	{
-          int palette = PALETTE[offset];
-          int red, green, blue;
-
-          blue   = ((palette>>6)&0x03) * 16*4;
-          green  = ((palette>>3)&0x07) * 16*2;
-          red    = ((palette>>0)&0x07) * 16*2;
-
-          palette_change_color (offset, red, green, blue);
-	}
-}
-
-/*
-
-void battlane_vh_convert_color_prom (unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom)
-{
-
-}
-*/
-
-/***************************************************************************
 
   Draw the game screen in the given osd_bitmap.
   Do NOT call osd_update_display() from this function, it will be called by
@@ -227,16 +219,14 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
     int scrollx,scrolly;
 	int x,y, offs;
 
-    /* Scroll registers */
-    scrolly=256*(battlane_video_ctrl&0x01)+battlane_scrolly;
-    scrollx=256*(battlane_cpu_control&0x01)+battlane_scrollx;
-
-
-    battlane_build_palette();
 	if (palette_recalc ())
     {
          // Mark cached layer as dirty
     }
+	
+    /* Scroll registers */
+    scrolly=256*(battlane_video_ctrl&0x01)+battlane_scrolly;
+    scrollx=256*(battlane_cpu_control&0x01)+battlane_scrollx;
 
     /* Draw tile map. TODO: Cache it */
     for (offs=0; offs <0x400;  offs++)
@@ -249,7 +239,7 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
         sy=((offs&0x200)/2+(offs&0x0f0))/16;
         drawgfx(bkgnd_bitmap,Machine->gfx[1+(attr&0x01)],
                code,
-               (attr>>1)&0x07,
+               (attr>>1)&0x03,
                !flipscreen,flipscreen,
                sx*16,sy*16,
                NULL,
@@ -263,10 +253,6 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
         scrly=-scrolly;
         copyscrollbitmap(bitmap,bkgnd_bitmap,1,&scrly,1,&scrlx,&Machine->visible_area,TRANSPARENCY_NONE,0);
     }
-    {
-    char baf[256];
-    char baf2[40];
-    baf[0]=0;
 
     /* Draw sprites */
     for (offs=0; offs<0x0100; offs+=4)
@@ -276,7 +262,7 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
            0x40=
            0x20=bank 1
            0x10=y double
-           0x08=Unknown - all vehicles have this bit clear
+           0x08=color
            0x04=x flip
            0x02=y flip
            0x01=Sprite enable
@@ -285,14 +271,10 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
           int code=battlane_spriteram[offs+3];
           code += 256*((attr>>6) & 0x02);
           code += 256*((attr>>5) & 0x01);
-          if (offs > 0x00a0)
-          {
-               sprintf(baf2, "%02x ", attr);
-               strcat(baf,baf2);
-          }
 
           if (attr & 0x01)
 	      {
+				int color = (attr>>3)&1;
                int sx=battlane_spriteram[offs+2];
                int sy=battlane_spriteram[offs];
                int flipx=attr&0x04;
@@ -313,7 +295,7 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
                    }
                    drawgfx(bitmap,Machine->gfx[0],
                      code,
-                     0,
+                     color,
                      flipx,flipy,
                      sx, sy,
 					 &Machine->visible_area,
@@ -321,7 +303,7 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 
                     drawgfx(bitmap,Machine->gfx[0],
                      code+1,
-                     0,
+                     color,
                      flipx,flipy,
                      sx, sy-dy,
 					 &Machine->visible_area,
@@ -331,7 +313,7 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
                 {
                    drawgfx(bitmap,Machine->gfx[0],
 					 code,
-                     0,
+                     color,
                      flipx,flipy,
                      sx, sy,
 					 &Machine->visible_area,
@@ -341,8 +323,6 @@ void battlane_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 	}
 
 
-//    usrintf_showmessage(baf);
-    }
     /* Draw foreground bitmap */
     if (flipscreen)
     {

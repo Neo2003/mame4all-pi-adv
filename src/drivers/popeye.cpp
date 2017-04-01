@@ -57,13 +57,10 @@ I/O 2  ;bit 0 Coin in 1
 
 
 
-extern unsigned char *popeye_videoram;
-extern size_t popeye_videoram_size;
-extern unsigned char *popeye_background_pos,*popeye_palette_bank;
+extern unsigned char *popeye_background_pos,*popeye_palettebank, *popeye_textram;
 WRITE_HANDLER( popeye_backgroundram_w );
-WRITE_HANDLER( popeye_videoram_w );
-WRITE_HANDLER( popeye_colorram_w );
-WRITE_HANDLER( popeye_palettebank_w );
+WRITE_HANDLER( popeye_bitmap_w );
+WRITE_HANDLER( popeyebl_bitmap_w );
 void popeye_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom);
 void popeyebl_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom);
 void popeye_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
@@ -71,13 +68,45 @@ int  popeye_vh_start(void);
 void popeye_vh_stop(void);
 
 
+/* the protection device simply returns the last two values written shifted left */
+/* by a variable amount. */
+static int prot0,prot1,prot_shift;
+
+static READ_HANDLER( protection_r )
+{
+    if (offset == 0)
+    {
+	return ((prot1 << prot_shift) | (prot0 >> (8-prot_shift))) & 0xff;
+    }
+    else    /* offset == 1 */
+    {
+	/* the game just checks is bit 2 is clear. Returning 0 seems to be enough. */
+	return 0;
+    }
+}
+
+static WRITE_HANDLER( protection_w )
+{
+    if (offset == 0)
+    {
+	/* this is the same as the level number (1-3) */
+	prot_shift = data & 0x07;
+    }
+    else    /* offset == 1 */
+    {
+	prot0 = prot1;
+	prot1 = data;
+    }
+}
 
 static struct MemoryReadAddress readmem[] =
 {
 	{ 0x0000, 0x7fff, MRA_ROM },
 	{ 0x8000, 0x87ff, MRA_RAM },
+	{ 0x8800, 0x8bff, MRA_RAM },
 	{ 0x8c00, 0x8e7f, MRA_RAM },
-	{ 0x8f00, 0x8fff, MRA_RAM },
+	{ 0x8e80, 0x8fff, MRA_RAM },
+	{ 0xe000, 0xe001, protection_r },
 	{ -1 }	/* end of table */
 };
 
@@ -85,13 +114,38 @@ static struct MemoryWriteAddress writemem[] =
 {
 	{ 0x0000, 0x7fff, MWA_ROM },
 	{ 0x8000, 0x87ff, MWA_RAM },
-	{ 0x8c04, 0x8e7f, MWA_RAM, &spriteram, &spriteram_size },
-	{ 0x8f00, 0x8fff, MWA_RAM },
-	{ 0xa000, 0xa3ff, videoram_w, &videoram, &videoram_size },
-	{ 0xa400, 0xa7ff, colorram_w, &colorram },
-	{ 0xc000, 0xcfff, popeye_videoram_w, &popeye_videoram, &popeye_videoram_size },
+	{ 0x8800, 0x8bff, MWA_RAM },
 	{ 0x8c00, 0x8c01, MWA_RAM, &popeye_background_pos },
-	{ 0x8c03, 0x8c03, popeye_palettebank_w, &popeye_palette_bank },
+	{ 0x8c03, 0x8c03, MWA_RAM, &popeye_palettebank },
+	{ 0x8c04, 0x8e7f, MWA_RAM, &spriteram, &spriteram_size },
+	{ 0x8e80, 0x8fff, MWA_RAM },
+	{ 0xa000, 0xa7ff, MWA_RAM, &popeye_textram },
+	{ 0xc000, 0xdfff, popeye_bitmap_w },
+	{ 0xe000, 0xe001, protection_w },
+	{ -1 }	/* end of table */
+};
+
+
+static struct MemoryReadAddress readmem_bl[] =
+{
+	{ 0x0000, 0x7fff, MRA_ROM },
+	{ 0x8000, 0x87ff, MRA_RAM },
+	{ 0x8c00, 0x8e7f, MRA_RAM },
+	{ 0x8e80, 0x8fff, MRA_RAM },
+	{ 0xe000, 0xe01f, MRA_ROM },
+	{ -1 }	/* end of table */
+};
+
+static struct MemoryWriteAddress writemem_bl[] =
+{
+	{ 0x0000, 0x7fff, MWA_ROM },
+	{ 0x8000, 0x87ff, MWA_RAM },
+	{ 0x8c00, 0x8c01, MWA_RAM, &popeye_background_pos },
+	{ 0x8c03, 0x8c03, MWA_RAM, &popeye_palettebank },
+	{ 0x8c04, 0x8e7f, MWA_RAM, &spriteram, &spriteram_size },
+	{ 0x8e80, 0x8fff, MWA_RAM },
+	{ 0xa000, 0xa7ff, MWA_RAM, &popeye_textram },
+	{ 0xc000, 0xcfff, popeyebl_bitmap_w },
 	{ -1 }	/* end of table */
 };
 
@@ -146,22 +200,33 @@ INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START	/* DSW0 */
+	PORT_START      /* DSW0 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, "A 3/1 B 1/2" )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, "A 2/1 B 2/5" )
+	PORT_DIPSETTING(    0x04, "A 2/1 B 1/3" )
+	PORT_DIPSETTING(    0x07, "A 1/1 B 2/1" )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0c, "A 1/1 B 1/2" )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, "A 1/2 B 1/4" )
+	PORT_DIPSETTING(    0x0b, "A 1/2 B 1/5" )
+	PORT_DIPSETTING(    0x02, "A 2/5 B 1/1" )
+	PORT_DIPSETTING(    0x0a, "A 1/3 B 1/1" )
+	PORT_DIPSETTING(    0x09, "A 1/4 B 1/1" )
+	PORT_DIPSETTING(    0x05, "A 1/5 B 1/1" )
+	PORT_DIPSETTING(    0x08, "A 1/6 B 1/1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-/*  0x0e = 2 Coins/1 Credit
-    0x07, 0x0c = 1 Coin/1 Credit
-    0x01, 0x0b, 0x0d = 1 Coin/2 Credits */
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )	/* bit 7 scans DSW1 one bit at a time */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x40, "Copyright" )
+	PORT_DIPSETTING(    0x40, "Nintendo" )
+	PORT_DIPSETTING(    0x20, "Nintendo Co.,Ltd" )
+	PORT_DIPSETTING(    0x60, "Nintendo of America" )
+	//      PORT_DIPSETTING(    0x00, "Nintendo of America" )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* scans DSW1 one bit at a time */
 
 	PORT_START	/* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
@@ -257,7 +322,7 @@ static struct AY8910interface ay8910_interface =
 
 
 
-static struct MachineDriver machine_driver_popeyebl =
+static struct MachineDriver machine_driver_popeye =
 {
 	/* basic machine hardware */
 	{
@@ -273,12 +338,50 @@ static struct MachineDriver machine_driver_popeyebl =
 	0,
 
 	/* video hardware */
-	32*16, 30*16, { 0*16, 32*16-1, 1*16, 29*16-1 },
+	32*16, 32*16, { 0*16, 32*16-1, 2*16, 30*16-1 },
 	gfxdecodeinfo,
-	32+16+256, 16*2+64*4,
+	16+16+256, 16*2+64*4,
 	popeyebl_vh_convert_color_prom,
 
-	VIDEO_TYPE_RASTER | VIDEO_SUPPORTS_DIRTY,
+	VIDEO_TYPE_RASTER|VIDEO_MODIFIES_PALETTE,
+	0,
+	popeye_vh_start,
+	popeye_vh_stop,
+	popeye_vh_screenrefresh,
+
+	/* sound hardware */
+	0,0,0,0,
+	{
+		{
+			SOUND_AY8910,
+			&ay8910_interface
+		}
+	}
+};
+
+
+static struct MachineDriver machine_driver_popeyebl =
+{
+	/* basic machine hardware */
+	{
+		{
+			CPU_Z80,
+			4000000,	/* 4 Mhz */
+			readmem_bl,writemem_bl,readport,writeport,
+			nmi_interrupt,2
+		}
+	},
+	30, DEFAULT_30HZ_VBLANK_DURATION,	/* frames per second, vblank duration */
+	1,	/* single CPU, no need for interleaving */
+	0,
+
+	/* video hardware */
+	32*16, 32*16, { 0*16, 32*16-1, 2*16, 30*16-1 },
+	gfxdecodeinfo,
+	16+16+256, 16*2+64*4,
+	popeyebl_vh_convert_color_prom_bl,
+
+	VIDEO_TYPE_RASTER,
 	0,
 	popeye_vh_start,
 	popeye_vh_stop,
@@ -378,11 +481,23 @@ ROM_START( popeyebl )
 ROM_END
 
 
+static void init_popeye(void)
+{
+    unsigned char *buffer;
+    data8_t *rom = memory_region(REGION_CPU1);
+    int len = 0x10000;
 
-/* The original doesn't work because the ROMs are encrypted. */
-/* The encryption is based on a custom ALU and seems to be dynamically evolving */
-/* (like Jr. PacMan). I think it decodes 16 bits at a time, bits 0-2 are (or can be) */
-/* an opcode for the ALU and the others contain the data. */
-GAMEX( 1982?, popeye,   0,      popeyebl, popeye, 0, ROT0, "Nintendo", "Popeye (set 1)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAMEX( 1982?, popeye2,  popeye, popeyebl, popeye, 0, ROT0, "Nintendo", "Popeye (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAMEX( 1982?, popeyebl, popeye, popeyebl, popeye, 0, ROT0, "bootleg", "Popeye (bootleg)", GAME_NO_COCKTAIL )
+    /* decrypt the program ROMs */
+    if ((buffer = malloc(len)))
+    {
+	int i;
+	for (i = 0;i < len; i++)
+	    buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
+	memcpy(rom,buffer,len);
+	free(buffer);
+    }
+}
+
+GAMEX( 1982, popeye,   0,      popeye, popeye, popeye, ROT0, "Nintendo", "Popeye (set 1)", GAME_NO_COCKTAIL )
+GAMEX( 1982, popeye2,  popeye, popeye, popeye, popeye, ROT0, "Nintendo", "Popeye (set 2)", GAME_NO_COCKTAIL )
+GAMEX( 1982, popeyebl, popeye, popeyebl, popeye, 0, ROT0, "bootleg", "Popeye (bootleg)", GAME_NO_COCKTAIL )

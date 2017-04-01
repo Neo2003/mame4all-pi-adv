@@ -4608,5 +4608,126 @@ DECLARE(copyrozbitmap_core,(struct osd_bitmap *bitmap,struct osd_bitmap *srcbitm
 		}
 	}
 })
+#define ADJUST_FOR_ORIENTATION(type, orientation, bitmap, x, y)				\
+	type *dst = &((type *)bitmap->line[y])[x];								\
+	int xadv = 1;															\
+	if (orientation)														\
+	{																		\
+		int dy = bitmap->line[1] - bitmap->line[0];							\
+		int tx = x, ty = y, temp;											\
+		if (orientation & ORIENTATION_SWAP_XY)								\
+		{																	\
+			temp = tx; tx = ty; ty = temp;									\
+			xadv = dy / sizeof(type);										\
+		}																	\
+		if (orientation & ORIENTATION_FLIP_X)								\
+		{																	\
+			tx = bitmap->width - 1 - tx;									\
+			if (!(orientation & ORIENTATION_SWAP_XY)) xadv = -xadv;			\
+		}																	\
+		if (orientation & ORIENTATION_FLIP_Y)								\
+		{																	\
+			ty = bitmap->height - 1 - ty;									\
+			if (orientation & ORIENTATION_SWAP_XY) xadv = -xadv;			\
+		}																	\
+		/* can't lookup line because it may be negative! */					\
+		dst = (type *)(bitmap->line[0] + dy * ty) + tx;						\
+	}
+
+void draw_scanline8(struct osd_bitmap *bitmap,int x,int y,int length,
+		const DATA_TYPE *src,UINT16 *pens,int transparent_pen)
+{
+	/* 8bpp destination */
+	if (bitmap->depth == 8)
+	{
+		/* adjust in case we're oddly oriented */
+		ADJUST_FOR_ORIENTATION(UINT8, Machine->orientation, bitmap, x, y);
+
+		/* with pen lookups */
+		if (pens)
+		{
+			if (transparent_pen == -1)
+				while (length--)
+				{
+					*dst = pens[*src++];
+					dst += xadv;
+				}
+			else
+				while (length--)
+				{
+					UINT32 spixel = *src++;
+					if (spixel != transparent_pen)
+						*dst = pens[spixel];
+					dst += xadv;
+				}
+		}
+
+		/* without pen lookups */
+		else
+		{
+			if (transparent_pen == -1)
+				while (length--)
+				{
+					*dst = *src++;
+					dst += xadv;
+				}
+			else
+				while (length--)
+				{
+					UINT32 spixel = *src++;
+					if (spixel != transparent_pen)
+						*dst = spixel;
+					dst += xadv;
+				}
+		}
+	}
+
+	/* 16bpp destination */
+	else 
+	{
+		/* adjust in case we're oddly oriented */
+		ADJUST_FOR_ORIENTATION(UINT16, Machine->orientation, bitmap, x, y);
+
+		/* with pen lookups */
+		if (pens)
+		{
+			if (transparent_pen == -1)
+				while (length--)
+				{
+					*dst = pens[*src++];
+					dst += xadv;
+				}
+			else
+				while (length--)
+				{
+					UINT32 spixel = *src++;
+					if (spixel != transparent_pen)
+						*dst = pens[spixel];
+					dst += xadv;
+				}
+		}
+
+		/* without pen lookups */
+		else
+		{
+			if (transparent_pen == -1)
+				while (length--)
+				{
+					*dst = *src++;
+					dst += xadv;
+				}
+			else
+				while (length--)
+				{
+					UINT32 spixel = *src++;
+					if (spixel != transparent_pen)
+						*dst = spixel;
+					dst += xadv;
+				}
+		}
+	}
+}
+
+#undef ADJUST_FOR_ORIENTATION
 
 #endif /* DECLARE */

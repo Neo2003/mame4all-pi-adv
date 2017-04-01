@@ -238,6 +238,7 @@ static void hs_save (void)
 				*/
 				copy_from_memory (mem_range->cpu, mem_range->addr, data, mem_range->num_bytes);
 				osd_fwrite(f, data, mem_range->num_bytes);
+				free(data);
 			}
 			mem_range = mem_range->next;
 		}
@@ -267,6 +268,7 @@ void hs_open (const char *name)
 		{
 			if (mode==FIND_NAME)
 			{
+				if (strlen(buffer) == 0) break;
 				if (matching_game_name (buffer, name))
 				{
 					mode = FIND_DATA;

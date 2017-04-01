@@ -115,6 +115,13 @@ write:
 4805      8910 #3  write
 	    port B bit 0 SOUND CPU NMI disable
 
+Kickstart Wheelie King :
+- additional ram @ $d800-$dfff (scroll ram  + ??)
+- taitosj_colorbank_w @ $d000-$d001
+- taitosj_scroll @ $d002-$d007
+- strange controls :
+	 - 'revolve type' - 3 pos switch (gears) +  button/pedal (accel)
+	 - two buttons for gear change, auto acceleration
 ***************************************************************************/
 
 #include "driver.h"
@@ -147,6 +154,7 @@ extern unsigned char *taitosj_scroll;
 extern unsigned char *taitosj_colscrolly;
 extern unsigned char *taitosj_gfxpointer;
 extern unsigned char *taitosj_colorbank,*taitosj_video_priority;
+extern unsigned char *kikstart_scrollram;
 void taitosj_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom);
 READ_HANDLER( taitosj_gfxrom_r );
 WRITE_HANDLER( taitosj_videoram2_w );
@@ -155,6 +163,7 @@ WRITE_HANDLER( taitosj_paletteram_w );
 WRITE_HANDLER( taitosj_colorbank_w );
 WRITE_HANDLER( taitosj_videoenable_w );
 WRITE_HANDLER( taitosj_characterram_w );
+WRITE_HANDLER( junglhbr_characterram_w );
 READ_HANDLER( taitosj_collision_reg_r );
 WRITE_HANDLER( taitosj_collision_reg_clear_w );
 int taitosj_vh_start(void);
@@ -276,7 +285,80 @@ static struct MemoryWriteAddress mcu_writemem[] =
 	{ -1 }  /* end of table */
 };
 
+/* seems the most logical way to do the gears */
+static int kikstart_gear;
 
+READ_HANDLER ( kikstart_gears_read )
+{
+	/* gear MUST be 1, 2 or 3 */
+
+	int portreturn = readinputport(3) & 0xf4;
+
+	if (readinputport(8) & 0x01) kikstart_gear = 1;
+	if (readinputport(8) & 0x02) kikstart_gear = 2;
+	if (readinputport(8) & 0x04) kikstart_gear = 3;
+
+	if (kikstart_gear == 1) portreturn |= (0x02);
+	if (kikstart_gear == 2) portreturn |= (0x03);
+	if (kikstart_gear == 3) portreturn |= (0x01);
+
+	//usrintf_showmessage("Kikstart gear %02x",  kikstart_gear);
+
+	return portreturn;
+}
+
+static struct MemoryReadAddress kikstart_readmem [] = 
+{
+	{ 0x0000, 0x5fff, MRA_ROM },
+	{ 0x6000, 0x7fff, MRA_BANK1 },
+	{ 0x8000, 0x87ff, MRA_RAM },
+	{ 0x8800, 0x8800, taitosj_mcu_data_r },
+	{ 0x8801, 0x8801, taitosj_mcu_status_r },
+	{ 0x8802, 0x8802, MRA_NOP },
+	{ 0xc400, 0xd05f, MRA_RAM },
+	{ 0xd100, 0xd17f, MRA_RAM },
+	{ 0xd400, 0xd403, taitosj_collision_reg_r },
+	{ 0xd404, 0xd404, taitosj_gfxrom_r },
+	{ 0xd408, 0xd408, input_port_0_r },     /* IN0 */
+	{ 0xd409, 0xd409, input_port_1_r },     /* IN1 */
+	{ 0xd40a, 0xd40a, input_port_5_r },     /* DSW1 */
+	{ 0xd40b, 0xd40b, input_port_2_r },     /* IN2 */
+	{ 0xd40c, 0xd40c, kikstart_gears_read },     /* Service */
+	{ 0xd40d, 0xd40d, input_port_4_r },
+	{ 0xd40f, 0xd40f, AY8910_read_port_0_r },       /* DSW2 and DSW3 */
+	{ 0xd800, 0xdfff, MRA_RAM },
+	{ 0xe000, 0xefff, MRA_ROM },
+	{ -1 }  /* end of table */
+};
+
+static struct MemoryWriteAddress kikstart_writemem [] =
+{
+	{ 0x0000, 0x7fff, MWA_ROM },
+	{ 0x8000, 0x87ff, MWA_RAM },
+	{ 0x8800, 0x8800, taitosj_mcu_data_w },
+	{ 0x8802, 0x8802, MWA_NOP },
+	{ 0x9000, 0xbfff, taitosj_characterram_w, &taitosj_characterram },
+	{ 0xc400, 0xc7ff, videoram_w, &videoram, &videoram_size },
+	{ 0xc800, 0xcbff, taitosj_videoram2_w, &taitosj_videoram2 },
+	{ 0xcc00, 0xcfff, taitosj_videoram3_w, &taitosj_videoram3 },
+	{ 0x8a00, 0x8a5f, MWA_RAM, &taitosj_colscrolly },
+	{ 0xd100, 0xd17f, MWA_RAM, &spriteram, &spriteram_size },
+	{ 0xd200, 0xd27f, taitosj_paletteram_w, &paletteram },
+	{ 0xd300, 0xd300, MWA_RAM, &taitosj_video_priority },
+	{ 0xd40e, 0xd40e, AY8910_control_port_0_w },
+	{ 0xd40f, 0xd40f, AY8910_write_port_0_w },
+	{ 0xd000, 0xd001, taitosj_colorbank_w, &taitosj_colorbank },
+	{ 0xd002, 0xd007, MWA_RAM, &taitosj_scroll },
+	{ 0xd508, 0xd508, taitosj_collision_reg_clear_w },
+	{ 0xd509, 0xd50a, MWA_RAM, &taitosj_gfxpointer },
+	{ 0xd50b, 0xd50b, taitosj_soundcommand_w },
+	{ 0xd50d, 0xd50d, watchdog_reset_w },
+	{ 0xd50e, 0xd50e, taitosj_bankswitch_w },
+	{ 0xd600, 0xd600, taitosj_videoenable_w },
+	{ 0xd800, 0xdfff, MWA_RAM,&kikstart_scrollram },// scroll ram + ???
+	{ 0xe000, 0xefff, MWA_ROM },
+	{ -1 }  /* end of table */
+};
 
 static struct MemoryReadAddress sound_readmem[] =
 {
@@ -286,7 +368,7 @@ static struct MemoryReadAddress sound_readmem[] =
 	{ 0x4803, 0x4803, AY8910_read_port_2_r },
 	{ 0x4805, 0x4805, AY8910_read_port_3_r },
 	{ 0x5000, 0x5000, soundlatch_r },
-	{ 0xe000, 0xefff, MRA_ROM },
+	{ 0xe000, 0xefff, MRA_ROM },	/* space for diagnostic ROM */
 	{ -1 }  /* end of table */
 };
 
@@ -300,6 +382,7 @@ static struct MemoryWriteAddress sound_writemem[] =
 	{ 0x4803, 0x4803, AY8910_write_port_2_w },
 	{ 0x4804, 0x4804, AY8910_control_port_3_w },
 	{ 0x4805, 0x4805, AY8910_write_port_3_w },
+	{ 0xe000, 0xefff, MWA_ROM },
 	{ -1 }  /* end of table */
 };
 
@@ -398,13 +481,13 @@ INPUT_PORTS_START( spaceskr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
 	PORT_START      /* DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -466,7 +549,7 @@ INPUT_PORTS_START( junglek )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN | IPF_8WAY )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP | IPF_8WAY )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -476,7 +559,7 @@ INPUT_PORTS_START( junglek )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -509,7 +592,7 @@ INPUT_PORTS_START( junglek )
 	PORT_DIPSETTING(    0x02, "Timer x1" )
 	PORT_DIPSETTING(    0x01, "Timer x2" )
 	PORT_DIPSETTING(    0x00, "Timer x3" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
@@ -534,13 +617,13 @@ INPUT_PORTS_START( junglek )
 	PORT_DIPSETTING(    0x01, "20000" )
 	PORT_DIPSETTING(    0x00, "30000" )
 	PORT_DIPSETTING(    0x03, "None" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
@@ -554,6 +637,100 @@ INPUT_PORTS_START( junglek )
 	PORT_DIPSETTING(    0x00, "A only" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( piratpet )
+	PORT_START      /* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  | IPF_8WAY )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT | IPF_8WAY )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  | IPF_8WAY )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    | IPF_8WAY )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )			// Skip level when "Debug Mode" is ON
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START      /* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )	// Skip level when "Debug Mode" is ON
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START      /* IN2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START      /* Service */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START      /* DSW1 */
+	PORT_DIPNAME( 0x03, 0x03, "Finish Bonus" )
+	PORT_DIPSETTING(    0x03, "None" )
+	PORT_DIPSETTING(    0x02, "Timer x1" )
+	PORT_DIPSETTING(    0x01, "Timer x2" )
+	PORT_DIPSETTING(    0x00, "Timer x3" )
+	PORT_DIPNAME( 0x04, 0x04, "Debug Mode" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START      /* DSW2 Coinage */
+	DSW2_PORT
+
+	PORT_START      /* DSW3 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x02, "10000" )
+	PORT_DIPSETTING(    0x01, "20000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPSETTING(    0x03, "None" )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x1c, "Easiest" )
+	PORT_DIPSETTING(    0x18, "Easier" )
+	PORT_DIPSETTING(    0x14, "Easy" )
+	PORT_DIPSETTING(    0x10, "Normal" )
+	PORT_DIPSETTING(    0x0c, "Medium" )
+	PORT_DIPSETTING(    0x08, "Hard" )
+	PORT_DIPSETTING(    0x04, "Harder" )
+	PORT_DIPSETTING(    0x00, "Hardest" )
+	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_BITX(    0x40, 0x40, IPT_DIPSWITCH_NAME | IPF_CHEAT, "Free Game", IP_KEY_NONE, IP_JOY_NONE )
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, "A and B" )
+	PORT_DIPSETTING(    0x00, "A only" )
+INPUT_PORTS_END
 INPUT_PORTS_START( alpine )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT | IPF_2WAY | IPF_COCKTAIL )
@@ -607,9 +784,9 @@ INPUT_PORTS_START( alpine )
 	PORT_DIPSETTING(    0x08, "1:30" )
 	PORT_DIPSETTING(    0x10, "2:00" )
 	PORT_DIPSETTING(    0x18, "2:30" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "End of Race Time Bonus" )
+	PORT_DIPSETTING(    0x20, "0:10" )
+	PORT_DIPSETTING(    0x00, "0:20" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -841,8 +1018,8 @@ INPUT_PORTS_START( wwestern )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT | IPF_8WAY )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN | IPF_8WAY )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP | IPF_8WAY )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -851,8 +1028,8 @@ INPUT_PORTS_START( wwestern )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP | IPF_8WAY | IPF_COCKTAIL )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 | IPF_COCKTAIL )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 | IPF_COCKTAIL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -939,8 +1116,8 @@ INPUT_PORTS_START( frontlin )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT | IPF_8WAY )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN | IPF_8WAY )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP | IPF_8WAY )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -949,8 +1126,8 @@ INPUT_PORTS_START( frontlin )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP | IPF_8WAY | IPF_COCKTAIL )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 | IPF_COCKTAIL )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 | IPF_COCKTAIL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1082,7 +1259,7 @@ INPUT_PORTS_START( elevator )
 	PORT_DIPSETTING(    0x03, "10000" )
 	PORT_DIPSETTING(    0x02, "15000" )
 	PORT_DIPSETTING(    0x01, "20000" )
-	PORT_DIPSETTING(    0x00, "24000" )
+	PORT_DIPSETTING(    0x00, "25000" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1136,8 +1313,8 @@ INPUT_PORTS_START( tinstar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT | IPF_8WAY )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN | IPF_8WAY )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP | IPF_8WAY )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1146,8 +1323,8 @@ INPUT_PORTS_START( tinstar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP | IPF_8WAY | IPF_COCKTAIL )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 | IPF_COCKTAIL )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 | IPF_COCKTAIL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1210,7 +1387,7 @@ INPUT_PORTS_START( tinstar )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, "Star Sound" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
@@ -1623,6 +1800,91 @@ INPUT_PORTS_START( hwrace )
 	PORT_DIPSETTING(    0x00, "A only" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( kikstart )
+	PORT_START      /* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  | IPF_2WAY )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT | IPF_2WAY )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+
+	PORT_START      /* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  | IPF_2WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT | IPF_2WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )
+
+	PORT_START      /* IN2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START      /* Service */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // gear
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) // gear
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // gear
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START      /* DSW1 */
+	PORT_DIPNAME(0x03, 0x01, "Gate Bonus" )
+	PORT_DIPSETTING(   0x00, "5k Points" )
+	PORT_DIPSETTING(   0x01, "10k Points" )
+	PORT_DIPSETTING(   0x02, "15k Points" )
+	PORT_DIPSETTING(   0x03, "20k Points" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x18, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(   0x18, "Easy" )		/* 3:00 */
+	PORT_DIPSETTING(   0x10, "Normal" ) 		/* 2:30 */
+	PORT_DIPSETTING(   0x08, "Difficult" )		/* 2:00 */
+	PORT_DIPSETTING(   0x00, "Very Difficult" ) 	/* 1:30 */
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START      /* DSW2 Coinage */
+	DSW2_PORT
+
+	PORT_START      /* DSW3 */
+
+	PORT_DIPNAME( 0x08, 0x08, "Control Type" )
+	PORT_DIPSETTING(    0x08, "Revolve" )
+	PORT_DIPSETTING(    0x00, "Buttons" )
+	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_BITX(    0x40, 0x40, IPT_DIPSWITCH_NAME | IPF_CHEAT, "No Hit", IP_KEY_NONE, IP_JOY_NONE )//?
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, "A and B" )
+	PORT_DIPSETTING(    0x00, "A only" )
+
+	/* fake for handling the gears */
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+INPUT_PORTS_END
 
 static struct GfxLayout charlayout =
 {
@@ -1792,6 +2054,64 @@ static struct MachineDriver machine_driver_mcu =
 	}
 };
 
+static struct MachineDriver machine_driver_kikstart =
+{
+	/* basic machine hardware */
+	{
+		{
+			CPU_Z80,
+			8000000/2,      /* 4 Mhz */
+			kikstart_readmem,kikstart_writemem,0,0,
+			interrupt,1
+		},
+		{
+			CPU_Z80 | CPU_AUDIO_CPU,
+			6000000/2,      /* 3 Mhz */
+			sound_readmem,sound_writemem,0,0,
+			/* interrupts: */
+			/* - no interrupts synced with vblank */
+			/* - NMI triggered by the main CPU */
+			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
+			/*   that is a period of 27306666.6666 ns */
+			0,0,
+			interrupt,27306667
+		},
+		{
+			CPU_M68705,
+			3000000/4,      /* xtal is 3MHz, I think it's divided by 4 internally */
+			m68705_readmem,m68705_writemem,0,0,
+			ignore_interrupt,0      /* IRQs are caused by the main CPU */
+		}
+	},
+	60, DEFAULT_REAL_60HZ_VBLANK_DURATION,  /* frames per second, vblank duration */
+	1,      /* 1 CPU slice per frame - interleaving is forced when a sound command is written */
+	taitosj_init_machine,
+
+	/* video hardware */
+	32*8, 32*8, { 0*8, 32*8-1, 2*8, 30*8-1 },
+	gfxdecodeinfo,
+	64, 16*8,
+	taitosj_vh_convert_color_prom,
+
+	VIDEO_TYPE_RASTER|VIDEO_MODIFIES_PALETTE,
+	0,
+	taitosj_vh_start,
+	taitosj_vh_stop,
+	taitosj_vh_screenrefresh,
+
+	/* sound hardware */
+	0,0,0,0,
+	{
+		{
+			SOUND_AY8910,
+			&ay8910_interface
+		},
+		{
+			SOUND_DAC,
+			&dac_interface
+		}
+	}
+};
 
 
 /***************************************************************************
@@ -1923,6 +2243,65 @@ ROM_START( jungleh )
 	ROM_LOAD( "eb16.22",      0x0000, 0x0100, 0xb833b5ea )
 ROM_END
 
+ROM_START( junglhbr )
+	ROM_REGION( 0x12000, REGION_CPU1 ) /* 64k for code */
+	ROM_LOAD( "ic1.bin",      0x00000, 0x2000, 0x3255a10e )
+	ROM_LOAD( "ic2.bin",      0x02000, 0x2000, 0x8482bc63 )
+	ROM_LOAD( "ic3.bin",      0x04000, 0x2000, 0x1abc661d )
+	ROM_LOAD( "kn47.bin",     0x06000, 0x1000, 0x5c3199e0 )
+	ROM_LOAD( "kn48a",        0x07000, 0x1000, 0xef80e931 )
+	/* 10000-10fff space for another banked ROM (not used) */
+	ROM_LOAD( "kn60.bin",     0x11000, 0x1000, 0x1a9c0a26 ) /* banked at 7000 */
+
+	ROM_REGION( 0x10000, REGION_CPU2 ) /* 64k for the audio CPU */
+	ROM_LOAD( "kn37.bin",     0x0000, 0x1000, 0xdee7f5d4 )
+	ROM_LOAD( "kn38.bin",     0x1000, 0x1000, 0xbffd3d21 )
+	ROM_LOAD( "kn59-1.bin",   0x2000, 0x1000, 0xcee485fc )
+
+	ROM_REGION( 0x8000, REGION_GFX1 )   /* graphic ROMs used at runtime */
+	ROM_LOAD( "kn29.bin",     0x0000, 0x1000, 0x8f83c290 )
+	ROM_LOAD( "kn30.bin",     0x1000, 0x1000, 0x89fd19f1 )
+	ROM_LOAD( "kn51.bin",     0x2000, 0x1000, 0x70e8fc12 )
+	ROM_LOAD( "kn52.bin",     0x3000, 0x1000, 0xbcbac1a3 )
+	ROM_LOAD( "kn53.bin",     0x4000, 0x1000, 0xb946c87d )
+	ROM_LOAD( "kn34.bin",     0x5000, 0x1000, 0x320db2e1 )
+	ROM_LOAD( "kn55.bin",     0x6000, 0x1000, 0x70aef58f )
+	ROM_LOAD( "kn56.bin",     0x7000, 0x1000, 0x932eb667 )
+
+	ROM_REGION( 0x0100, REGION_PROMS )      /* layer PROM */
+	ROM_LOAD( "eb16.22",      0x0000, 0x0100, 0xb833b5ea )
+ROM_END
+
+ROM_START( piratpet )
+	ROM_REGION( 0x12000, REGION_CPU1 ) /* 64k for code */
+	ROM_LOAD( "pp0p_ic.69", 0x00000, 0x1000, 0x8287dbc2 )
+	ROM_LOAD( "pp1p_ic.68", 0x01000, 0x1000, 0x27a90850 )
+	ROM_LOAD( "pp2p_ic.67", 0x02000, 0x1000, 0xd224fa85 )
+	ROM_LOAD( "pp3p_ic.66", 0x03000, 0x1000, 0x2c900874 )
+	ROM_LOAD( "pp4p_ic.65", 0x04000, 0x1000, 0x1aed98d9 )
+	ROM_LOAD( "pp5p_ic.64", 0x05000, 0x1000, 0x09c3aacd )
+	ROM_LOAD( "pp6p_ic.55", 0x06000, 0x1000, 0xbdeed702 )
+	ROM_LOAD( "pp7p_ic.54", 0x07000, 0x1000, 0x5f36d082 )
+	/* 10000-10fff space for another banked ROM (not used) */
+	ROM_LOAD( "pp7b_ic.52", 0x11000, 0x1000, 0xbbc38b03 ) /* banked at 7000 */
+
+	ROM_REGION( 0x10000, REGION_CPU2 ) /* 64k for the audio CPU */
+	ROM_LOAD( "pp05_ic.70", 0x0000, 0x1000, 0xdcb5eb9d )
+	ROM_LOAD( "pp15_ic.71", 0x1000, 0x1000, 0x3123dbe1 )
+
+	ROM_REGION( 0x8000, REGION_GFX1 ) /* graphic ROMs used at runtime */
+	ROM_LOAD( "pp0e_ic.1", 0x0000, 0x1000, 0xaceaf79b )
+	ROM_LOAD( "pp1e_ic.2", 0x1000, 0x1000, 0xac148214 )
+	ROM_LOAD( "pp2e_ic.3", 0x2000, 0x1000, 0x108194d2 )
+	ROM_LOAD( "pp3e_ic.4", 0x3000, 0x1000, 0x621b0da1 )
+	ROM_LOAD( "pp4e_ic.5", 0x4000, 0x1000, 0xe9826d90 )
+	ROM_LOAD( "pp5e_ic.6", 0x5000, 0x1000, 0xfe0d38c6 )
+	ROM_LOAD( "pp6e_ic.7", 0x6000, 0x1000, 0x2cfd127b )
+	ROM_LOAD( "pp7e_ic.8", 0x7000, 0x1000, 0x9857533f )
+
+	ROM_REGION( 0x0100, REGION_PROMS ) /* layer PROM */
+	ROM_LOAD( "eb16.22", 0x0000, 0x0100, 0xb833b5ea )
+ROM_END
 ROM_START( alpine )
 	ROM_REGION( 0x12000, REGION_CPU1 )      /* 64k for code */
 	ROM_LOAD( "rh16.069",     0x0000, 0x1000, 0x6b2a69b7 )
@@ -2340,23 +2719,34 @@ static void init_alpinea(void)
 	install_mem_write_handler(0, 0xd50e, 0xd50e, alpinea_bankswitch_w);
 }
 
+static void init_junglhbr(void)
+{
+	/* inverter on bits 0 and 1 */
+	install_mem_write_handler (0, 0x9000, 0xbfff, junglhbr_characterram_w);
+}
 
+static void init_kikstart(void)
+{
+	kikstart_gear = 1;
+}
 
-GAME( 1981, spaceskr, 0,        nomcu, spaceskr,   0,       ROT180, "Taito Corporation", "Space Seeker" )
-GAME( 1982, junglek,  0,        nomcu, junglek,    0,       ROT0,   "Taito Corporation", "Jungle King (Japan)" )
-GAME( 1982, junglkj2, junglek,  nomcu, junglek,    0,       ROT0,   "Taito Corporation", "Jungle King (Japan, earlier)" )
-GAME( 1982, jungleh,  junglek,  nomcu, junglek,    0,       ROT0,   "Taito America Corporation", "Jungle Hunt (US)" )
-GAME( 1982, alpine,   0,        nomcu, alpine,     alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)" )
-GAME( 1982, alpinea,  alpine,   nomcu, alpinea,    alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)" )
-GAME( 1982, timetunl, 0,        nomcu, timetunl,   0,       ROT0,   "Taito Corporation", "Time Tunnel" )
-GAME( 1982, wwestern, 0,        nomcu, wwestern,   0,       ROT270, "Taito Corporation", "Wild Western (set 1)" )
-GAME( 1982, wwester1, wwestern, nomcu, wwestern,   0,       ROT270, "Taito Corporation", "Wild Western (set 2)" )
-GAME( 1982, frontlin, 0,        mcu,   frontlin,   0,       ROT270, "Taito Corporation", "Front Line" )
-GAME( 1983, elevator, 0,        mcu,   elevator,   0,       ROT0,   "Taito Corporation", "Elevator Action" )
-GAME( 1983, elevatob, elevator, nomcu, elevator,   0,       ROT0,   "bootleg", "Elevator Action (bootleg)" )
-GAME( 1983, tinstar,  0,        mcu,   tinstar,    0,       ROT0,   "Taito Corporation", "The Tin Star" )
-GAME( 1983, waterski, 0,        nomcu, waterski,   0,       ROT270, "Taito Corporation", "Water Ski" )
-GAME( 1983, bioatack, 0,        nomcu, bioatack,   0,       ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack" )
-GAME( 1984, sfposeid, 0,        mcu,   sfposeid,   0,       ROT0,   "Taito Corporation", "Sea Fighter Poseidon" )
-GAME( 1983, hwrace,   0,        nomcu, hwrace,     0,       ROT270, "Taito Corporation", "High Way Race" )
-GAMEX(1984, kikstart, 0,        mcu,   junglek,    0,       ROT0,   "Taito Corporation", "Kick Start Wheelie King", GAME_NOT_WORKING )
+GAME( 1981, spaceskr, 0,        nomcu,    spaceskr,   0,       ROT180, "Taito Corporation", "Space Seeker" )
+GAME( 1982, junglek,  0,        nomcu,    junglek,    0,       ROT0,   "Taito Corporation", "Jungle King (Japan)" )
+GAME( 1982, junglkj2, junglek,  nomcu,    junglek,    0,       ROT0,   "Taito Corporation", "Jungle King (Japan, earlier)" )
+GAME( 1982, jungleh,  junglek,  nomcu,    junglek,    0,       ROT0,   "Taito America Corporation", "Jungle Hunt (US)" )
+GAME( 1983, junglhbr, junglek,  nomcu,    junglek,    junglhbr,ROT0,   "Taito do Brasil",   "Jungle Hunt (Brazil)" )
+GAME( 1982, piratpet, junglek,  nomcu,    piratpet,   0,       ROT0,   "Taito America Corporation", "Pirate Pete" )
+GAME( 1982, alpine,   0,        nomcu,    alpine,     alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)" )
+GAME( 1982, alpinea,  alpine,   nomcu,    alpinea,    alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)" )
+GAME( 1982, timetunl, 0,        nomcu,    timetunl,   0,       ROT0,   "Taito Corporation", "Time Tunnel" )
+GAME( 1982, wwestern, 0,        nomcu,    wwestern,   0,       ROT270, "Taito Corporation", "Wild Western (set 1)" )
+GAME( 1982, wwester1, wwestern, nomcu,    wwestern,   0,       ROT270, "Taito Corporation", "Wild Western (set 2)" )
+GAME( 1982, frontlin, 0,        mcu,      frontlin,   0,       ROT270, "Taito Corporation", "Front Line" )
+GAME( 1983, elevator, 0,        mcu,      elevator,   0,       ROT0,   "Taito Corporation", "Elevator Action" )
+GAME( 1983, elevatob, elevator, nomcu,    elevator,   0,       ROT0,   "bootleg", "Elevator Action (bootleg)" )
+GAME( 1983, tinstar,  0,        mcu,      tinstar,    0,       ROT0,   "Taito Corporation", "The Tin Star" )
+GAME( 1983, waterski, 0,        nomcu,    waterski,   0,       ROT270, "Taito Corporation", "Water Ski" )
+GAME( 1983, bioatack, 0,        nomcu,    bioatack,   0,       ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack" )
+GAME( 1984, sfposeid, 0,        mcu,      sfposeid,   0,       ROT0,   "Taito Corporation", "Sea Fighter Poseidon" )
+GAME( 1983, hwrace,   0,        nomcu,    hwrace,     0,       ROT270, "Taito Corporation", "High Way Race" )
+GAME( 1984, kikstart, 0,        kikstart, kikstart,   kikstart,ROT0,   "Taito Corporation", "Kick Start Wheelie King")

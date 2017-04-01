@@ -1056,7 +1056,7 @@ static struct MachineDriver machine_driver_neogeo =
 		},
 		{
 			CPU_Z80 | CPU_AUDIO_CPU | CPU_16BIT_PORT,
-			6000000,
+			4000000,
 			sound_readmem,sound_writemem,neo_readio,neo_writeio,
 			ignore_interrupt,0
 		}

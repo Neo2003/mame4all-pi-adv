@@ -2144,12 +2144,16 @@ ROM_START( alibaba )
 	ROM_LOAD( "5k",           0x0800, 0x0800, 0x713086b3 )
 
 	ROM_REGION( 0x0120, REGION_PROMS )
-	ROM_LOAD( "alibaba.7f",   0x0000, 0x0020, 0x00000000 )  /* missing */
-	ROM_LOAD( "alibaba.4a",   0x0020, 0x0100, 0x00000000 )
+	//ROM_LOAD( "alibaba.7f",   0x0000, 0x0020, 0x00000000 )  /* missing */
+	//ROM_LOAD( "alibaba.4a",   0x0020, 0x0100, 0x00000000 )
+	ROM_LOAD( "82s123.e7",   0x0000, 0x0020, 0x00000000 )  /* use them if available from Mame 0.81 */
+	ROM_LOAD( "82s129.a4",   0x0020, 0x0100, 0x00000000 )
 
 	ROM_REGION( 0x0200, REGION_SOUND1 )	/* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, 0xa9cc86bf )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, 0x77245b66 )	/* timing - not used */
+	ROM_REGION( 0x1000, REGION_USER1 )
+	ROM_LOAD( "7.p6",         0x000, 0x1000, 0x00000000 )	/* Unused? */
 ROM_END
 
 

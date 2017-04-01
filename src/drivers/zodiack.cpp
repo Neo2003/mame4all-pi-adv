@@ -25,16 +25,16 @@ TODO:
 
 
 extern unsigned char *zodiack_videoram2;
-extern unsigned char *galaxian_attributesram;
-extern unsigned char *galaxian_bulletsram;
-extern size_t galaxian_bulletsram_size;
+extern unsigned char *zodiack_attributesram;
+extern unsigned char *zodiack_bulletsram;
+extern size_t zodiack_bulletsram_size;
 
 int percuss_hardware;
 
 void zodiack_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom);
 void zodiack_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 void zodiack_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
-WRITE_HANDLER( galaxian_attributes_w );
+WRITE_HANDLER( zodiack_attributes_w );
 WRITE_HANDLER( zodiac_flipscreen_w );
 WRITE_HANDLER( zodiac_control_w );
 
@@ -84,9 +84,9 @@ static struct MemoryWriteAddress writemem[] =
 	{ 0x7000, 0x7000, watchdog_reset_w },
 	{ 0x7100, 0x7100, zodiac_master_interrupt_enable_w },
 	{ 0x7200, 0x7200, zodiac_flipscreen_w },
-	{ 0x9000, 0x903f, galaxian_attributes_w, &galaxian_attributesram },
+	{ 0x9000, 0x903f, zodiack_attributes_w, &zodiack_attributesram },
 	{ 0x9040, 0x905f, MWA_RAM, &spriteram, &spriteram_size },
-	{ 0x9060, 0x907f, MWA_RAM, &galaxian_bulletsram, &galaxian_bulletsram_size },
+	{ 0x9060, 0x907f, MWA_RAM, &zodiack_bulletsram, &zodiack_bulletsram_size },
 	{ 0x9080, 0x93ff, MWA_RAM },
 	{ 0xa000, 0xa3ff, videoram_w, &videoram, &videoram_size },
 	{ 0xb000, 0xb3ff, MWA_RAM, &zodiack_videoram2 },
@@ -96,7 +96,7 @@ static struct MemoryWriteAddress writemem[] =
 
 static struct MemoryReadAddress sound_readmem[] =
 {
-	{ 0x0000, 0x0fff, MRA_ROM },
+	{ 0x0000, 0x1fff, MRA_ROM },
 	{ 0x2000, 0x23ff, MRA_RAM },
 	{ 0x6000, 0x6000, soundlatch_r },
 	{ -1 }	/* end of table */
@@ -104,7 +104,7 @@ static struct MemoryReadAddress sound_readmem[] =
 
 static struct MemoryWriteAddress sound_writemem[] =
 {
-	{ 0x0000, 0x0fff, MWA_ROM },
+	{ 0x0000, 0x1fff, MWA_ROM },
 	{ 0x2000, 0x23ff, MWA_RAM },
 	{ 0x4000, 0x4000, interrupt_enable_w },
 	{ 0x6000, 0x6000, soundlatch_w },
@@ -343,12 +343,12 @@ INPUT_PORTS_START( percuss )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT | IPF_8WAY | IPF_COCKTAIL )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  | IPF_8WAY )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  | IPF_8WAY | IPF_COCKTAIL )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 | IPF_COCKTAIL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 | IPF_COCKTAIL)
 
 	PORT_START      /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -361,6 +361,75 @@ INPUT_PORTS_START( percuss )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  | IPF_8WAY )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( bounty )
+	PORT_START      /* DSW0 */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START      /* DSW1 */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START      /* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  | IPF_8WAY )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  | IPF_8WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 | IPF_COCKTAIL )
+
+	PORT_START      /* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT | IPF_8WAY )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    | IPF_8WAY )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 | IPF_COCKTAIL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  | IPF_8WAY )
+INPUT_PORTS_END
 
 static struct GfxLayout charlayout =
 {
@@ -592,4 +661,4 @@ GAMEX(1983, zodiack,  0, zodiack, zodiac,   0, ROT270, "Orca (Esco Trading Co, I
 GAMEX(1983, dogfight, 0, zodiack, dogfight, 0, ROT270, "[Orca] Thunderbolt", "Dog Fight", GAME_IMPERFECT_COLORS )	/* bullet color needs to be verified */
 GAMEX(1982, moguchan, 0, zodiack, moguchan, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  /* this is in the ROM at $0b5c */ "Moguchan", GAME_WRONG_COLORS )
 GAME( 1981, percuss,  0, percuss, percuss,  0, ROT270, "Orca", "The Percussor" )
-GAMEX(1982, bounty,   0, zodiack, percuss,  0, ROT0,   "Orca", "The Bounty", GAME_NOT_WORKING )
+GAME( 1982, bounty,   0, percuss, bounty,   0, ROT180, "Orca", "The Bounty" )

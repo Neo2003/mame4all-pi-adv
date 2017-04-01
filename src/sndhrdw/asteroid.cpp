@@ -1,568 +1,322 @@
 /*****************************************************************************
  *
- * A (partially wrong) try to emulate Asteroid's analog sound
- * It's getting better but is still imperfect :/
- * If you have ideas, corrections, suggestions contact Juergen
- * Buchmueller <pullmoll@t-online.de>
- *
- * Known issues (TODO):
- * - find out if/why the samples are 'damped', I don't see no
- *	 low pass filter in the sound output, but the samples sound
- *	 like there should be one. Maybe in the amplifier..
- * - better (accurate) way to emulate the low pass on the thrust sound?
- * - verify the thump_frequency calculation. It's only an approximation now
- * - the nastiest piece of the circuit is the saucer sound IMO
- *	 the circuits are almost equal, but there are some strange looking
- *	 things like the direct coupled op-amps and transistors and I can't
- *	 calculate the true resistance and thus voltage at the control
- *	 input (5) of the NE555s.
- * - saucer sound is not easy either and the calculations might be off, still.
+ * Asteroids Analog Sound system interface into discrete sound emulation
+ * input mapping system.
  *
  *****************************************************************************/
 
-#include <math.h>
+//#include <math.h>
 #include "driver.h"
 
-#define VMAX    32767
-#define VMIN	0
+/************************************************************************/
+/* Asteroids Sound System Analog emulation by K.Wilkins Nov 2000        */
+/* Questions/Suggestions to mame@dysfunction.demon.co.uk                */
+/************************************************************************/
 
-#define SAUCEREN    0
-#define SAUCRFIREEN 1
-#define SAUCERSEL   2
-#define THRUSTEN    3
-#define SHIPFIREEN	4
-#define LIFEEN		5
+const struct discrete_lfsr_desc asteroid_lfsr={
+	16,			/* Bit Length */
+	0,			/* Reset Value */
+	6,			/* Use Bit 6 as XOR input 0 */
+	14,			/* Use Bit 14 as XOR input 1 */
+	DISC_LFSR_XNOR,		/* Feedback stage1 is XNOR */
+	DISC_LFSR_OR,		/* Feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,	/* Feedback stage3 replaces the shifted register contents */
+	0x000001,		/* Everything is shifted into the first bit only */
+	0,			/* Output is already inverted by XNOR */
+	16			/* Output bit is feedback bit */
+};
 
-#define EXPITCH0	(1<<6)
-#define EXPITCH1	(1<<7)
-#define EXPAUDSHIFT 2
-#define EXPAUDMASK	(0x0f<<EXPAUDSHIFT)
+#define	ASTEROID_THUMP_EN		NODE_01
+#define	ASTEROID_THUMP_FREQ		NODE_02
+#define ASTEROID_THUMP_DUTY		NODE_03
+#define	ASTEROID_SAUCER_SEL		NODE_04
+#define	ASTEROID_SAUCER_SND_EN		NODE_05
+#define	ASTEROID_SAUCER_FIRE_EN		NODE_06
+#define	ASTEROID_SHIP_FIRE_EN		NODE_07
+#define	ASTEROID_THRUST_EN		NODE_08
+#define	ASTEROID_LIFE_EN		NODE_09
+#define ASTEROID_EXPLODE_DATA		NODE_10
+#define ASTEROID_EXPLODE_PITCH		NODE_11
+#define ASTEROID_NOISE_RESET		NODE_12
 
-#define NE555_T1(Ra,Rb,C)	(VMAX*2/3/(0.639*((Ra)+(Rb))*(C)))
-#define NE555_T2(Ra,Rb,C)	(VMAX*2/3/(0.639*(Rb)*(C)))
-#define NE555_F(Ra,Rb,C)	(1.44/(((Ra)+2*(Rb))*(C)))
-static int channel;
-static int explosion_latch;
-static int thump_latch;
-static int sound_latch[8];
+#define ASTEROID_NOISE			NODE_20
+#define ASTEROID_THUMP_SND		NODE_21
+#define ASTEROID_SAUCER_SND		NODE_22
+#define ASTEROID_LIFE_SND		NODE_23
+#define ASTEROID_SAUCER_FIRE_SND	NODE_24
+#define ASTEROID_SHIP_FIRE_SND		NODE_25
+#define ASTEROID_EXPLODE_SND		NODE_26
+#define ASTEROID_THRUST_SND		NODE_27
 
-static int polynome;
-static int thump_frequency;
+DISCRETE_SOUND_START(asteroid_sound_interface)
+	/************************************************/
+	/* Asteroid Effects Relataive Gain Table        */
+	/*                                              */
+	/* Effect       V-ampIn   Gain ratio  Relative  */
+	/* Thump         5        1/47          131.6   */
+	/* Saucer        2.4      1/39           76.1   */
+	/* Life          3.8      1/47          100.0   */
+	/* Saucer Fire   5-0.6    1/(100+10)     49.5   */
+	/* Ship Fire     5-0.6    1/(100+2.7)    53.0   */
+	/* Explode       3.8      1/4.7        1000.0   */
+	/* Thrust        3.8      1/4.7         600.0   */
+	/*  NOTE: Thrust gain has to be tweaked, due to */
+	/*        the filter stage.                     */
+	/************************************************/
 
-static INT16 *discharge;
-static INT16 vol_explosion[16];
-#define EXP(charge,n) (charge ? 0x7fff - discharge[0x7fff-n] : discharge[n])
+	/************************************************/
+	/* Input register mapping for asteroids ,the    */
+	/* registers are lumped in three groups for no  */
+	/* other reason than they are controlled by 3   */
+	/* registers on the schematics                  */
+	/* Address values are also arbitary in here.    */
+	/************************************************/
+	/*                        NODE                ADDR  MASK    GAIN        OFFSET  INIT */
+	DISCRETE_INPUT      (ASTEROID_SAUCER_SND_EN,  0x00,0x003f,                       0)
+	DISCRETE_INPUT      (ASTEROID_SAUCER_FIRE_EN, 0x01,0x003f,                       0)
+	DISCRETE_INPUT      (ASTEROID_SAUCER_SEL,     0x02,0x003f,                       0)
+	DISCRETE_INPUT      (ASTEROID_THRUST_EN,      0x03,0x003f,                       0)
+	DISCRETE_INPUT      (ASTEROID_SHIP_FIRE_EN,   0x04,0x003f,                       0)
+	DISCRETE_INPUT      (ASTEROID_LIFE_EN,        0x05,0x003f,                       0)
+	DISCRETE_INPUT_PULSE(ASTEROID_NOISE_RESET,    0x06,0x003f,                       1)
 
-INLINE int explosion(int samplerate)
-{
-	static int counter, sample_counter;
-	static int out;
+	DISCRETE_INPUT      (ASTEROID_THUMP_EN,       0x10,0x003f,                       0)
+	DISCRETE_INPUTX     (ASTEROID_THUMP_FREQ,     0x11,0x003f,   70.0/15.0,  20.0,   0)
+	DISCRETE_INPUTX     (ASTEROID_THUMP_DUTY,     0x12,0x003f,   55.0/15.0,  33.0,   0)
 
-	counter -= 12000;
-	while( counter <= 0 )
-	{
-		counter += samplerate;
-		if( ((polynome & 0x4000) == 0) == ((polynome & 0x0040) == 0) )
-			polynome = (polynome << 1) | 1;
-		else
-			polynome <<= 1;
-		if( ++sample_counter == 16 )
-		{
-			sample_counter = 0;
-			if( explosion_latch & EXPITCH0 )
-				sample_counter |= 2 + 8;
-			else
-				sample_counter |= 4;
-			if( explosion_latch & EXPITCH1 )
-				sample_counter |= 1 + 8;
-		}
-		/* ripple count output is high? */
-		if( sample_counter == 15 )
-			out = polynome & 1;
-	}
-	if( out )
-		return vol_explosion[(explosion_latch & EXPAUDMASK) >> EXPAUDSHIFT];
+	DISCRETE_INPUTX     (ASTEROID_EXPLODE_DATA,   0x20,0x003f, 1000.0/15.0,   0.0,   0)
+	DISCRETE_INPUT      (ASTEROID_EXPLODE_PITCH,  0x21,0x003f,                      12)
 
-    return 0;
-}
+	/************************************************/
+	/* Thump circuit is based on a VCO with the     */
+	/* VCO control fed from the 4 low order bits    */
+	/* from /THUMP bit 4 controls the osc enable.   */
+	/* A resistor ladder network is used to convert */
+	/* the 4 bit value to an analog value.          */
+	/*                                              */
+	/* The VCO is implemented with a 555 timer and  */
+	/* an RC filter to perform smoothing on the     */
+	/* output                                       */
+	/*                                              */
+	/* The sound can be tweaked with the gain and   */
+	/* adder constants in the 2 lines below         */
+	/************************************************/
+	DISCRETE_SQUAREWFIX(NODE_30, ASTEROID_THUMP_EN, ASTEROID_THUMP_FREQ, 106.4, ASTEROID_THUMP_DUTY, 0, 0)
+	DISCRETE_RCFILTER(ASTEROID_THUMP_SND, 1, NODE_30, 3300, 0.1e-6)
 
-INLINE int thrust(int samplerate)
-{
-	static int counter, out, amp;
+	/************************************************/
+	/* The SAUCER sound is based on two VCOs, a     */
+	/* slow VCO feed the input to a higher freq VCO */
+	/* with the SAUCERSEL switch being used to move */
+	/* the frequency ranges of both VCOs            */
+	/*                                              */
+	/* The slow VCO is implemented with a 555 timer */
+	/* and a 566 is used for the higher VCO.        */
+	/*                                              */
+	/* The sound can be tweaked with the gain and   */
+	/* adder constants in the 2 lines below         */
+	/************************************************/
+	// SAUCER_SEL = 1 - larger saucer
+	DISCRETE_MULTADD(NODE_40, 1, ASTEROID_SAUCER_SEL, -2.5, 8.25)	// Saucer Warble rate (5.75 or 8.25Hz)
+	DISCRETE_TRIANGLEWAVE(NODE_41, 1, NODE_40, 920.0, 920.0/2, 0)	// (amount of warble)
 
-    if( sound_latch[THRUSTEN] )
-	{
-		/* SHPSND filter */
-		counter -= 110;
-		while( counter <= 0 )
-		{
-			counter += samplerate;
-			out = polynome & 1;
-		}
-		if( out )
-		{
-			if( amp < VMAX )
-				amp += (VMAX - amp) * 32768 / 32 / samplerate + 1;
-		}
-		else
-		{
-			if( amp > VMIN )
-				amp -= amp * 32768 / 32 / samplerate + 1;
-		}
-		return amp;
-	}
-	return 0;
-}
+	DISCRETE_TRANSFORM4(NODE_42, 1, ASTEROID_SAUCER_SEL, -250, NODE_41, 750, "01*2+3+")	// Large saucer is 250hz lower
 
-INLINE int thump(int samplerate)
-{
-	static int counter, out;
+	DISCRETE_TRIANGLEWAVE(NODE_43, ASTEROID_SAUCER_SND_EN, NODE_42, 76.1, 0, 0)
+	DISCRETE_RCFILTER(ASTEROID_SAUCER_SND, 1, NODE_43, 1, 1.0e-5)
 
-    if( thump_latch & 0x10 )
-	{
-		counter -= thump_frequency;
-		while( counter <= 0 )
-		{
-			counter += samplerate;
-			out ^= 1;
-		}
-		if( out )
-			return VMAX;
-	}
-	return 0;
-}
+	/************************************************/
+	/* The Ship Fire sound is produced by a 555     */
+	/* based VCO where the frequency rapidly decays */
+	/* with time.                                   */
+	/************************************************/
+	DISCRETE_RAMP(NODE_50, ASTEROID_SHIP_FIRE_EN, ASTEROID_SHIP_FIRE_EN, (820.0-110.0)/0.28, 820.0, 110.0, 0)	/* Decay - Freq */
+	DISCRETE_RCDISC(NODE_51, ASTEROID_SHIP_FIRE_EN, 53.0-7.0, 2700.0*3, 1e-5)	/* Decay - Amplitude */
+	DISCRETE_ADDER2(NODE_52, 1, NODE_51, 7.0)	/* Amplitude */
+	DISCRETE_TRANSFORM3(NODE_53, ASTEROID_SHIP_FIRE_EN, 4500, NODE_50, 67, "01/2+")	/* Duty */
+	DISCRETE_SQUAREWAVE(NODE_54, ASTEROID_SHIP_FIRE_EN, NODE_50, NODE_52, NODE_53, 0, 0)
+	DISCRETE_RCFILTER(ASTEROID_SHIP_FIRE_SND, 1, NODE_54, 1, 1.0e-5)
 
+	/************************************************/
+	/* The Saucer Fire sound is produced by a 555   */
+	/* based VCO where the frequency rapidly decays */
+	/* with time.                                   */
+	/************************************************/
+	DISCRETE_RAMP(NODE_60, ASTEROID_SAUCER_FIRE_EN, ASTEROID_SAUCER_FIRE_EN, (830.0-630.0)/0.28, 830.0, 630.0, 0)	/* Decay - Freq */
+	DISCRETE_RCDISC(NODE_61, ASTEROID_SAUCER_FIRE_EN, 49.5-7.0, 10000.0*3, 1e-5)	/* Decay - Amplitude */
+	DISCRETE_ADDER2(NODE_62, 1, NODE_61, 7.0)	/* Amplitude */
+	DISCRETE_TRANSFORM3(NODE_63, ASTEROID_SAUCER_FIRE_EN, 4500, NODE_60, 67, "01/2+")	/* Duty */
+	DISCRETE_SQUAREWAVE(NODE_64, ASTEROID_SAUCER_FIRE_EN, NODE_60, NODE_62, NODE_63, 0, 0)
+	DISCRETE_RCFILTER(ASTEROID_SAUCER_FIRE_SND, 1, NODE_64, 2, 1.0e-5)
 
-INLINE int saucer(int samplerate)
-{
-	static int vco, vco_charge, vco_counter;
-    static int out, counter;
-	float v5;
+	/************************************************/
+	/* Thrust noise is a gated noise source         */
+	/* fed into a filter network                    */
+	/* It is an RC lowpass, followed by a           */
+	/* Sallen-Key bandpass, followed by an active	*/
+	/* lowpass.                             		*/
+	/************************************************/
+	DISCRETE_LFSR_NOISE(ASTEROID_NOISE, ASTEROID_NOISE_RESET, ASTEROID_NOISE_RESET, 12000.0, 1.0, 0, 0, &asteroid_lfsr)
 
-    /* saucer sound enabled ? */
-	if( sound_latch[SAUCEREN] )
-	{
-		/* NE555 setup as astable multivibrator:
-		 * C = 10u, Ra = 5.6k, Rb = 10k
-		 * or, with /SAUCERSEL being low:
-		 * C = 10u, Ra = 5.6k, Rb = 6k (10k parallel with 15k)
-		 */
-		if( vco_charge )
-		{
-			if( sound_latch[SAUCERSEL] )
-				vco_counter -= NE555_T1(5600,10000,10e-6);
-			else
-				vco_counter -= NE555_T1(5600,6000,10e-6);
-			if( vco_counter <= 0 )
-			{
-				int steps = (-vco_counter / samplerate) + 1;
-				vco_counter += steps * samplerate;
-				if( (vco += steps) >= VMAX*2/3 )
-				{
-					vco = VMAX*2/3;
-					vco_charge = 0;
-				}
-			}
-		}
-		else
-		{
-			if( sound_latch[SAUCERSEL] )
-				vco_counter -= NE555_T2(5600,10000,10e-6);
-			else
-				vco_counter -= NE555_T2(5600,6000,10e-6);
-			if( vco_counter <= 0 )
-			{
-				int steps = (-vco_counter / samplerate) + 1;
-				vco_counter += steps * samplerate;
-				if( (vco -= steps) <= VMAX*1/3 )
-				{
-					vco = VMIN*1/3;
-					vco_charge = 1;
-				}
-			}
-		}
-		/*
-		 * NE566 voltage controlled oscillator
-		 * Co = 0.047u, Ro = 10k
-		 * to = 2.4 * (Vcc - V5) / (Ro * Co * Vcc)
-		 */
-		if( sound_latch[SAUCERSEL] )
-			v5 = 12.0 - 1.66 - 5.0 * EXP(vco_charge,vco) / 32768;
-		else
-			v5 = 11.3 - 1.66 - 5.0 * EXP(vco_charge,vco) / 32768;
-		counter -= floor(2.4 * (12.0 - v5) / (10000 * 0.047e-6 * 12.0));
-		while( counter <= 0 )
-		{
-			counter += samplerate;
-			out ^= 1;
-		}
-		if( out )
-			return VMAX;
-	}
-	return 0;
-}
+	DISCRETE_GAIN(NODE_70, ASTEROID_NOISE, 600)
+	DISCRETE_RCFILTER(NODE_71, ASTEROID_THRUST_EN, NODE_70, 2200, 1e-6)
+	/* TBD - replace this line with a Sallen-Key Bandpass macro */
+	DISCRETE_FILTER2(NODE_72, 1, NODE_71, 89.5, (1.0 / 7.6), DISC_FILTER_BANDPASS)
+	/* TBD - replace this line with a Active Lowpass macro */
+	DISCRETE_FILTER1(ASTEROID_THRUST_SND, 1, NODE_72, 160, DISC_FILTER_LOWPASS)
 
-INLINE int saucerfire(int samplerate)
-{
-	static int vco, vco_counter;
-	static int amp, amp_counter;
-	static int out, counter;
+	/************************************************/
+	/* Explosion generation circuit, pitch and vol  */
+	/* are variable.                                */
+	/* The pitch divides using an overflow counter. */
+	/* Meaning the duty cycle varies.  The on time  */
+	/* is always the same (one 12Khz cycle).  But   */
+	/* the off time varies.  /12 = 11 off cycles    */
+	/* Then it is ANDed with the 12kHz to make a    */
+	/* shorter pulse.  There is no real reason to   */
+	/* do this, as the D-Latch already triggers on  */
+	/* the rising edge.  So we won't add the extra  */
+	/* nodes.                                       */
+	/************************************************/
+	DISCRETE_DIVIDE(NODE_80, 1, 12000, ASTEROID_EXPLODE_PITCH)		/* Frequency */
+	DISCRETE_DIVIDE(NODE_81, 1, 100, ASTEROID_EXPLODE_PITCH)		/* Duty */
+	DISCRETE_SQUAREWFIX(NODE_82, 1, NODE_80, 1.0, NODE_81, 1.0/2, 0)	/* Pitch clock */
+	DISCRETE_SAMPLHOLD(NODE_83, 1, ASTEROID_NOISE, NODE_82, DISC_SAMPHOLD_REDGE)
+	DISCRETE_MULTIPLY(NODE_84, 1, NODE_83, ASTEROID_EXPLODE_DATA)
+	DISCRETE_RCFILTER(ASTEROID_EXPLODE_SND, 1, NODE_84, 3042, 1e-6)
 
-    if( sound_latch[SAUCRFIREEN] )
-	{
-		if( vco < VMAX*12/5 )
-		{
-			/* charge C38 (10u) through R54 (10K) from 5V to 12V */
-			#define C38_CHARGE_TIME (VMAX)
-			vco_counter -= C38_CHARGE_TIME;
-			while( vco_counter <= 0 )
-			{
-				vco_counter += samplerate;
-				if( ++vco == VMAX*12/5 )
-					break;
-			}
-		}
-		if( amp > VMIN )
-		{
-			/* discharge C39 (10u) through R58 (10K) and diode CR6,
-			 * but only during the time the output of the NE555 is low.
-			 */
-			if( out )
-			{
-				#define C39_DISCHARGE_TIME (int)(VMAX)
-				amp_counter -= C39_DISCHARGE_TIME;
-				while( amp_counter <= 0 )
-				{
-					amp_counter += samplerate;
-					if( --amp == VMIN )
-						break;
-				}
-			}
-		}
-		if( out )
-		{
-			/* C35 = 1u, Ra = 3.3k, Rb = 680
-			 * discharge = 0.693 * 680 * 1e-6 = 4.7124e-4 -> 2122 Hz
-			 */
-			counter -= 2122;
-			if( counter <= 0 )
-			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				out = 0;
-			}
-		}
-		else
-		{
-			/* C35 = 1u, Ra = 3.3k, Rb = 680
-			 * charge 0.693 * (3300+680) * 1e-6 = 2.75814e-3 -> 363Hz
-			 */
-			counter -= 363 * 2 * (VMAX*12/5-vco) / 32768;
-			if( counter <= 0 )
-			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				out = 1;
-			}
-		}
-        if( out )
-			return amp;
-	}
-	else
-	{
-		/* charge C38 and C39 */
-		amp = VMAX;
-		vco = VMAX;
-	}
-	return 0;
-}
+	/************************************************/
+	/* Life enable is just 3KHz tone from the clock */
+	/* generation cct according to schematics       */
+	/************************************************/
+	DISCRETE_SQUAREWFIX(ASTEROID_LIFE_SND, ASTEROID_LIFE_EN, 3000, 100.0, 50.0, 0, 0)
 
-INLINE int shipfire(int samplerate)
-{
-	static int vco, vco_counter;
-	static int amp, amp_counter;
-    static int out, counter;
+	/************************************************/
+	/* Combine all 7 sound sources with a double    */
+	/* adder circuit                                */
+	/************************************************/
+	DISCRETE_ADDER4(NODE_90, 1, ASTEROID_THUMP_SND, ASTEROID_SAUCER_SND, ASTEROID_SHIP_FIRE_SND, ASTEROID_SAUCER_FIRE_SND)
+	DISCRETE_ADDER4(NODE_91, 1, ASTEROID_THRUST_SND, ASTEROID_EXPLODE_SND, ASTEROID_LIFE_SND, NODE_90)
+	DISCRETE_GAIN(NODE_92, NODE_91, 65534.0 / (131.6+76.1+49.5+53.0+1000.0+600.0))
 
-    if( sound_latch[SHIPFIREEN] )
-	{
-		if( vco < VMAX*12/5 )
-		{
-			/* charge C47 (1u) through R52 (33K) and Q3 from 5V to 12V */
-			#define C47_CHARGE_TIME (VMAX * 3)
-			vco_counter -= C47_CHARGE_TIME;
-			while( vco_counter <= 0 )
-			{
-				vco_counter += samplerate;
-				if( ++vco == VMAX*12/5 )
-					break;
-			}
-        }
-		if( amp > VMIN )
-		{
-			/* discharge C48 (10u) through R66 (2.7K) and CR8,
-			 * but only while the output of theNE555 is low.
-			 */
-			if( out )
-			{
-				#define C48_DISCHARGE_TIME (VMAX * 3)
-				amp_counter -= C48_DISCHARGE_TIME;
-				while( amp_counter <= 0 )
-				{
-					amp_counter += samplerate;
-					if( --amp == VMIN )
-						break;
-				}
-			}
-		}
-
-		if( out )
-		{
-			/* C50 = 1u, Ra = 3.3k, Rb = 680
-			 * discharge = 0.693 * 680 * 1e-6 = 4.7124e-4 -> 2122 Hz
-			 */
-			counter -= 2122;
-			if( counter <= 0 )
-			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				out = 0;
-			}
-		}
-		else
-		{
-			/* C50 = 1u, Ra = R65 (3.3k), Rb = R61 (680)
-			 * charge = 0.693 * (3300+680) * 1e-6) = 2.75814e-3 -> 363Hz
-			 */
-			counter -= 363 * 2 * (VMAX*12/5-vco) / 32768;
-			if( counter <= 0 )
-			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				out = 1;
-			}
-		}
-		if( out )
-			return amp;
-	}
-	else
-	{
-		/* charge C47 and C48 */
-		amp = VMAX;
-		vco = VMAX;
-	}
-	return 0;
-}
-
-INLINE int life(int samplerate)
-{
-	static int counter, out;
-    if( sound_latch[LIFEEN] )
-	{
-		counter -= 3000;
-		while( counter <= 0 )
-		{
-			counter += samplerate;
-			out ^= 1;
-		}
-		if( out )
-			return VMAX;
-	}
-	return 0;
-}
+	DISCRETE_OUTPUT(NODE_92, 100)		// Take the output from the mixer
+DISCRETE_SOUND_END
 
 
-static void asteroid_sound_update(int param, INT16 *buffer, int length)
-{
-	int samplerate = Machine->sample_rate;
+DISCRETE_SOUND_START(astdelux_sound_interface)
+	/************************************************/
+	/* Asteroid delux sound hardware is mostly done */
+	/* in the Pokey chip except for the thrust and  */
+	/* explosion sounds that are a direct lift of   */
+	/* the asteroids hardware hence is a clone of   */
+	/* the circuit above apart from gain scaling.   */
+	/*                                              */
+	/* Note that the thrust enable signal is invert */
+	/************************************************/
+	/*                         NODE                ADDR  MASK    GAIN        OFFSET  INIT */
+	DISCRETE_INPUT       (ASTEROID_THRUST_EN,      0x03,0x003f,                       0)
+	DISCRETE_INPUT_PULSE (ASTEROID_NOISE_RESET,    0x06,0x003f,                       1)
 
-    while( length-- > 0 )
-	{
-		int sum = 0;
+	DISCRETE_INPUTX      (ASTEROID_EXPLODE_DATA,   0x20,0x003f, 1000.0/15.0,   0.0,   0)
+	DISCRETE_INPUT       (ASTEROID_EXPLODE_PITCH,  0x21,0x003f,                      12)
 
-		sum += explosion(samplerate) / 7;
-		sum += thrust(samplerate) / 7;
-		sum += thump(samplerate) / 7;
-		sum += saucer(samplerate) / 7;
-		sum += saucerfire(samplerate) / 7;
-		sum += shipfire(samplerate) / 7;
-		sum += life(samplerate) / 7;
+	/************************************************/
+	/* Thrust noise is a gated noise source         */
+	/* fed into a filter network                    */
+	/* It is an RC lowpass, followed by a           */
+	/* Sallen-Key bandpass, followed by an active	*/
+	/* lowpass.                             		*/
+	/************************************************/
+	DISCRETE_LFSR_NOISE(ASTEROID_NOISE, ASTEROID_NOISE_RESET, ASTEROID_NOISE_RESET, 12000.0, 1.0, 0, 0, &asteroid_lfsr)
 
-        *buffer++ = sum;
-	}
-}
+	DISCRETE_GAIN(NODE_70, ASTEROID_NOISE, 1000)
+	DISCRETE_RCFILTER(NODE_71, ASTEROID_THRUST_EN, NODE_70, 2200, 1e-6)
+	/* TBD - replace this line with a Sallen-Key Bandpass macro */
+	DISCRETE_FILTER2(NODE_72, 1, NODE_71, 89.5, (1.0 / 7.6), DISC_FILTER_BANDPASS)
+	/* TBD - replace this line with a Active Lowpass macro */
+	DISCRETE_FILTER1(ASTEROID_THRUST_SND, 1, NODE_72, 160, DISC_FILTER_LOWPASS)
 
-static void explosion_init(void)
-{
-	int i;
+	/************************************************/
+	/* Explosion generation circuit, pitch and vol  */
+	/* are variable.                                */
+	/* The pitch divides using an overflow counter. */
+	/* Meaning the duty cycle varies.  The on time  */
+	/* is always the same (one 12Khz cycle).  But   */
+	/* the off time varies.  /12 = 11 off cycles    */
+	/* Then it is ANDed with the 12kHz to make a    */
+	/* shorter pulse.  There is no real reason to   */
+	/* do this, as the D-Latch already triggers on  */
+	/* the rising edge.  So we won't add the extra  */
+	/* nodes.                                       */
+	/************************************************/
+	DISCRETE_DIVIDE(NODE_80, 1, 12000, ASTEROID_EXPLODE_PITCH)		/* Frequency */
+	DISCRETE_DIVIDE(NODE_81, 1, 100, ASTEROID_EXPLODE_PITCH)		/* Duty */
+	DISCRETE_SQUAREWFIX(NODE_82, 1, NODE_80, 1.0, NODE_81, 1.0/2, 0)	/* Pitch clock */
+	DISCRETE_SAMPLHOLD(NODE_83, 1, ASTEROID_NOISE, NODE_82, DISC_SAMPHOLD_REDGE)
+	DISCRETE_MULTIPLY(NODE_84, 1, NODE_83, ASTEROID_EXPLODE_DATA)
+	DISCRETE_RCFILTER(ASTEROID_EXPLODE_SND, 1, NODE_84, 3042, 1e-6)
 
-    for( i = 0; i < 16; i++ )
-    {
-        /* r0 = open, r1 = open */
-        float r0 = 1.0/1e12, r1 = 1.0/1e12;
+	/************************************************/
+	/* Combine all 7 sound sources with a double    */
+	/* adder circuit                                */
+	/************************************************/
+	DISCRETE_ADDER2(NODE_90, 1, ASTEROID_THRUST_SND, ASTEROID_EXPLODE_SND)
+	DISCRETE_GAIN(NODE_91, NODE_90, 65534.0/(1000+600))
 
-        /* R14 */
-        if( i & 1 )
-            r1 += 1.0/47000;
-        else
-            r0 += 1.0/47000;
-        /* R15 */
-        if( i & 2 )
-            r1 += 1.0/22000;
-        else
-            r0 += 1.0/22000;
-        /* R16 */
-        if( i & 4 )
-            r1 += 1.0/12000;
-        else
-            r0 += 1.0/12000;
-        /* R17 */
-        if( i & 8 )
-            r1 += 1.0/5600;
-        else
-            r0 += 1.0/5600;
-        r0 = 1.0/r0;
-        r1 = 1.0/r1;
-        vol_explosion[i] = VMAX * r0 / (r0 + r1);
-    }
-
-}
-
-int asteroid_sh_start(const struct MachineSound *msound)
-{
-    int i;
-
-	discharge = (INT16 *)malloc(32768 * sizeof(INT16));
-	if( !discharge )
-        return 1;
-
-    for( i = 0; i < 0x8000; i++ )
-		discharge[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
-
-	/* initialize explosion volume lookup table */
-	explosion_init();
-
-    channel = stream_init("Custom", 100, Machine->sample_rate, 0, asteroid_sound_update);
-    if( channel == -1 )
-        return 1;
-
-    return 0;
-}
-
-void asteroid_sh_stop(void)
-{
-	if( discharge )
-		free(discharge);
-	discharge = NULL;
-}
-
-void asteroid_sh_update(void)
-{
-	stream_update(channel, 0);
-}
+	DISCRETE_OUTPUT(NODE_91, 100)	// Take the output from the mixer
+DISCRETE_SOUND_END
 
 
 WRITE_HANDLER( asteroid_explode_w )
 {
-	if( data == explosion_latch )
-		return;
-
-    stream_update(channel, 0);
-	explosion_latch = data;
+	discrete_sound_w(0x20,(data&0x3c)>>2);				// Volume
+	/* We will modify the pitch data to send the divider value. */
+	switch ((data&0xc0))
+	{
+		case 0x00:
+			data = 12;
+			break;
+		case 0x40:
+			data = 6;
+			break;
+		case 0x80:
+			data = 3;
+			break;
+		case 0xc0:
+			data = 5;
+			break;
+	}
+	discrete_sound_w(0x21, data);
 }
 
 
 
 WRITE_HANDLER( asteroid_thump_w )
 {
-	float r0 = 1/47000, r1 = 1/1e12;
-
-    if( data == thump_latch )
-		return;
-
-    stream_update(channel, 0);
-	thump_latch = data;
-
-	if( thump_latch & 1 )
-		r1 += 1.0/220000;
-	else
-		r0 += 1.0/220000;
-	if( thump_latch & 2 )
-		r1 += 1.0/100000;
-	else
-		r0 += 1.0/100000;
-	if( thump_latch & 4 )
-		r1 += 1.0/47000;
-	else
-		r0 += 1.0/47000;
-	if( thump_latch & 8 )
-		r1 += 1.0/22000;
-	else
-		r0 += 1.0/22000;
-
-	/* NE555 setup as voltage controlled astable multivibrator
-	 * C = 0.22u, Ra = 22k...???, Rb = 18k
-	 * frequency = 1.44 / ((22k + 2*18k) * 0.22n) = 56Hz .. huh?
-	 */
-	thump_frequency = 56 + 56 * r0 / (r0 + r1);
+	discrete_sound_w(0x10,data&0x10);		//Thump enable
+	discrete_sound_w(0x11,(data&0x0f)^0x0f);	//Thump frequency
+	discrete_sound_w(0x12,data&0x0f);		//Thump duty
 }
 
 
 WRITE_HANDLER( asteroid_sounds_w )
 {
-	data &= 0x80;
-    if( data == sound_latch[offset] )
-		return;
-
-    stream_update(channel, 0);
-	sound_latch[offset] = data;
+	discrete_sound_w(0x00+offset,(data&0x80)?1:0);
 }
 
-
-
-static void astdelux_sound_update(int param, INT16 *buffer, int length)
-{
-	int samplerate = Machine->sample_rate;
-
-    while( length-- > 0)
-	{
-		int sum = 0;
-
-		sum += explosion(samplerate) / 2;
-		sum += thrust(samplerate) / 2;
-
-		*buffer++ = sum;
-	}
-}
-
-int astdelux_sh_start(const struct MachineSound *msound)
-{
-	/* initialize explosion volume lookup table */
-	explosion_init();
-
-	channel = stream_init("Custom", 50, Machine->sample_rate, 0, astdelux_sound_update);
-    if( channel == -1 )
-        return 1;
-
-    return 0;
-}
-
-void astdelux_sh_stop(void)
-{
-}
-
-void astdelux_sh_update(void)
-{
-	stream_update(channel, 0);
-}
 
 
 WRITE_HANDLER( astdelux_sounds_w )
 {
-	data = ~data & 0x80;
-	if( data == sound_latch[THRUSTEN] )
-		return;
-    stream_update(channel, 0);
-	sound_latch[THRUSTEN] = data;
+	/* Only ever activates the thrusters in Astdelux */
+//	discrete_sound_w(0x03,(data&0x80)?0:1);
+	discrete_sound_w(0x03,(data&0x80)?1:0);
 }
+
+WRITE_HANDLER( asteroid_noise_reset_w )
+{
+	discrete_sound_w(6, 0);
+}
+
 
 

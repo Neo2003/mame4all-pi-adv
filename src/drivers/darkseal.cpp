@@ -288,9 +288,9 @@ static struct GfxDecodeInfo gfxdecodeinfo[] =
 static struct OKIM6295interface okim6295_interface =
 {
 	2,              /* 2 chips */
-	{ 7757, 15514 },/* Frequency */
+	{ 32220000/32/132, 32220000/16/132 },/* Frequency */
 	{ REGION_SOUND1, REGION_SOUND2 },       /* memory regions */
-	{ 50, 25 }		/* Note!  Keep chip 1 (voices) louder than chip 2 */
+	{ 99, 25 }		/* Note!  Keep chip 1 (voices) louder than chip 2 */
 };
 
 static struct YM2203interface ym2203_interface =

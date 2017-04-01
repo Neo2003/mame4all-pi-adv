@@ -345,9 +345,9 @@ struct snd_interface sndintf[] =
 		AY8910_num,
 		AY8910_clock,
 		AY8910_sh_start,
+		AY8910_sh_stop,
 		0,
-		0,
-		0
+		AY8910_sh_reset
 	},
 #endif
 #if (HAS_YM2203)
@@ -405,7 +405,7 @@ struct snd_interface sndintf[] =
 		YM2610_num,
 		YM2610_clock,
 		YM2610B_sh_start,
-		YM2610_sh_stop,
+		YM2610B_sh_stop,
 		0,
 		YM2610_sh_reset
 	},
@@ -514,6 +514,7 @@ struct snd_interface sndintf[] =
 		SN76496_clock,
 		SN76496_sh_start,
         0,
+		0,
 		0
 	},
 #endif

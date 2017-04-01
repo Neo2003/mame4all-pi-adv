@@ -55,7 +55,7 @@ void bankp_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 static struct MemoryReadAddress readmem[] =
 {
 	{ 0x0000, 0xdfff, MRA_ROM },
-	{ 0xe000, 0xe7ff, MRA_RAM },
+	{ 0xe000, 0xefff, MRA_RAM },
 	{ 0xf000, 0xffff, MRA_RAM },
 	{ -1 }	/* end of table */
 };
@@ -63,7 +63,7 @@ static struct MemoryReadAddress readmem[] =
 static struct MemoryWriteAddress writemem[] =
 {
 	{ 0x0000, 0xdfff, MWA_ROM },
-	{ 0xe000, 0xe7ff, MWA_RAM },
+	{ 0xe000, 0xefff, MWA_RAM },
 	{ 0xf000, 0xf3ff, videoram_w, &videoram, &videoram_size },
 	{ 0xf400, 0xf7ff, colorram_w, &colorram },
 	{ 0xf800, 0xfbff, bankp_videoram2_w, &bankp_videoram2 },
@@ -146,6 +146,52 @@ INPUT_PORTS_START( bankp )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( combh )
+	PORT_START	/* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP | IPF_2WAY )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN | IPF_2WAY )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_START	/* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP | IPF_2WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN | IPF_2WAY | IPF_COCKTAIL )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 | IPF_COCKTAIL )
+
+	PORT_START	/* IN2 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 | IPF_COCKTAIL )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* probably unused */
+
+	PORT_START	/* DSW */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x00, "Coinage" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, "Easy" )
+	PORT_DIPSETTING(    0x40, "Hard" )
+	PORT_DIPNAME( 0x80, 0x80, "Fuel" )
+	PORT_DIPSETTING(    0x80, "120 Units" )
+	PORT_DIPSETTING(    0x00, "90 Units" )
+INPUT_PORTS_END
 
 
 static struct GfxLayout charlayout =
@@ -181,7 +227,7 @@ static struct GfxDecodeInfo gfxdecodeinfo[] =
 static struct SN76496interface sn76496_interface =
 {
 	3,	/* 3 chips */
-	{ 3867120, 3867120, 3867120 },	/* ?? the main oscillator is 15.46848 Mhz */
+	{  15468480/6,  15468480/6,  15468480/6 },	/* the main oscillator is 15.46848 Mhz */
 	{ 100, 100, 100 }
 };
 
@@ -193,7 +239,7 @@ static struct MachineDriver machine_driver_bankp =
 	{
 		{
 			CPU_Z80,
-			3867120,	/* ?? the main oscillator is 15.46848 Mhz */
+			15468480/6,	/* the main oscillator is 15.46848 Mhz */
 			readmem,writemem,readport,writeport,
 			nmi_interrupt,1
 		},
@@ -225,6 +271,42 @@ static struct MachineDriver machine_driver_bankp =
 };
 
 
+static struct MachineDriver machine_driver_combh =
+{
+	/* basic machine hardware */
+	{
+		{
+			CPU_Z80,
+			15468480/6,	/* the main oscillator is 15.46848 Mhz */
+			readmem,writemem,readport,writeport,
+			nmi_interrupt,1
+		},
+	},
+	60, DEFAULT_60HZ_VBLANK_DURATION,	/* frames per second, vblank duration */
+	1,	/* single CPU, no need for interleaving */
+	0,
+
+	/* video hardware */
+	32*8, 32*8, { 3*8, 31*8-1, 2*8, 30*8-1 },
+	gfxdecodeinfo,
+	32, 32*4+16*8,
+	bankp_vh_convert_color_prom,
+
+	VIDEO_TYPE_RASTER,
+	0,
+	bankp_vh_start,
+	bankp_vh_stop,
+	bankp_vh_screenrefresh,
+
+	/* sound hardware */
+	0,0,0,0,
+	{
+		{
+			SOUND_SN76496,
+			&sn76496_interface
+		}
+	}
+};
 
 /***************************************************************************
 
@@ -257,6 +339,36 @@ ROM_START( bankp )
 	ROM_LOAD( "pr6179.clr",   0x0120, 0x100, 0xe53bafdb ) 	/* charset #2 lookup table */
 ROM_END
 
+ROM_START( combh )
+	ROM_REGION( 0x10000, REGION_CPU1 )	/* 64k for code */
+	ROM_LOAD( "epr-10904.7e",  0x0000, 0x4000, 0x4b106335 )
+	ROM_LOAD( "epr-10905.7f",  0x4000, 0x4000, 0xa76fc390 )
+	ROM_LOAD( "epr-10906.7h",  0x8000, 0x4000, 0x16d54885 )
+	ROM_LOAD( "epr-10903.7d",  0xc000, 0x2000, 0xb7a59cab )
+
+	ROM_REGION( 0x04000, REGION_GFX1 | REGIONFLAG_DISPOSE )
+	ROM_LOAD( "epr-10914.5l",  0x0000, 0x2000, 0x7d7a2340 )
+	ROM_LOAD( "epr-10913.5k",  0x2000, 0x2000, 0xd5c1a8ae )
+
+	ROM_REGION( 0x0c000, REGION_GFX2 | REGIONFLAG_DISPOSE )
+	ROM_LOAD( "epr-10907.5b",  0x0000, 0x2000, 0x08e5eea3 )
+	ROM_LOAD( "epr-10908.5d",  0x2000, 0x2000, 0xd9e413f5 )
+	ROM_LOAD( "epr-10909.5e",  0x4000, 0x2000, 0xfec7962c )
+	ROM_LOAD( "epr-10910.5f",  0x6000, 0x2000, 0x33db0fa7 )
+	ROM_LOAD( "epr-10911.5h",  0x8000, 0x2000, 0x565d9e6d )
+	ROM_LOAD( "epr-10912.5i",  0xa000, 0x2000, 0xcbe22738 )
+
+	ROM_REGION( 0x0220, REGION_PROMS )
+	ROM_LOAD( "pr-10900.8a",   0x0000, 0x020, 0xf95fcd66 )    /* palette */
+	ROM_LOAD( "pr-10901.6f",   0x0020, 0x100, 0x6fd981c8 )    /* charset #2 lookup table */
+	ROM_LOAD( "pr-10902.5a",   0x0120, 0x100, 0x84d6bded )    /* charset #1 lookup table */
+
+	ROM_REGION( 0x025c, REGION_USER1 )
+	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, 0x2e57bbba )
+	//ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, 0x0 ) /* read protected */
+ROM_END
 
 
-GAME( 1984, bankp, 0, bankp, bankp, 0, ROT0, "Sega", "Bank Panic" )
+
+GAME( 1984, bankp, 0, bankp, bankp, 0, ROT0,	"Sega", "Bank Panic" )
+GAME( 1984, combh, 0, combh, combh, 0, ROT270,	"Sega", "Combat Hawk" )

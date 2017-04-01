@@ -49,13 +49,14 @@ same as Pooyan
 
 extern unsigned char *timeplt_videoram,*timeplt_colorram;
 
-void init_timeplt(void);
-void init_psurge(void);
+//void init_timeplt(void);
+//void init_psurge(void);
 READ_HANDLER( timeplt_scanline_r );
 WRITE_HANDLER( timeplt_videoram_w );
 WRITE_HANDLER( timeplt_colorram_w );
 WRITE_HANDLER( timeplt_flipscreen_w );
 int  timeplt_vh_start(void);
+void  timeplt_vh_stop(void);
 void timeplt_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom);
 void timeplt_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 
@@ -327,7 +328,8 @@ static struct MachineDriver machine_driver_timeplt =
 			CPU_Z80,
 			3072000,	/* 3.072 Mhz (?) */
 			readmem,writemem,0,0,
-			nmi_interrupt,1
+			timeplt_interrupt,256	/* once per raster line */
+			//nmi_interrupt,1
 		},
 		{
 			CPU_Z80 | CPU_AUDIO_CPU,
@@ -349,7 +351,7 @@ static struct MachineDriver machine_driver_timeplt =
 	VIDEO_TYPE_RASTER,
 	0,
 	timeplt_vh_start,
-	0,
+	timeplt_vh_stop, //0,
 	timeplt_vh_screenrefresh,
 
 	/* sound hardware */
@@ -463,9 +465,9 @@ ROM_START( psurge )
 	ROM_LOAD( "timeplt.e12",  0x0140, 0x0100, 0x00000000 ) /* char lookup table */
 ROM_END
 
+GAME( 1982, timeplt,  0,       timeplt, timeplt, 0, ROT90, "Konami", "Time Pilot" )
+GAME( 1982, timepltc, timeplt, timeplt, timeplt, 0, ROT90, "Konami (Centuri license)", "Time Pilot (Centuri)" )
+GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90, "bootleg", "Space Pilot" )
+GAME( 1988, psurge,   0,       timeplt, psurge,  0, ROT270,  "<unknown>", "Power Surge" )
 
 
-GAME( 1982, timeplt,  0,       timeplt, timeplt, timeplt, ROT270, "Konami", "Time Pilot" )
-GAME( 1982, timepltc, timeplt, timeplt, timeplt, timeplt, ROT270, "Konami (Centuri license)", "Time Pilot (Centuri)" )
-GAME( 1982, spaceplt, timeplt, timeplt, timeplt, timeplt, ROT270, "bootleg", "Space Pilot" )
-GAME( 1988, psurge,   0,       timeplt, psurge,  psurge,  ROT90,  "<unknown>", "Power Surge" )

@@ -353,7 +353,7 @@ static struct MachineDriver GAMENAME = \
 		}, \
 		{ \
 			CPU_Z80 | CPU_AUDIO_CPU, \
-			5000000, /* Changed from 4.096000Mhz to 5Mhz */ \
+			4000000, /* Changed from 4.096000Mhz to 5Mhz */ \
 			sound_readmem_7759,sound_writemem,sound_readport,sound_writeport_7759, \
 			ignore_interrupt,1 \
 		}, \

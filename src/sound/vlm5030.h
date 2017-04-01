@@ -7,8 +7,8 @@ struct VLM5030interface
 	int volume;         /* volume                         */
 	int memory_region;  /* memory region of speech rom    */
 	int memory_size;    /* memory size of speech rom (0=memory region length) */
-	int vcu;            /* vcu pin level                  */
-	const char **samplenames;	/* optional samples to replace emulation */
+	int dummy1;	    /* not used */ //int vcu;            /* vcu pin level                  */
+	const char **samplenames;	    /* not used */ //const char **samplenames;	/* optional samples to replace emulation */
 };
 
 /* use sampling data when speech_rom == 0 */

@@ -28,6 +28,7 @@ unsigned char *wiz_attributesram;
 unsigned char *wiz_attributesram2;
 
 static int flipx, flipy;
+static int bgpen;
 
 unsigned char *wiz_sprite_bank;
 static unsigned char char_bank[2];
@@ -105,6 +106,10 @@ WRITE_HANDLER( wiz_palettebank_w )
 	}
 }
 
+WRITE_HANDLER( wiz_bgcolor_w )
+{
+	bgpen = data;
+}
 WRITE_HANDLER( wiz_char_bank_select_w )
 {
 	if (char_bank[offset] != (data & 1))
@@ -137,67 +142,40 @@ WRITE_HANDLER( wiz_flipy_w )
 
 static void draw_background(struct osd_bitmap *bitmap, int bank, int colortype)
 {
-	int i,offs;
+	int offs;
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int scroll,sx,sy,col;
+
+		sx = offs % 32;
+		sy = offs / 32;
+
+		if (colortype)
 		{
-			int sx,sy,col;
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-
-			if (colortype)
-			{
-				col = (wiz_attributesram[2 * sx + 1] & 0x07);
-			}
-			else
-			{
-				col = (colorram[offs] & 0x07);
-			}
-
-			if (flipx) sx = 31 - sx;
-			if (flipy) sy = 31 - sy;
-
-			drawgfx(tmpbitmap,Machine->gfx[bank],
-				videoram[offs],
-				(wiz_attributesram[2 * (offs % 32) + 1] & 0x07) + 8 * palette_bank,
-				flipx,flipy,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
-		}
-	}
-
-	/* copy the temporary bitmap to the screen */
-	{
-		int scroll[32];
-
-
-		if (flipx)
-		{
-			for (i = 0;i < 32;i++)
-			{
-				scroll[31-i] = -wiz_attributesram[2 * i];
-				if (flipy) scroll[31-i] = -scroll[31-i];
-			}
+			col = (wiz_attributesram[2 * sx + 1] & 0x07);
 		}
 		else
 		{
-			for (i = 0;i < 32;i++)
-			{
-				scroll[i] = -wiz_attributesram[2 * i];
-				if (flipy) scroll[i] = -scroll[i];
-			}
+			col = (wiz_attributesram[2 * (offs % 32) + 1] & 0x04) + (videoram[offs] & 3);
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&Machine->visible_area,TRANSPARENCY_NONE,0);
+		scroll = (8*sy + 256 - wiz_attributesram[2 * sx]) % 256;
+		if (flipy)
+		{
+		   scroll = (248 - scroll) % 256;
+		}
+		if (flipx) sx = 31 - sx;
 
+		drawgfx(bitmap,Machine->gfx[bank],
+			videoram[offs],
+			col + 8 * palette_bank,
+			flipx,flipy,
+			8*sx,scroll,
+			&Machine->visible_area,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -279,20 +257,13 @@ void wiz_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 	int bank;
 	const struct rectangle* visible_area;
 
+	fillbitmap(bitmap,Machine->pens[bgpen],&Machine->visible_area);
 	draw_background(bitmap, 2 + ((char_bank[0] << 1) | char_bank[1]), 0);
 	draw_foreground(bitmap, 0);
 
 	visible_area = flipx ? &spritevisibleareaflipx : &spritevisiblearea;
 
-	/* I seriously doubt that the real hardware works this way */
-	if ((spriteram[1] & 0x80) || !spriteram[3] || !spriteram[0])
-	{
-	    bank = 7 + *wiz_sprite_bank;
-	}
-	else
-	{
-		bank = 8;	// Dragon boss
-	}
+	bank = 7 + *wiz_sprite_bank;
 
 	draw_sprites(bitmap, spriteram_2, 6,    visible_area);
 	draw_sprites(bitmap, spriteram  , bank, visible_area);
@@ -301,6 +272,7 @@ void wiz_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 
 void stinger_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 {
+	fillbitmap(bitmap,Machine->pens[bgpen],&Machine->visible_area);
 	draw_background(bitmap, 2 + char_bank[0], 1);
 	draw_foreground(bitmap, 1);
 	draw_sprites(bitmap, spriteram_2, 4, &Machine->visible_area);

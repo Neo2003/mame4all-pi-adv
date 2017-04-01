@@ -558,8 +558,9 @@ TESTDRIVER( herocast )
 	DRIVER( lupin3 )	/* (c) 1980 Taito */
 	DRIVER( helifire )	/* (c) Nintendo */
 	DRIVER( helifira )	/* (c) Nintendo */
-	DRIVER( spacefev )
-	DRIVER( sfeverbw )
+	DRIVER( spacefev )  /* (c) Nintendo */
+	//DRIVER( sfeverbw )
+	DRIVER( spacefva )  /* (c) Nintendo */
 	DRIVER( spclaser )
 	DRIVER( laser )
 	DRIVER( spcewarl )
@@ -739,6 +740,14 @@ TESTDRIVER( kengo )
 	DRIVER( sichuan2 )	/* (c) 1989 Tamtex */
 	DRIVER( sichuana )	/* (c) 1989 Tamtex */
 	DRIVER( shisen )	/* (c) 1989 Tamtex */
+	
+	/* M90 */
+	DRIVER( hasamu )	/* (c) 1989 Japan */
+	DRIVER( bbmanw )	/* (c) 1989 World */
+	DRIVER( bbmanwj )	/* (c) 1989 Japan */
+	DRIVER( dynablst )	/* (c) 1989 World */
+	DRIVER( bombrman )	/* (c) 1989 Japan */
+	
 	/* M92 */
 	DRIVER( bmaster )	/* (c) 1991 Irem */
 	DRIVER( gunforce )	/* (c) 1991 Irem (World) */
@@ -810,6 +819,8 @@ TESTDRIVER( firebarr )	/* (c) 1993 Irem (Japan) */
 	DRIVER( junglek )	/* (c) 1982 Taito Corporation */
 	DRIVER( junglkj2 )	/* (c) 1982 Taito Corporation */
 	DRIVER( jungleh )	/* (c) 1982 Taito America Corporation */
+	DRIVER( junglhbr )	/* KN  (c) 1982 Taito do Brasil */
+	DRIVER( piratpet )	/* KN  (c) 1982 Taito America Corporation */
 	DRIVER( alpine )	/* (c) 1982 Taito Corporation */
 	DRIVER( alpinea )	/* (c) 1982 Taito Corporation */
 	DRIVER( timetunl )	/* (c) 1982 Taito Corporation */
@@ -1604,6 +1615,7 @@ TESTDRIVER( kopunch )	/* 834-0103 (c) 1981 Sega */
 	DRIVER( suprloco )	/* (c) 1982 Sega */
 	DRIVER( appoooh )	/* (c) 1984 Sega */
 	DRIVER( bankp )		/* (c) 1984 Sega */
+	DRIVER( combh )		/* (c) 1984 Sega */
 	DRIVER( dotrikun )	/* cabinet test board */
 	DRIVER( dotriku2 )	/* cabinet test board */
 
@@ -2307,6 +2319,8 @@ TESTDRIVER( liberat2 )
 	DRIVER( arcadecl )	/* (c) 1992 */
 	DRIVER( sparkz )	/* (c) 1992 */
 	DRIVER( firetrk )	/* (c) 1978 */
+	DRIVER( superbug )	/* (c) */
+	DRIVER( montecar )	/* (c) */
 
 	/* SNK / Rock-ola games */
 	DRIVER( sasuke )	/* [1980] Shin Nihon Kikaku (SNK) */
@@ -2724,7 +2738,7 @@ TESTDRIVER( sngkblad )	/* (c) 1996 */
 	DRIVER( dogfight )	/* (c) 1983 Thunderbolt */
 	DRIVER( moguchan )	/* (c) 1982 Orca + Eastern Commerce Inc. license (doesn't appear on screen) */
 	DRIVER( percuss )	/* (c) 1981 Orca */
-TESTDRIVER( bounty )
+	DRIVER( bounty )	/* (c) 1982 Orca */
 	DRIVER( espial )	/* (c) 1983 Thunderbolt, Orca logo is hidden in title screen */
 	DRIVER( espiale )	/* (c) 1983 Thunderbolt, Orca logo is hidden in title screen */
 	/* Vastar was made by Orca, but when it was finished, Orca had already bankrupted. */
@@ -2864,6 +2878,7 @@ TESTDRIVER( dlair )
 	DRIVER( crazyblk )	/* (c) 1983 Kiwako + ECI license */
 	DRIVER( polyplay )
 	DRIVER( mermaid )	/* (c) 1982 Rock-ola */
+	DRIVER( rougien)	/* (c) 1982 Sanritsu */
 	DRIVER( magix )		/* (c) 1995 Yun Sung */
 	DRIVER( royalmah )	/* (c) 1982 Falcon */
 
@@ -3020,11 +3035,11 @@ TESTDRIVER( dlair )
 	DRIVER( breakrev )	/* 0245 (c) 1998 Visco */
 	DRIVER( shocktr2 )	/* 0246 (c) 1998 Saurus */
 	DRIVER( flipshot )	/* 0247 (c) 1998 Visco */
-TESTDRIVER( pbobbl2n )	/* 0248 (c) 1999 Taito (SNK license) */
-TESTDRIVER( ctomaday )	/* 0249 (c) 1999 Visco */
-TESTDRIVER( mslugx )	/* 0250 (c) 1999 SNK */
-TESTDRIVER( kof99 )		/* 0251 (c) 1999 SNK */
-TESTDRIVER( garou )		/* 0253 (c) 1999 SNK */
+	DRIVER( pbobbl2n )	/* 0248 (c) 1999 Taito (SNK license) */
+	DRIVER( ctomaday )	/* 0249 (c) 1999 Visco */
+	DRIVER( mslugx )	/* 0250 (c) 1999 SNK */
+	DRIVER( kof99 )		/* 0251 (c) 1999 SNK */
+	DRIVER( garou )		/* 0253 (c) 1999 SNK */
 	/* Prehistoric Isle 2 */
 	/* Strikers 1945 Plus */
 	/* Ganryu */

@@ -132,6 +132,7 @@ void copyscrollbitmap(struct osd_bitmap *dest,struct osd_bitmap *src,
 void copyscrollbitmap_remap(struct osd_bitmap *dest,struct osd_bitmap *src,
 		int rows,const int *rowscroll,int cols,const int *colscroll,
 		const struct rectangle *clip,int transparency,int transparent_color);
+void draw_scanline8(struct osd_bitmap *bitmap,int x,int y,int length,const UINT8 *src,UINT16 *pens,int transparent_pen);
 
 /*
   Copy a bitmap applying rotation, zooming, and arbitrary distortion.

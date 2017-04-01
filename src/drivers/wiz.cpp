@@ -144,7 +144,7 @@ static struct MemoryWriteAddress writemem[] =
 	{ 0xf800, 0xf800, sound_command_w },
 	{ 0xf808, 0xf808, MWA_NOP },	/* explosion sound trigger; analog? */
 	{ 0xf80a, 0xf80a, MWA_NOP },	/* shoot sound trigger; analog? */
-	{ 0xf818, 0xf818, MWA_NOP },
+	{ 0xf818, 0xf818, wiz_bgcolor_w },//{ 0xf818, 0xf818, MWA_NOP },
 	{ -1 }  /* end of table */
 };
 
@@ -704,8 +704,8 @@ static void init_stinger(void)
 
 
 
-GAMEX( 1983, stinger, 0,     stinger, stinger, stinger, ROT90,  "Seibu Denshi", "Stinger",     GAME_IMPERFECT_COLORS )
-GAMEX( 1984, scion,   0,     stinger, scion,   0,       ROT0,   "Seibu Denshi", "Scion",       GAME_IMPERFECT_COLORS )
-GAMEX( 1984, scionc,  scion, stinger, scion,   0,       ROT0,   "Seibu Denshi [Cinematronics license]", "Scion (Cinematronics)", GAME_IMPERFECT_COLORS )
-GAMEX( 1985, wiz,     0,     wiz,     wiz,     0,       ROT270, "Seibu Kaihatsu Inc.", "Wiz",  GAME_IMPERFECT_COLORS )
-GAMEX( 1985, wizt,    wiz,   wiz,     wiz,     0,       ROT270, "Taito Corp.",  "Wiz (Taito)", GAME_IMPERFECT_COLORS )
+GAME ( 1983, stinger, 0,     stinger, stinger, stinger, ROT90,  "Seibu Denshi", "Stinger")
+GAME ( 1984, scion,   0,     stinger, scion,   0,       ROT0,   "Seibu Denshi", "Scion")
+GAME ( 1984, scionc,  scion, stinger, scion,   0,       ROT0,   "Seibu Denshi [Cinematronics license]", "Scion (Cinematronics)")
+GAME ( 1985, wiz,     0,     wiz,     wiz,     0,       ROT270, "Seibu Kaihatsu Inc.", "Wiz")
+GAME ( 1985, wizt,    wiz,   wiz,     wiz,     0,       ROT270, "Taito Corp.",  "Wiz (Taito)")

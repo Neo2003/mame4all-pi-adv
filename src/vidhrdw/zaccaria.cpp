@@ -11,11 +11,18 @@
 
 
 
-unsigned char *zaccaria_attributesram;
+data8_t *zaccaria_attributesram;
+
+static struct tilemap *bg_tilemap;
 
 static struct rectangle spritevisiblearea =
 {
 	2*8+1, 29*8-1,
+	2*8, 30*8-1
+};
+static struct rectangle spritevisiblearea_flipx =
+{
+	3*8+1, 30*8-1,
 	2*8, 30*8-1
 };
 
@@ -31,14 +38,14 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
      Prom 9F        74LS374
     -----------   ____________
        12         |  3   2   |---680 ohm----| blue out
-       11         |  4   5   |---1k ohm-----|
+       11         |  4   5   |---1k ohm-----| (+ 470 ohm pulldown)
        10         |  7   6   |---820 ohm-------|
         9         |  8   9   |---1k ohm--------| green out
-     Prom 9G      |          |                 |
+     Prom 9G      |          |                 | (+ 390 ohm pulldown)
        12         |  13  12  |---1.2k ohm------|
        11         |  14  15  |---820 ohm----------|
        10         |  17  16  |---1k ohm-----------| red out
-        9         |  18  19  |---1.2k ohm---------|
+        9         |  18  19  |---1.2k ohm---------| (+ 390 ohm pulldown)
                   |__________|
 
 
@@ -55,8 +62,14 @@ void zaccaria_vh_convert_color_prom(unsigned char *palette, unsigned short *colo
 		int bit0,bit1,bit2;
 
 
-		/* I'm not sure, but I think that pen 0 must always be black, otherwise */
-		/* there's some junk brown background in Jack Rabbit */
+		/*
+		  TODO: I'm not sure, but I think that pen 0 must always be black, otherwise
+		  there's some junk brown background in Jack Rabbit.
+		  From the schematics it seems that the background color can be changed, but
+		  I'm not sure where it would be taken from; I think the high bits of
+		  attributesram, but they are always 0 in these games so they would turn out
+		  black anyway.
+		 */
 		if (((i % 64) / 8) == 0)
 		{
 			*(palette++) = 0;
@@ -78,7 +91,7 @@ void zaccaria_vh_convert_color_prom(unsigned char *palette, unsigned short *colo
 			/* blue component */
 			bit0 = (color_prom[Machine->drv->total_colors] >> 1) & 0x01;
 			bit1 = (color_prom[Machine->drv->total_colors] >> 0) & 0x01;
-			*(palette++) = 0x53 * bit0 + 0x7b * bit1;
+			*(palette++) = 0x66 * bit0 + 0x96 * bit1;
 		}
 
 		color_prom++;
@@ -113,28 +126,43 @@ void zaccaria_vh_convert_color_prom(unsigned char *palette, unsigned short *colo
 }
 
 
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
 
 WRITE_HANDLER( zaccaria_attributes_w )
 {
-	if ((offset & 1) && zaccaria_attributesram[offset] != data)
+	if (offset & 1)
 	{
-		int i;
+		if (zaccaria_attributesram[offset] != data)
+		{
+			int i;
 
 
-		for (i = offset / 2;i < videoram_size;i += 32)
-			dirtybuffer[i] = 1;
+			for (i = offset / 2;i < 0x400;i += 32)
+				dirtybuffer[i] = 1;
+		}
 	}
 
 	zaccaria_attributesram[offset] = data;
 }
 
+WRITE_HANDLER( zaccaria_flip_screen_x_w )
+{
+	flip_screen_x_w(offset,data);
+}
+
+WRITE_HANDLER( zaccaria_flip_screen_y_w )
+{
+	flip_screen_y_w(offset,data);
+}
 
 
 /***************************************************************************
 
-  Draw the game screen in the given osd_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
+  Display refresh
 
 ***************************************************************************/
 void zaccaria_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)

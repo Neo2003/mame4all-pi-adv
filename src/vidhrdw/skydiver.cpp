@@ -12,47 +12,20 @@
 static int skydiver_lamps[8];
 static int skydiver_width = 0;
 
+
+READ_HANDLER( skydiver_wram_r )
+{
+	return videoram[offset | 0x380];
+}
+
+WRITE_HANDLER( skydiver_wram_w )
+{
+	videoram[offset | 0x0380] = data;
+}
+
 WRITE_HANDLER( skydiver_width_w )
 {
 	skydiver_width = offset;
-	//logerror("width: %02x\n", data);
-}
-
-WRITE_HANDLER( skydiver_sk_lamps_w )
-{
-	switch (offset)
-	{
-		case 0:	skydiver_lamps[0] = 0;	break;
-		case 1:	skydiver_lamps[0] = 1;	break;	/* S */
-		case 2:	skydiver_lamps[1] = 0;	break;
-		case 3:	skydiver_lamps[1] = 1;	break;	/* K */
-	}
-}
-
-WRITE_HANDLER( skydiver_yd_lamps_w )
-{
-	switch (offset)
-	{
-		case 0:	skydiver_lamps[2] = 0;	break;
-		case 1:	skydiver_lamps[2] = 1;	break;	/* Y */
-		case 2:	skydiver_lamps[3] = 0;	break;
-		case 3:	skydiver_lamps[3] = 1;	break;	/* D */
-	}
-}
-
-WRITE_HANDLER( skydiver_iver_lamps_w )
-{
-	switch (offset)
-	{
-		case 0:	skydiver_lamps[4] = 0;	break;
-		case 1:	skydiver_lamps[4] = 1;	break;	/* I */
-		case 2:	skydiver_lamps[5] = 0;	break;
-		case 3:	skydiver_lamps[5] = 1;	break;	/* V */
-		case 4:	skydiver_lamps[6] = 0;	break;
-		case 5:	skydiver_lamps[6] = 1;	break;	/* E */
-		case 6:	skydiver_lamps[7] = 0;	break;
-		case 7:	skydiver_lamps[7] = 1;	break;	/* R */
-	}
 }
 
 /***************************************************************************
@@ -82,8 +55,8 @@ void skydiver_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 			charcode = videoram[offs] & 0x3F;
 			color    = (videoram[offs] & 0xc0) >> 6;
 
-			sx = 8 * (offs % 32);
-			sy = 8 * (offs / 32);
+			sx = (offs & 31) << 3;
+			sy = (offs >> 5) << 3;
 			drawgfx(tmpbitmap,Machine->gfx[0],
 				charcode, color,
 				0,0,sx,sy,
@@ -117,19 +90,28 @@ void skydiver_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 		int charcode;
 		int xflip, yflip;
 		int color;
+		int wide;
 
-		sx = 29*8 - spriteram[pic];
-		sy = 30*8 - spriteram[pic*2 + 8];
-		charcode = spriteram[pic*2 + 9];
-		xflip = (charcode & 0x10) >> 4;
-		yflip = (charcode & 0x08) >> 3;
+		sx = 29*8 - videoram[pic + 0x0390];
+		sy = 30*8 - videoram[pic*2 + 0x0398];
+		charcode = videoram[pic*2 + 0x0399];
+		xflip = charcode & 0x10;
+		yflip = charcode & 0x08;
+		wide = (~pic & 0x02) && skydiver_width;
 		charcode = (charcode & 0x07) | ((charcode & 0x60) >> 2);
 		color = pic & 0x01;
 
-		drawgfx(bitmap,Machine->gfx[1+(charcode >= 0x10)],
+                if (wide)
+		{
+		    sx -= 8;
+		}
+
+
+		drawgfxzoom(bitmap,Machine->gfx[1],
 			charcode, color,
 			xflip,yflip,sx,sy,
-			&Machine->visible_area,TRANSPARENCY_PEN,0);
+			&Machine->visible_area,TRANSPARENCY_PEN, 0,
+			wide ? 0x20000 : 0x10000, 0x10000);
 
 	}
 }

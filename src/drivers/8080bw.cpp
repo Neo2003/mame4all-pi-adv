@@ -71,28 +71,28 @@ READ_HANDLER( spcenctr_port_1_r );
 
 void init_machine_invaders(void);
 void init_machine_invad2ct(void);
-void init_machine_sheriff(void);
+//void init_machine_sheriff(void);
 void init_machine_gunfight(void);
 void init_machine_boothill(void);
-void init_machine_helifire(void);
+//void init_machine_helifire(void);
 void init_machine_ballbomb(void);
 void init_machine_seawolf(void);
 void init_machine_desertgu(void);
 void init_machine_schaser(void);
 void init_machine_polaris(void);
 
-WRITE_HANDLER( sheriff_sh_p2_w );
-READ_HANDLER( sheriff_sh_p1_r );
-READ_HANDLER( sheriff_sh_p2_r );
-READ_HANDLER( sheriff_sh_t0_r );
-READ_HANDLER( sheriff_sh_t1_r );
+//WRITE_HANDLER( sheriff_sh_p2_w );
+//READ_HANDLER( sheriff_sh_p1_r );
+//READ_HANDLER( sheriff_sh_p2_r );
+//READ_HANDLER( sheriff_sh_t0_r );
+//READ_HANDLER( sheriff_sh_t1_r );
 
 extern struct SN76477interface invaders_sn76477_interface;
 extern struct Samplesinterface invaders_samples_interface;
 extern struct SN76477interface invad2ct_sn76477_interface;
 extern struct Samplesinterface invad2ct_samples_interface;
-extern struct DACinterface sheriff_dac_interface;
-extern struct SN76477interface sheriff_sn76477_interface;
+//extern struct DACinterface sheriff_dac_interface;
+//extern struct SN76477interface sheriff_sn76477_interface;
 extern struct Samplesinterface boothill_samples_interface;
 extern struct DACinterface schaser_dac_interface;
 extern struct CustomSound_interface schaser_custom_interface;
@@ -117,18 +117,18 @@ void init_seawolf(void);
 void init_blueshrk(void);
 void init_desertgu(void);
 void init_spcenctr(void);
-void init_helifire(void);
+//void init_helifire(void);
 void init_phantom2(void);
 
 WRITE_HANDLER( invaders_videoram_w );
 WRITE_HANDLER( schaser_colorram_w );
 READ_HANDLER( schaser_colorram_r );
-WRITE_HANDLER( helifire_colorram_w );
+//WRITE_HANDLER( helifire_colorram_w );
 
 void invaders_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 
 void invadpt2_vh_convert_color_prom(unsigned char *pallete, unsigned short *colortable,const unsigned char *color_prom);
-void helifire_vh_convert_color_prom(unsigned char *pallete, unsigned short *colortable,const unsigned char *color_prom);
+//void helifire_vh_convert_color_prom(unsigned char *pallete, unsigned short *colortable,const unsigned char *color_prom);
 
 
 static unsigned char invaders_palette[] =
@@ -189,12 +189,14 @@ static struct IOWritePort writeport_1_2[] =
 	{ -1 }  /* end of table */
 };
 
+#if 0
 static struct IOWritePort writeport_2_3[] =
 {
 	{ 0x02, 0x02, invaders_shift_amount_w },
 	{ 0x03, 0x03, invaders_shift_data_w },
 	{ -1 }  /* end of table */
 };
+#endif
 
 static struct IOWritePort writeport_2_4[] =
 {
@@ -1078,6 +1080,7 @@ static struct MachineDriver machine_driver_rollingc =
 /*                                                       */
 /*********************************************************/
 
+#if 0
 static struct MemoryReadAddress sheriff_readmem[] =
 {
 	{ 0x0000, 0x27ff, MRA_ROM },
@@ -1156,8 +1159,8 @@ INPUT_PORTS_START( sheriff )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN  | IPF_8WAY | IPF_COCKTAIL )
 
 	PORT_START      /* 02 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 | IPF_COCKTAIL )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 | IPF_COCKTAIL )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* Marked for   */
@@ -1213,8 +1216,8 @@ INPUT_PORTS_START( bandido )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN  | IPF_8WAY | IPF_COCKTAIL )
 
 	PORT_START      /* 02 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 | IPF_COCKTAIL )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 | IPF_COCKTAIL )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* Marked for   */
@@ -1296,6 +1299,7 @@ static struct MachineDriver machine_driver_sheriff =
 		}
 	}
 };
+#endif
 
 
 /*******************************************************/
@@ -2113,6 +2117,7 @@ static struct MachineDriver machine_driver_lupin3 =
 /*                                                     */
 /*******************************************************/
 
+#if 0
 static struct MemoryReadAddress helifire_readmem[] =
 {
 	{ 0x0000, 0x27ff, MRA_ROM },
@@ -2250,6 +2255,7 @@ INPUT_PORTS_START( spacefev )
 //	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 //	PORT_DIPSETTING(    0xfc, DEF_STR( Off ) )
 INPUT_PORTS_END
+#endif
 
 
 /*******************************************************/
@@ -4104,6 +4110,7 @@ ROM_START( yosakdon )
 	ROM_LOAD( "yd7.bin", 	  0x1c00, 0x0400, 0x2744e68b )
 ROM_END
 
+#if 0
 ROM_START( sheriff )
 	ROM_REGION( 0x10000, REGION_CPU1 )             /* 64k for code */
 	ROM_LOAD( "f1",           0x0000, 0x0400, 0xe79df6e8 )
@@ -4199,6 +4206,7 @@ ROM_START( sfeverbw )
 	ROM_REGION( 0x1000, REGION_CPU2 )	/* Sound 8035 + 76477 Sound Generator */
 	ROM_LOAD( "basnd.u2",     0x0000, 0x0400, 0x75731745 )
 ROM_END
+#endif 
 
 
 /* Midway games */
@@ -4251,13 +4259,14 @@ ROM_END
 		  GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, invadpt2, ROT270, 	"Taito", "Balloon Bomber" )
 
 /* Nintendo games */
+/* Now in n8080.c */
 
-		  GAMEX(1980, sheriff,  0,        sheriff,  sheriff,  8080bw,	ROT270, 	"Nintendo", "Sheriff", GAME_IMPERFECT_SOUND )
-		  GAMEX(1980, bandido,  sheriff,  sheriff,  bandido,  8080bw,	ROT270, 	"Exidy", "Bandido", GAME_IMPERFECT_SOUND )
-		  GAMEX(1980, helifire, 0,        helifire, helifire, helifire,	ROT270, 	"Nintendo", "HeliFire (revision B)", GAME_NO_SOUND )
-		  GAMEX(1980, helifira, helifire, helifire, helifire, helifire,	ROT270, 	"Nintendo", "HeliFire (revision A)", GAME_NO_SOUND )
-		  GAMEX(1980, spacefev, 0,        sheriff,  spacefev, 8080bw,	ROT270, 	"Nintendo", "Space Fever (color)", GAME_IMPERFECT_SOUND )
-		  GAMEX(1980, sfeverbw, 0,        sheriff,  spacefev, 8080bw,	ROT270, 	"Nintendo", "Space Fever (black and white)", GAME_IMPERFECT_SOUND )
+		  //GAMEX(1980, sheriff,  0,        sheriff,  sheriff,  8080bw,	ROT270, 	"Nintendo", "Sheriff", GAME_IMPERFECT_SOUND )
+		  //GAMEX(1980, bandido,  sheriff,  sheriff,  bandido,  8080bw,	ROT270, 	"Exidy", "Bandido", GAME_IMPERFECT_SOUND )
+		  //GAMEX(1980, helifire, 0,        helifire, helifire, helifire,	ROT270, 	"Nintendo", "HeliFire (revision B)", GAME_NO_SOUND )
+		  //GAMEX(1980, helifira, helifire, helifire, helifire, helifire,	ROT270, 	"Nintendo", "HeliFire (revision A)", GAME_NO_SOUND )
+		  //GAMEX(1980, spacefev, 0,        sheriff,  spacefev, 8080bw,	ROT270, 	"Nintendo", "Space Fever (color)", GAME_IMPERFECT_SOUND )
+		  //GAMEX(1980, sfeverbw, 0,        sheriff,  spacefev, 8080bw,	ROT270, 	"Nintendo", "Space Fever (black and white)", GAME_IMPERFECT_SOUND )
 
 /* Misc. manufacturers */
 

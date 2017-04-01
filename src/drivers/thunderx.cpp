@@ -22,6 +22,7 @@ int scontra_vh_start(void);
 void scontra_vh_stop(void);
 void scontra_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 
+static int unknown_enable = 0;
 /***************************************************************************/
 
 static int scontra_interrupt( void )
@@ -45,7 +46,7 @@ static int thunderx_interrupt( void )
 
 static int palette_selected;
 static int bank;
-static unsigned char *ram,*unknownram;
+static unsigned char *ram,*cdram;
 
 static READ_HANDLER( scontra_bankedram_r )
 {
@@ -68,7 +69,7 @@ static READ_HANDLER( thunderx_bankedram_r )
 	if ((bank & 0x01) == 0)
 	{
 		if (bank & 0x10)
-			return unknownram[offset];
+			return cdram[offset];
 		else
 			return paletteram_r(offset);
 	}
@@ -81,7 +82,7 @@ static WRITE_HANDLER( thunderx_bankedram_w )
 	if ((bank & 0x01) == 0)
 	{
 		if (bank & 0x10)
-			unknownram[offset] = data;
+			cdram[offset] = data;
 		else
 			paletteram_xBBBBBGGGGGRRRRR_swap_w(offset,data);
 	}
@@ -89,80 +90,122 @@ static WRITE_HANDLER( thunderx_bankedram_w )
 		ram[offset] = data;
 }
 
-static void calculate_collisions( void ) {
-	unsigned char *ptr1 = &unknownram[0x10], *ptr2;
-	int i, j;
 
-	/* each sprite is defined as: flags height width xpos ypos */
-	for( i = 0; i < 127; i++, ptr1 += 5 ) {
-		int w,h;
-		int	x,y;
+// run_collisions
+//
+// collide objects from s0 to e0 against
+// objects from s1 to e1
+//
+// only compare objects with the specified bits (cm) set in their flags
+// only set object 0's hit bit if (hm & 0x40) is true
+//
+// the data format is:
+//
+// +0 : flags
+// +1 : width (4 pixel units)
+// +2 : height (4 pixel units)
+// +3 : x (2 pixel units) of center of object
+// +4 : y (2 pixel units) of center of object
 
-		if ( ( ptr1[0] & 0x80 ) == 0x00 )
-			continue;
+static void run_collisions(int s0, int e0, int s1, int e1, int cm, int hm)
+{
+	unsigned char*	p0;
+	unsigned char*	p1;
+	int				ii,jj;
 
-		ptr2 = ptr1 + 5;
-		w = 4; /* ? */
-		h = 4; /* ? */
-		x = ptr1[3];
-		y = ptr1[4];
+	p0 = &cdram[16 + 5*s0];
+	for (ii = s0; ii < e0; ii++, p0 += 5)
+	{
+		int	l0,r0,b0,t0;
 
-		for( j = i+1; j < 128; j++, ptr2 += 5 ) {
-			int x1,y1;
+		// check valid
+		if (!(p0[0] & cm))			continue;
 
-			if ( ( ptr2[0] & 0x80 ) == 0x00 )
-				continue;
+		// get area
+		l0 = p0[3] - p0[1];
+		r0 = p0[3] + p0[1];
+		t0 = p0[4] - p0[2];
+		b0 = p0[4] + p0[2];
 
-			x1 = ptr2[3];
-			y1 = ptr2[4];
+		p1 = &cdram[16 + 5*s1];
+		for (jj = s1; jj < e1; jj++,p1 += 5)
+		{
+			int	l1,r1,b1,t1;
 
-			x1 -= x;
+			// check valid
+			if (!(p1[0] & cm))		continue;
 
-			if ( x1 < 0 )
-				x1 = -x1;
+			// get area
+			l1 = p1[3] - p1[1];
+			r1 = p1[3] + p1[1];
+			t1 = p1[4] - p1[2];
+			b1 = p1[4] + p1[2];
 
-			if ( x1 > w )
-				continue;
+			// overlap check
+			if (l1 >= r0)	continue;
+			if (l0 >= r1)	continue;
+			if (t1 >= b0)	continue;
+			if (t0 >= b1)	continue;
 
-			y1 -= y;
-
-			if ( y1 < 0 )
-				y1 = -y1;
-
-			if ( y1 > h )
-				continue;
-
-/*
-00 - 02 - our ships
-02 - 40 - our bullets
-42 - 16 - enemy bullets
-58 - 60 - enemy ships
-118 - ? - ?
-*/
-			if ( i > 117 )
-				continue;
-
-			if ( i < 42 ) { /* our ship & bullets */
-				if ( j < 42 ) /* our ship & bullets */
-					continue;
-			} else { /* enemy ships & bullets */
-				if ( j > 41 ) /* enemy ships & bullets */
-					continue;
-			}
-
-			/* bullets dont collide eachother */
-			if ( i > 1 && i < 42 )
-				if ( j > 41 && j < 58 )
-					continue;
-
-			/* collision */
-			if ( ptr1[0] & 0x20 )
-				ptr1[0] |= 0x10;
-
-			if ( ptr2[0] & 0x20 )
-				ptr2[0] |= 0x10;
+			// set flags
+			if (hm & 0x40)		p0[0] |= 0x10;
+			p1[0] |= 0x10;
 		}
 	}
+}
+
+// calculate_collisions
+//
+// emulates K052591 collision detection
+
+static void calculate_collisions( void ) {
+	int	X0,Y0;
+	int	X1,Y1;
+	int	CM,HM;
+
+	// the data at 0x00 to 0x06 defines the operation
+	//
+	// 0x00 : word : last byte of set 0
+	// 0x02 : byte : last byte of set 1
+	// 0x03 : byte : collide mask
+	// 0x04 : byte : hit mask
+	// 0x05 : byte : first byte of set 0
+	// 0x06 : byte : first byte of set 1
+	//
+	// the USA version is slightly different:
+	//
+	// 0x05 : word : first byte of set 0
+	// 0x07 : byte : first byte of set 1
+	//
+	// the operation is to intersect set 0 with set 1
+	// collide mask specifies objects to ignore
+	// hit mask is 40 to set bit on object 0 and object 1
+	// hit mask is 20 to set bit on object 1 only
+
+	Y0 = cdram[0];
+	Y0 = (Y0 << 8) + cdram[1];
+	Y0 = (Y0 - 15) / 5;
+	Y1 = (cdram[2] - 15) / 5;
+
+	if (cdram[5] < 16)
+	{
+		// US Thunder Cross uses this form
+		X0 = cdram[5];
+		X0 = (X0 << 8) + cdram[6];
+		X0 = (X0 - 16) / 5;
+		X1 = (cdram[7] - 16) / 5;
+	}
+	else
+	{
+		// Japan Thunder Cross uses this form
+		X0 = (cdram[5] - 16) / 5;
+		X1 = (cdram[6] - 16) / 5;
+	}
+
+	CM = cdram[3];
+	HM = cdram[4];
+
+	run_collisions(X0,Y0,X1,Y1,CM,HM);
 }
 
 static WRITE_HANDLER( thunderx_1f98_w )
@@ -171,9 +214,16 @@ static WRITE_HANDLER( thunderx_1f98_w )
 	/* bit 0 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* bit 1 unknown - used by Thunder Cross during test of RAM C8 (5800-5fff) */
-	if ( data & 2 )
+	/* bit 1 = reset for collision MCU??? */
+	/* we don't need it, anyway */
+
+	/* bit 2 = do collision detection when 0->1 */
+	if ((data & 4) && !(unknown_enable & 4))
+	{
 		calculate_collisions();
+	}
+
+	unknown_enable = data;
 }
 
 WRITE_HANDLER( scontra_bankswitch_w )
@@ -882,7 +932,7 @@ static void thunderx_init_machine( void )
 	cpu_setbank( 1, &RAM[0x10000] ); /* init the default bank */
 
 	paletteram = &RAM[0x28000];
-	unknownram = &RAM[0x28800];
+	cdram = &RAM[0x28800];
 }
 
 static void init_scontra(void)
@@ -895,5 +945,5 @@ static void init_scontra(void)
 
 GAME( 1988, scontra,  0,        scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra" )
 GAME( 1988, scontraj, scontra,  scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra (Japan)" )
-GAMEX(1988, thunderx, 0,        thunderx, thunderx, scontra, ROT0, "Konami", "Thunder Cross", GAME_NOT_WORKING )
-GAMEX(1988, thnderxj, thunderx, thunderx, thunderx, scontra, ROT0, "Konami", "Thunder Cross (Japan)", GAME_NOT_WORKING )
+GAME( 1988, thunderx, 0,        thunderx, thunderx, scontra, ROT0, "Konami", "Thunder Cross" )
+GAME( 1988, thnderxj, thunderx, thunderx, thunderx, scontra, ROT0, "Konami", "Thunder Cross (Japan)" )

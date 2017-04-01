@@ -41,11 +41,13 @@ static WRITE_HANDLER( invaders_sh_port3_w );
 static WRITE_HANDLER( invaders_sh_port5_w );
 static WRITE_HANDLER( invad2ct_sh_port7_w );
 
+#if 0
 static WRITE_HANDLER( sheriff_sh_port4_w );
 static WRITE_HANDLER( sheriff_sh_port5_w );
 static WRITE_HANDLER( sheriff_sh_port6_w );
 
 static WRITE_HANDLER( helifire_sh_port6_w );
+#endif
 
 static WRITE_HANDLER( ballbomb_sh_port3_w );
 static WRITE_HANDLER( ballbomb_sh_port5_w );
@@ -424,6 +426,7 @@ static WRITE_HANDLER( polaris_sh_port6_w )
 /*                                                     */
 /*******************************************************/
 
+#if 0
 struct DACinterface sheriff_dac_interface =
 {
 	1,
@@ -593,6 +596,7 @@ static WRITE_HANDLER( helifire_sh_port6_w )
 {
 	flip_screen_w(offset, data & 0x20);
 }
+#endif
 
 
 /*******************************************************/

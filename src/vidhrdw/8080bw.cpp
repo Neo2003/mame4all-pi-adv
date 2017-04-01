@@ -30,7 +30,7 @@ static WRITE_HANDLER( polaris_videoram_w );
 static WRITE_HANDLER( invadpt2_videoram_w );
 static WRITE_HANDLER( astinvad_videoram_w );
 static WRITE_HANDLER( spaceint_videoram_w );
-static WRITE_HANDLER( helifire_videoram_w );
+//static WRITE_HANDLER( helifire_videoram_w );
 
 static void vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 static void seawolf_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
@@ -141,11 +141,13 @@ void init_rollingc(void)
 	background_color = 0;	/* black */
 }
 
+#if 0
 void init_helifire(void)
 {
 	init_8080bw();
 	videoram_w_p = helifire_videoram_w;
 }
+#endif
 
 void init_polaris(void)
 {
@@ -381,6 +383,7 @@ static WRITE_HANDLER( polaris_videoram_w )
 	plot_byte(x, y, data, foreground_color, back_color);
 }
 
+#if 0
 static WRITE_HANDLER( helifire_videoram_w )
 {
 	int x,y,back_color,foreground_color;
@@ -400,6 +403,7 @@ static WRITE_HANDLER( helifire_videoram_w )
 
 	plot_byte(x, y, data, foreground_color, back_color);
 }
+#endif 
 
 
 WRITE_HANDLER( schaser_colorram_w )
@@ -424,6 +428,7 @@ READ_HANDLER( schaser_colorram_r )
 }
 
 
+#if 0
 WRITE_HANDLER( helifire_colorram_w )
 {
 	colorram[offset] = data;
@@ -432,6 +437,7 @@ WRITE_HANDLER( helifire_colorram_w )
 	videoram_w_p(offset, videoram[offset]);
 }
 
+#endif
 
 /***************************************************************************
 
@@ -554,6 +560,7 @@ void invadpt2_vh_convert_color_prom(unsigned char *palette, unsigned short *colo
 	}
 }
 
+#if 0
 void helifire_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom)
 {
 	int i;
@@ -566,6 +573,7 @@ void helifire_vh_convert_color_prom(unsigned char *palette, unsigned short *colo
 		*(palette++) = 0xff * ((i >> 2) & 1);
 	}
 }
+#endif
 
 
 static WRITE_HANDLER( invadpt2_videoram_w )

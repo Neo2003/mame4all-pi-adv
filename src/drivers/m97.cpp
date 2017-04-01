@@ -233,6 +233,7 @@ ROM_START( atompunk )
 	ROM_LOAD( "5e",           0x0000, 0x20000, 0x4ad889ed )
 ROM_END
 
+#if 0
 ROM_START( bbmanw )
 	ROM_REGION( 0x100000, REGION_CPU1 )
 	ROM_LOAD_V20_EVEN( "bbm2_h0.bin",  0x080000, 0x20000, 0xf694b461 )
@@ -251,10 +252,11 @@ ROM_START( bbmanw )
 	ROM_LOAD( "bbm2_vo.bin",  0x0000, 0x20000, 0x0ae655ff )
 ROM_END
 
+#endif
 
 
 GAMEX( 1992, atompunk, 0,        m97, m97, 0, ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NOT_WORKING )
-GAMEX( 1992, bbmanw,   atompunk, m97, m97, 0, ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man World (Japan)", GAME_NOT_WORKING )
+//Alek GAMEX( 1992, bbmanw,   atompunk, m97, m97, 0, ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man World (Japan)", GAME_NOT_WORKING )
 GAMEX( 1992, quizf1,   0,        m97, m97, 0, ROT0, "Irem", "Quiz F-1 1,2finish", GAME_NOT_WORKING )
 GAMEX( 1993, riskchal, 0,        m97, m97, 0, ROT0, "Irem", "Risky Challenge", GAME_NOT_WORKING )
 GAMEX( 1993, gussun,   riskchal, m97, m97, 0, ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NOT_WORKING )

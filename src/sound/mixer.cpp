@@ -9,6 +9,7 @@
 #include "driver.h"
 #include <math.h>
 
+#include "osinline.h"
 
 /* enable this to turn off clipping (helpful to find cases where we max out */
 #define DISABLE_CLIPPING		0
@@ -174,6 +175,9 @@ void mixer_sh_update(void)
 	INT32 sample;
 	int	i;
 
+#ifdef clip_short
+	clip_short_pre();
+#endif
 	profiler_mark(PROFILER_MIXER);
 
 	/* update all channels (for streams this is a no-op) */
@@ -197,10 +201,14 @@ void mixer_sh_update(void)
 			/* fetch and clip the sample */
 			sample = left_accum[accum_pos];
 #if !DISABLE_CLIPPING
+#ifndef clip_short
 			if (sample < -32768)
 				sample = -32768;
 			else if (sample > 32767)
 				sample = 32767;
+#else
+            clip_short(sample);
+#endif
 #endif
 
 			/* store and zero out behind us */
@@ -224,10 +232,14 @@ void mixer_sh_update(void)
 			/* fetch and clip the left sample */
 			sample = left_accum[accum_pos];
 #if !DISABLE_CLIPPING
+#ifndef clip_short
 			if (sample < -32768)
 				sample = -32768;
 			else if (sample > 32767)
 				sample = 32767;
+#else
+            clip_short(sample);
+#endif
 #endif
 
 			/* store and zero out behind us */
@@ -237,10 +249,14 @@ void mixer_sh_update(void)
 			/* fetch and clip the right sample */
 			sample = right_accum[accum_pos];
 #if !DISABLE_CLIPPING
+#ifndef clip_short
 			if (sample < -32768)
 				sample = -32768;
 			else if (sample > 32767)
 				sample = 32767;
+#else
+            clip_short(sample);
+#endif
 #endif
 
 			/* store and zero out behind us */

@@ -209,4 +209,39 @@ void bitmap_free(struct osd_bitmap *bitmap);
 void save_screen_snapshot_as(void *fp,struct osd_bitmap *bitmap);
 void save_screen_snapshot(struct osd_bitmap *bitmap);
 
+/***************************************************************************
+ *
+ *         Useful macros to deal with bit shuffling encryptions
+ *
+ ***************************************************************************/
+
+#define BIT(data,bit) (((data)>>(bit))&1)
+
+#define BITSWAP8(val,B7,B6,B5,B4,B3,B2,B1,B0) \
+                    (((((val) >> (B7)) & 1) << 7) | \
+		      ((((val) >> (B6)) & 1) << 6) | \
+		      ((((val) >> (B5)) & 1) << 5) | \
+		      ((((val) >> (B4)) & 1) << 4) | \
+		      ((((val) >> (B3)) & 1) << 3) | \
+		      ((((val) >> (B2)) & 1) << 2) | \
+		      ((((val) >> (B1)) & 1) << 1) | \
+		      ((((val) >> (B0)) & 1) << 0))
+
+#define BITSWAP16(val,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
+                    (((((val) >> (B15)) & 1) << 15) | \
+		      ((((val) >> (B14)) & 1) << 14) | \
+		      ((((val) >> (B13)) & 1) << 13) | \
+		      ((((val) >> (B12)) & 1) << 12) | \
+		      ((((val) >> (B11)) & 1) << 11) | \
+		      ((((val) >> (B10)) & 1) << 10) | \
+		      ((((val) >> ( B9)) & 1) <<  9) | \
+		      ((((val) >> ( B8)) & 1) <<  8) | \
+		      ((((val) >> ( B7)) & 1) <<  7) | \
+		      ((((val) >> ( B6)) & 1) <<  6) | \
+		      ((((val) >> ( B5)) & 1) <<  5) | \
+		      ((((val) >> ( B4)) & 1) <<  4) | \
+		      ((((val) >> ( B3)) & 1) <<  3) | \
+		      ((((val) >> ( B2)) & 1) <<  2) | \
+		      ((((val) >> ( B1)) & 1) <<  1) | \
+		      ((((val) >> ( B0)) & 1) <<  0))
 #endif

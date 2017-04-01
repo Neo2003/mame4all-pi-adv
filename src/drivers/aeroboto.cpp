@@ -6,79 +6,110 @@ Formation Z / Aeroboto
 
 Driver by Carlos A. Lozano
 
+TODO:
+- star field
+  Uki's report:
+  - The color of stars:
+    at 1st title screen = neutral tints of blue and aqua (1 color only)
+    at 2nd title screen and attract mode (purple surface) = light & dark aqua
+    This color will not be affected by scroll. Leftmost 8pixels are light, next
+    16 pixels are dark, the next 16 pixels are light, and so on.
+
+Revisions:
+- Updated starfield according to Uki's report. (AT)
+
+*note: Holding any key at boot puts the game in MCU test. Press F3 to quit.
 ****************************************************************************/
 
 #include "driver.h"
 #include "vidhrdw/generic.h"
 
+extern data8_t *aeroboto_videoram;
+extern data8_t *aeroboto_hscroll, *aeroboto_vscroll, *aeroboto_tilecolor;
+extern data8_t *aeroboto_starx, *aeroboto_stary, *aeroboto_starcolor;
 
-extern unsigned char *aeroboto_videoram;
-extern unsigned char *aeroboto_fgscroll,*aeroboto_bgscroll;
-extern int aeroboto_charbank;
-
-void aeroboto_gfxctrl_w(int ofset,int data);
+void aeroboto_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom);
+int aeroboto_vh_start(void);
 void aeroboto_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 
+READ_HANDLER( aeroboto_in0_r );
+WRITE_HANDLER( aeroboto_3000_w );
+WRITE_HANDLER( aeroboto_videoram_w );
+WRITE_HANDLER( aeroboto_tilecolor_w );
 
+static data8_t *aeroboto_mainram;
+static int disable_irq = 0;
 
-static int player;
-
-static READ_HANDLER( aeroboto_in0_r )
-{
-	return readinputport(player);
-}
-
-static READ_HANDLER( aeroboto_201_r )
+READ_HANDLER( aeroboto_201_r )
 {
 	/* if you keep a button pressed during boot, the game will expect this */
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
 	int res[4] = { 0xff,0x9f,0x1b,0x03};
 	static int count;
-	//logerror("PC %04x: read 3004\n",cpu_get_pc());
+	//logerror("PC %04x: read 3004\n",activecpu_get_pc());
 	return res[(count++)&3];
 }
 
-static WRITE_HANDLER( aeroboto_3000_w )
+static int aeroboto_interrupt(void)
 {
-	/* bit 0 selects player1/player2 controls */
-	player = data & 1;
+	if (!disable_irq)
+		return interrupt();
+		//cpu_set_irq_line(0, 0, HOLD_LINE);
+	else {
+		disable_irq--;
+		return ignore_interrupt();
+	}
+}
 
-	/* not sure about this, could be bit 2 */
-	aeroboto_charbank = (data & 0x02) >> 1;
+READ_HANDLER( aeroboto_2973_r )
+{
+	aeroboto_mainram[0x02be] = 0;
+	return(0xff);
+}
 
-	/* there's probably a flip screen here as well */
+WRITE_HANDLER ( aeroboto_1a2_w )
+{
+	aeroboto_mainram[0x01a2] = data;
+	if (data) disable_irq = 1;
 }
 
 static struct MemoryReadAddress readmem[] =
 {
-	{ 0x0000, 0x07ff, MRA_RAM },
-	{ 0x0800, 0x08ff, MRA_RAM },	/* ? copied to 2000 */
-	{ 0x1000, 0x17ff, MRA_RAM },
-	{ 0x1800, 0x183f, MRA_RAM },
-	{ 0x2800, 0x28ff, MRA_RAM },
+	{ 0x0000, 0x07ff, MRA_RAM }, // main RAM
+	{ 0x0800, 0x08ff, MRA_RAM }, // tile color buffer; copied to 0x2000
+	{ 0x1000, 0x17ff, MRA_RAM }, // tile RAM
+	{ 0x1800, 0x183f, MRA_RAM }, // horizontal scroll regs
+	{ 0x2000, 0x20ff, MRA_RAM }, // tile color RAM
+	{ 0x2800, 0x28ff, MRA_RAM }, // sprite RAM
+	{ 0x2973, 0x2973, aeroboto_2973_r }, // protection read
 	{ 0x3000, 0x3000, aeroboto_in0_r },
 	{ 0x3001, 0x3001, input_port_2_r },
 	{ 0x3002, 0x3002, input_port_3_r },
-	{ 0x3004, 0x3004, aeroboto_201_r },
-	{ 0x3800, 0x3800, watchdog_reset_r },	/* or IRQ acknowledge */
-	{ 0x4000, 0xffff, MRA_ROM },
+	{ 0x3004, 0x3004, aeroboto_201_r }, // protection read
+	{ 0x3800, 0x3800, MRA_NOP }, // watchdog or IRQ ack
+	{ 0x4000, 0xffff, MRA_ROM }, // main ROM
 	{ -1 }  /* end of table */
 };
 
 static struct MemoryWriteAddress writemem[] =
 {
-	{ 0x0000, 0x07ff, MWA_RAM },
-	{ 0x0800, 0x08ff, MWA_RAM },	/* ? initialized on startup */
-	{ 0x0900, 0x09ff, MWA_RAM },	/* ? initialized on startup (same as 0800) */
-	{ 0x1000, 0x13ff, MWA_RAM, &aeroboto_videoram },
-	{ 0x1400, 0x17ff, videoram_w, &videoram, &videoram_size },
-	{ 0x1800, 0x181f, MWA_RAM, &aeroboto_fgscroll },
-	{ 0x1820, 0x183f, MWA_RAM, &aeroboto_bgscroll },
-	{ 0x2000, 0x20ff, MWA_RAM },	/* scroll? maybe stars? copied from 0800 */
+	{ 0x01a2, 0x01a2, aeroboto_1a2_w }, // affects IRQ line (more protection?)
+	{ 0x0000, 0x07ff, MWA_RAM, &aeroboto_mainram },
+	{ 0x0800, 0x08ff, MWA_RAM },
+	{ 0x0900, 0x09ff, MWA_RAM }, // a backup of default tile colors
+	{ 0x1000, 0x17ff, aeroboto_videoram_w, &videoram, &videoram_size },
+	{ 0x1800, 0x183f, MWA_RAM, &aeroboto_hscroll },
+	{ 0x2000, 0x20ff, aeroboto_tilecolor_w, &aeroboto_tilecolor },
+	{ 0x1840, 0x27ff, MWA_NOP }, // cleared during custom LSI test
 	{ 0x2800, 0x28ff, MWA_RAM, &spriteram, &spriteram_size },
+	{ 0x2900, 0x2fff, MWA_NOP }, // cleared along with sprite RAM
 	{ 0x3000, 0x3000, aeroboto_3000_w },
-	{ 0x3001, 0x3001, soundlatch_w },	/* ? */
-	{ 0x3002, 0x3002, soundlatch2_w },	/* ? */
+	{ 0x3001, 0x3001, soundlatch_w },
+	{ 0x3002, 0x3002, soundlatch2_w },
+	{ 0x3003, 0x3003, MWA_RAM, &aeroboto_vscroll },
+	{ 0x3004, 0x3004, MWA_RAM, &aeroboto_starx },
+	{ 0x3005, 0x3005, MWA_RAM, &aeroboto_stary }, // usable but probably wrong
+	{ 0x3006, 0x3006, MWA_RAM, &aeroboto_starcolor },
 	{ 0x4000, 0xffff, MWA_ROM },
 	{ -1 }  /* end of table */
 };
@@ -106,23 +137,23 @@ static struct MemoryWriteAddress writemem_sound[] =
 
 
 INPUT_PORTS_START( formatz )
-	PORT_START	/* IN0 */
+	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP | IPF_8WAY )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN | IPF_8WAY )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT | IPF_8WAY )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT | IPF_8WAY )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* IN1 */
+	PORT_START      /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT | IPF_8WAY | IPF_COCKTAIL )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT | IPF_8WAY | IPF_COCKTAIL )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 | IPF_COCKTAIL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 | IPF_COCKTAIL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -146,7 +177,9 @@ INPUT_PORTS_START( formatz )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	/* the coin input must stay low for exactly 2 frames to be consistently recognized. */
+	/* The last dip switch is directly connected to the video hardware and
+	   flips the screen. The program instead sees the coin input, which must
+	   stay low for exactly 2 frames to be consistently recognized. */
 	PORT_BIT_IMPULSE( 0x80, IP_ACTIVE_LOW, IPT_COIN1, 2 )
 
 	PORT_START
@@ -170,42 +203,53 @@ INPUT_PORTS_START( formatz )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	/* the manual lists the flip screen in the previous bank (replacing Coin A) */
-	PORT_DIPNAME( 0x80, 0x00, "Flip Screen?" )
-	PORT_DIPSETTING(    0x00, "Off?" )
-	PORT_DIPSETTING(    0x80, "On?" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 
 static struct GfxLayout charlayout =
 {
-	8,8,	/* 8*8 chars */
-	512,	/* 512 characters */
-	2,	/* 2 bits per pixel */
+	8,8,
+	RGN_FRAC(1,2),
+	2,
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 512*8*8+0, 512*8*8+1, 512*8*8+2, 512*8*8+3 },
+	{ 0, 1, 2, 3, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8
+};
+
+/* exact star layout unknown... could be anything */
+static struct GfxLayout starlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
 };
 
 static struct GfxLayout spritelayout =
 {
-	8,16,	/* 8*16 sprites */
-	256,	/* 128 sprites */
-	3,	/* 3 bits per pixel */
-	{ 2*256*16*8, 256*16*8, 0 },	/* the bitplanes are separated */
+	8,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-            8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	16*8	/* every sprite takes 16 consecutive bytes */
+	    8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	16*8
 };
 
 static struct GfxDecodeInfo gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &charlayout,     0, 64 },	/* chars */
-	{ REGION_GFX2, 0, &charlayout,     0, 64 },	/* sky */
-	{ REGION_GFX3, 0, &spritelayout,   0, 32 },
+	{ REGION_GFX1, 0, &charlayout,     0,  64 },     /* chars */
+	{ REGION_GFX2, 0, &starlayout,     0, 128 },     /* sky */
+	{ REGION_GFX3, 0, &spritelayout,   0,   8 },
 	{ -1 } /* end of array */
 };
 
@@ -230,11 +274,11 @@ static struct MachineDriver machine_driver_formatz =
 			CPU_M6809,
 			1250000,        /* 1.25 Mhz ? */
 			readmem,writemem,0,0,
-			interrupt,1
+			aeroboto_interrupt,1
 		},
 		{
 			CPU_M6809 | CPU_AUDIO_CPU,
-			1250000,        /* 1.25 Mhz ? */
+			640000,       
 			readmem_sound,writemem_sound,0,0,
 			interrupt,1
 		}
@@ -244,14 +288,14 @@ static struct MachineDriver machine_driver_formatz =
 	0,	/* init machine */
 
 	/* video hardware */
-	32*8, 32*8, { 0*8, 32*8-1, 2*8, 30*8-1 },
+	32*8, 32*8, { 0*8, 30*8-1, 3*8, 30*8-1 }, //32*8, 32*8, { 0*8, 32*8-1, 2*8, 30*8-1 },
 	gfxdecodeinfo,
 	256,256,
-	0,
+	aeroboto_vh_convert_color_prom,
 
 	VIDEO_TYPE_RASTER,
 	0,
-	generic_vh_start,
+	aeroboto_vh_start, //generic_vh_start,
 	generic_vh_stop,
 	aeroboto_vh_screenrefresh,
 
@@ -292,9 +336,9 @@ ROM_START( formatz )
 	ROM_LOAD( "format_z.3",   0x2000, 0x1000, 0x7d1aec79 )	/* sprites */
 
 	ROM_REGION( 0x0300, REGION_PROMS )
-	ROM_LOAD( "10a",          0x0000, 0x0100, 0x00000000 )
+	ROM_LOAD( "10c",          0x0000, 0x0100, 0x00000000 )
 	ROM_LOAD( "10b",          0x0100, 0x0100, 0x00000000 )
-	ROM_LOAD( "10c",          0x0200, 0x0100, 0x00000000 )
+	ROM_LOAD( "10a",          0x0200, 0x0100, 0x00000000 )
 ROM_END
 
 ROM_START( aeroboto )
@@ -318,12 +362,12 @@ ROM_START( aeroboto )
 	ROM_LOAD( "aeroboto.3",   0x2000, 0x1000, 0x5203ad04 )	/* sprites */
 
 	ROM_REGION( 0x0300, REGION_PROMS )
-	ROM_LOAD( "10a",          0x0000, 0x0100, 0x00000000 )
-	ROM_LOAD( "10b",          0x0100, 0x0100, 0x00000000 )
-	ROM_LOAD( "10c",          0x0200, 0x0100, 0x00000000 )
+	ROM_LOAD( "10c",          0x0000, 0x0100, 0xb756dd6d )
+	ROM_LOAD( "10b",          0x0100, 0x0100, 0x00df8809 )
+	ROM_LOAD( "10a",          0x0200, 0x0100, 0xe8733c8f )
 ROM_END
 
 
 
-GAMEX( 1984, formatz,  0,       formatz, formatz, 0, ROT0, "Jaleco", "Formation Z", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAMEX( 1984, aeroboto, formatz, formatz, formatz, 0, ROT0, "[Jaleco] (Williams license)", "Aeroboto", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAMEX( 1984, formatz,  0,       formatz, formatz, 0, ROT0, "Jaleco", "Formation Z", GAME_IMPERFECT_COLORS )
+GAMEX( 1984, aeroboto, formatz, formatz, formatz, 0, ROT0, "[Jaleco] (Williams license)", "Aeroboto", GAME_IMPERFECT_COLORS )

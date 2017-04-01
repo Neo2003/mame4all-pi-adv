@@ -171,7 +171,6 @@ int MSM5205_sh_start (const struct MachineSound *msound)
 		voice->stream = stream_init(name,msm5205_intf->mixing_level[i],
                                 Machine->sample_rate,i,
 		                        MSM5205_update);
-		voice->timer = timer_alloc(MSM5205_vclk_callback);
 	}
 	/* initialize */
 	MSM5205_sh_reset();
@@ -195,6 +194,29 @@ void MSM5205_sh_update (void)
 {
 }
 
+static void MSM5205_set_timer(int num,int select)
+{
+	struct MSM5205Voice *voice = &msm5205[num];
+	static int prescaler_table[4] = {96,48,64,0};
+	int prescaler = prescaler_table[select&0x03];
+
+	if( voice->prescaler != prescaler )
+	{
+		/* remove VCLK timer */
+		if(voice->timer)
+		{
+			timer_remove(voice->timer);
+			voice->timer = 0;
+		}
+		voice->prescaler = prescaler;
+		/* timer set */
+		if( prescaler )
+		{
+			voice->timer =
+				timer_pulse (TIME_IN_HZ (msm5205_intf->baseclock / prescaler), num, MSM5205_vclk_callback);
+		}
+	}
+}
 /*
  *    Reset emulation of an MSM5205-compatible chip
  */
@@ -216,7 +238,9 @@ void MSM5205_sh_reset(void)
 		voice->signal  = 0;
 		voice->step    = 0;
 		/* timer set */
-		MSM5205_selector_w(i,msm5205_intf->select[i]);
+		MSM5205_set_timer(i,msm5205_intf->select[i] & 0x03);
+		/* bitwidth reset */
+		msm5205[i].bitwidth = msm5205_intf->select[i]&0x04 ? 4 : 3;
 	}
 }
 
@@ -277,34 +301,22 @@ void MSM5205_data_w (int num, int data)
  *    Handle an change of the selector
  */
 
-void MSM5205_selector_w(int num,int select)
+void MSM5205_selector_w (int num, int select)
 {
 	struct MSM5205Voice *voice = &msm5205[num];
-	static int prescaler_table[4] = {96,48,64,0};
-	int prescaler = prescaler_table[select & 3];
-	int bitwidth = (select & 4) ? 4 : 3;
 
 
-	if( voice->prescaler != prescaler )
+	stream_update(voice->stream,0);
+	MSM5205_set_timer(num,select);
+}
+/* bitsel = -3B/4B pin : 0= 3bit , 1=4bit */
+void MSM5205_bitwidth_w (int num, int bitsel)
+{
+	int bitwidth = bitsel ? 4 : 3;
+	if( msm5205[num].bitwidth != bitwidth )
 	{
-		stream_update(voice->stream,0);
-
-		voice->prescaler = prescaler;
-		/* timer set */
-		if( prescaler )
-		{
-			timer_tm period = TIME_IN_HZ(msm5205_intf->baseclock / prescaler);
-			timer_adjust(voice->timer, period, num, period);
-		}
-		else
-			timer_adjust(voice->timer, TIME_NEVER, 0, 0);
-	}
-
-	if( voice->bitwidth != bitwidth )
-	{
-		stream_update(voice->stream,0);
-
-		voice->bitwidth = bitwidth;
+		stream_update(msm5205[num].stream,0);
+		msm5205[num].bitwidth = bitwidth;
 	}
 }
 

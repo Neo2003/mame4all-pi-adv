@@ -9,438 +9,423 @@
 #include "driver.h"
 #include "vidhrdw/generic.h"
 
+/*----------- defined in vidhrdw/arabian.c -----------*/
+
+extern UINT8 arabian_video_control;
+extern UINT8 arabian_flip_screen;
+
+int arabian_vh_start(void);
+void arabian_vh_stop(void);
+void arabian_vh_screenrefresh(struct osd_bitmap *bitmap, int full_refresh);
+void arabian_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable, const unsigned char *color_prom);
+
+WRITE_HANDLER( arabian_blitter_w );
+WRITE_HANDLER( arabian_videoram_w );
+
+/* Constants */
+#define BITMAP_WIDTH		256
+#define BITMAP_HEIGHT		256
 
 
-static struct osd_bitmap *tmpbitmap2;
-static unsigned char inverse_palette[256]; /* JB 970727 */
+/* Local variables */
+static UINT8 *main_bitmap;
+static UINT8 *converted_gfx;
 
 
-void arabian_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable,const unsigned char *color_prom)
+/* Globals */
+UINT8 arabian_video_control;
+UINT8 arabian_flip_screen;
+
+
+
+/*************************************
+ *
+ *	Color PROM conversion
+ *
+ *************************************/
+
+void arabian_vh_convert_color_prom(unsigned char *palette, unsigned short *colortable, const unsigned char *color_prom)
 {
 	int i;
 
-	/* this should be very close */
-	for (i = 0;i < Machine->drv->total_colors/2;i++)
+	/* there are effectively 6 bits of color: 2 red, 2 green, 2 blue */
+	for (i = 0; i < 64; i++)
 	{
-		int on;
-
-
-		on = (i & 0x08) ? 0x80 : 0xff;
-
-		*(palette++) = (i & 0x04) ? 0xff : 0;
-		*(palette++) = (i & 0x02) ? on : 0;
-		*(palette++) = (i & 0x01) ? on : 0;
+		*palette++ = ((i >> 5) & 1) * (153*192/255) + ((i >> 4) & 1) * (102*192/255) + ((i & 0x30) ? 63 : 0);
+		*palette++ = ((i >> 3) & 1) * (156*192/255) + ((i >> 2) & 1) * (99*192/255) + ((i & 0x0c) ? 63 : 0);
+		*palette++ = ((i >> 1) & 1) * 192 + ((i >> 0) & 1) * 63;
 	}
 
+	/* there are 13 color table bits */
+	for (i = 0; i < (1 << 13); i++)
+	{
+		int ena = (i >> 12) & 1;
+		int enb = (i >> 11) & 1;
+		int abhf = (~i >> 10) & 1;
+		int aghf = (~i >> 9) & 1;
+		int arhf = (~i >> 8) & 1;
+		int az = (i >> 7) & 1;
+		int ar = (i >> 6) & 1;
+		int ag = (i >> 5) & 1;
+		int ab = (i >> 4) & 1;
+		int bz = (i >> 3) & 1;
+		int br = (i >> 2) & 1;
+		int bg = (i >> 1) & 1;
+		int bb = (i >> 0) & 1;
 
-	/* this is handmade to match the screen shot */
+		int planea = (az | ar | ag | ab) & ena;
 
-	*(palette++) = 0x00;
-	*(palette++) = 0x00;	  // 0000
-	*(palette++) = 0x00;
+		/*-------------------------------------------------------------------------
+			red derivation:
 
-	*(palette++) = 0x00;
-	*(palette++) = 0xff;  // 0001
-	*(palette++) = 0x00;
+			ROUT.1200	= !IC192.11
+						= !(!(!IC117.11 | !IC118.12))
+						= !IC117.11 | !IC118.12
+						= !(IC99.8 ^ IC119.6) | !(!(!BLNK & IC119.11 & BR))
+						= !((!ARHF & !BLNK & AR & AZ) ^ !(AR & !BLNK)) | (!BLNK & IC119.11 & BR)
+						= !BLNK & (!((!ARHF & AR & AZ) ^ !AR) | (IC119.11 & BR))
+						= !BLNK & ((!(!ARHF & AR & AZ) ^ AR) | (BR & !(AZ | AR | AG | AB)))
 
-	*(palette++) = 0x00;
-	*(palette++) = 0xff;  // 0010
-	*(palette++) = 0x00;
+			ROUT.1800	= !IC192.3
+						= !(!(!IC119.6 | !IC118.12))
+						= !IC119.6 | !IC118.12
+						= !(!(AR & !BLNK) | !(!(!BLNK & IC119.11 & BZ)))
+						= (AR & !BLNK) | (!BLNK & IC119.11 & BZ)
+						= !BLNK & (AR | (BZ & !(AZ | AR | AG | AB)))
 
-	*(palette++) = 0x00;
-	*(palette++) = 0xff;  // 0011
-	*(palette++) = 0x00;
+			RENA		= IC116.6
+						= !IC192.11 | !IC192.3
+						= ROUT.1200 | ROUT.1800
 
-	*(palette++) = 0xff;
-	*(palette++) = 0x00;  // 0100
-	*(palette++) = 0x00;
+			red.hi   = planea ? ar : bz;
+			red.lo   = planea ? ((!arhf & az) ? 0 : ar) : br;
+			red.base = (red.hi | red.lo)
+		-------------------------------------------------------------------------*/
 
-	*(palette++) = 0xff;
-	*(palette++) = 0xff;  // 0101
-	*(palette++) = 0x00;
+		int rhi = planea ? ar : enb ? bz : 0;
+		int rlo = planea ? ((!arhf & az) ? 0 : ar) : enb ? br : 0;
 
-	*(palette++) = 0xff;
-	*(palette++) = 0xff;  // 0110
-	*(palette++) = 0x00;
+		/*-------------------------------------------------------------------------
+			green derivation:
 
-	*(palette++) = 0xff;
-	*(palette++) = 0xff;  // 0111
-	*(palette++) = 0x00;
+			GOUT.750	= !IC192.8
+						= !(!(!IC119.8 | !IC120.8))
+						= !IC119.8 | !IC120.8
+						= !(!(AG & !BLNK)) | !(!(!BLNK & IC119.11 & BB))
+						= (AG & !BLNK) | (!BLNK & IC119.11 & BB)
+						= !BLNK & (AG | (IC119.11 & BB))
+						= !BLNK & (AG | (BB & !(AZ | AR | AG | AB)))
 
+			GOUT.1200	= !IC192.6
+						= !(!(!IC117.3 | !IC118.6))
+						= !IC117.3 | !IC118.6
+						= !(IC99.6 ^ IC119.8) | !(!(!BLNK & IC119.11 & BG))
+						= !((!AGHF & !BLNK & AG & AZ) ^ !(AG & !BLNK)) | (!BLNK & IC119.11 & BG)
+						= !BLNK & (!((!AGHF & AG & AZ) ^ !AG) | (IC119.11 & BG))
+						= !BLNK & ((!(!AGHF & AG & AZ) ^ AG) | (BG & !(AZ | AR | AG | AB)))
 
+			GENA		= IC116.8
+						= !IC192.8 | !IC192.6
+						= GOUT.750 | GOUT.1200
 
-	*(palette++) = 0x00;
-	*(palette++) = 0x00;  // 1000
-	*(palette++) = 0x00;
+			grn.hi   = planea ? ag : bb;
+			grn.lo   = planea ? ((!aghf & az) ? 0 : ag) : bg;
+			grn.base = (grn.hi | grn.lo)
+		-------------------------------------------------------------------------*/
 
-	*(palette++) = 0xff;
-	*(palette++) = 0xff;  // 1001
-	*(palette++) = 0x00;
+		int ghi = planea ? ag : enb ? bb : 0;
+		int glo = planea ? ((!aghf & az) ? 0 : ag) : enb ? bg : 0;
 
-	*(palette++) = 0xff;
-	*(palette++) = 0x80;  // 1010
-	*(palette++) = 0x00;
+		/*-------------------------------------------------------------------------
+			blue derivation:
 
-	*(palette++) = 0x00;
-	*(palette++) = 0xff;  // 1011
-	*(palette++) = 0x00;
+			BOUT.1200	= !IC117.6
+						= !IC119.3
+						= !(!(AB & !BLNK))
+						= !BLNK & AB
 
-	*(palette++) = 0xff;
-	*(palette++) = 0x00;  // 1100
-	*(palette++) = 0x00;
+			BENA		= !IC117.8
+						= !(IC189.6 ^ IC119.3)
+						= !((!ABHF & !BLNK & AB & AZ) ^ !(AB & !BLNK))
+						= (!(!ABHF & !BLNK & AB & AZ) ^ (AB & !BLNK))
+						= !BLNK & (!(!ABHF & AB & AZ) ^ AB)
 
-	*(palette++) = 0xff;
-	*(palette++) = 0xff;  // 1101
-	*(palette++) = 0x00;
+			blu.hi   = ab;
+			blu.base = ((!abhf & az) ? 0 : ab);
+		-------------------------------------------------------------------------*/
 
-	*(palette++) = 0xff;
-	*(palette++) = 0x80;  // 1110
-	*(palette++) = 0x00;
+		int bhi = ab;
+		int bbase = (!abhf & az) ? 0 : ab;
 
-	*(palette++) = 0xff;
-	*(palette++) = 0xff;  // 1111
-	*(palette++) = 0x00;
+		*colortable++ = (rhi << 5) | (rlo << 4) |
+						(ghi << 3) | (glo << 2) |
+						(bhi << 1) | bbase;
+	}
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given osd_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
 
-***************************************************************************/
+/*************************************
+ *
+ *	Video startup
+ *
+ *************************************/
 
 int arabian_vh_start(void)
 {
-	int p1,p2,p3,p4,v1,v2,offs;
-	int i;	/* JB 970727 */
+	UINT8 *gfxbase = memory_region(REGION_GFX1);
+	int offs;
 
-	if ((tmpbitmap = bitmap_alloc(Machine->drv->screen_width,Machine->drv->screen_height)) == 0)
+	/* allocate a common bitmap to use for both planes */
+	/* plane A (top plane with motion objects) is in the upper 4 bits */
+	/* plane B (bottom plane with playfield) is in the lower 4 bits */
+	main_bitmap = (UINT8 *) malloc(BITMAP_WIDTH * BITMAP_HEIGHT);
+	if (main_bitmap == 0)
 		return 1;
 
-	if ((tmpbitmap2 = bitmap_alloc(Machine->drv->screen_width,Machine->drv->screen_height)) == 0)
+	/* allocate memory for the converted graphics data */
+	converted_gfx = (UINT8 *) malloc(0x8000 * 2);
+	if (converted_gfx == 0)
 	{
-		bitmap_free(tmpbitmap2);
+		free(main_bitmap);
 		return 1;
 	}
 
-	/* JB 970727 */
-	for (i = 0;i < Machine->drv->total_colors;i++)
-		inverse_palette[ Machine->pens[i] ] = i;
 
-/*transform graphics data into more usable format*/
-/*which is coded like this:
+	/*--------------------------------------------------
+		transform graphics data into more usable format
+		which is coded like this:
 
-  byte adr+0x4000  byte adr
-  DCBA DCBA        DCBA DCBA
+		  byte adr+0x4000  byte adr
+		  DCBA DCBA        DCBA DCBA
 
-D-bits of pixel 4
-C-bits of pixel 3
-B-bits of pixel 2
-A-bits of pixel 1
+		D-bits of pixel 4
+		C-bits of pixel 3
+		B-bits of pixel 2
+		A-bits of pixel 1
 
-after conversion :
+		after conversion :
 
-  byte adr+0x4000  byte adr
-  DDDD CCCC        BBBB AAAA
-*/
+		  byte adr+0x4000  byte adr
+		  DDDD CCCC        BBBB AAAA
+	--------------------------------------------------*/
 
-  for (offs=0; offs<0x4000; offs++)
-  {
-     v1 = memory_region(REGION_GFX1)[offs];
-     v2 = memory_region(REGION_GFX1)[offs+0x4000];
+	for (offs = 0; offs < 0x4000; offs++)
+	{
+		int v1 = gfxbase[offs + 0x0000];
+		int v2 = gfxbase[offs + 0x4000];
+		int p1, p2, p3, p4;
 
-     p1 = (v1 & 0x01) | ( (v1 & 0x10) >> 3) | ( (v2 & 0x01) << 2 ) | ( (v2 & 0x10) >> 1);
-     v1 = v1 >> 1;
-     v2 = v2 >> 1;
-     p2 = (v1 & 0x01) | ( (v1 & 0x10) >> 3) | ( (v2 & 0x01) << 2 ) | ( (v2 & 0x10) >> 1);
-     v1 = v1 >> 1;
-     v2 = v2 >> 1;
-     p3 = (v1 & 0x01) | ( (v1 & 0x10) >> 3) | ( (v2 & 0x01) << 2 ) | ( (v2 & 0x10) >> 1);
-     v1 = v1 >> 1;
-     v2 = v2 >> 1;
-     p4 = (v1 & 0x01) | ( (v1 & 0x10) >> 3) | ( (v2 & 0x01) << 2 ) | ( (v2 & 0x10) >> 1);
+		p1 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
+		v1 >>= 1;
+		v2 >>= 1;
+		p2 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
+		v1 >>= 1;
+		v2 >>= 1;
+		p3 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
+		v1 >>= 1;
+		v2 >>= 1;
+		p4 = (v1 & 0x01) | ((v1 & 0x10) >> 3) | ((v2 & 0x01) << 2) | ((v2 & 0x10) >> 1);
 
-     memory_region(REGION_GFX1)[offs] = p1 | (p2<<4);
-     memory_region(REGION_GFX1)[offs+0x4000] = p3 | (p4<<4);
+		converted_gfx[offs * 4 + 3] = p1;
+		converted_gfx[offs * 4 + 2] = p2;
+		converted_gfx[offs * 4 + 1] = p3;
+		converted_gfx[offs * 4 + 0] = p4;
+	}
 
-  }
 	return 0;
 }
 
-/***************************************************************************
 
-  Stop the video hardware emulation.
 
-***************************************************************************/
+/*************************************
+ *
+ *	Video shutdown
+ *
+ *************************************/
 
 void arabian_vh_stop(void)
 {
-	bitmap_free(tmpbitmap2);
-	bitmap_free(tmpbitmap);
+	free(converted_gfx);
+	free(main_bitmap);
 }
 
 
 
+/*************************************
+ *
+ *	DMA blitter simulation
+ *
+ *************************************/
 
-INLINE void blit_byte(UINT8 x, UINT8 y, int val, int val2, UINT8 plane)
+static void blit_area(UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy)
 {
-	int p1,p2,p3,p4;
-
-	INT8 dx=1,dy=0;
-
-
-	p4 =  val        & 0x0f;
-	p3 = (val  >> 4) & 0x0f;
-	p2 =  val2       & 0x0f;
-	p1 = (val2 >> 4) & 0x0f;
-
-
-	if (Machine->orientation & ORIENTATION_SWAP_XY)
-	{
-		int t;
-
-		t = x; x = y; y = t;
-		t = dx; dx = dy; dy = t;
-	}
-	if (Machine->orientation & ORIENTATION_FLIP_X)
-	{
-		x = x ^ 0xff;
-		dx = -dx;
-	}
-	if (Machine->orientation & ORIENTATION_FLIP_Y)
-	{
-		y = y ^ 0xff;
-		dy = -dy;
-	}
-
-
-	if (plane & 0x01)
-	{
-		if (p4 != 8)  tmpbitmap ->line[y     ][x     ] = Machine->pens[p4];
-		if (p3 != 8)  tmpbitmap ->line[y+  dy][x+  dx] = Machine->pens[p3];
-		if (p2 != 8)  tmpbitmap ->line[y+2*dy][x+2*dx] = Machine->pens[p2];
-		if (p1 != 8)  tmpbitmap ->line[y+3*dy][x+3*dx] = Machine->pens[p1];
-	}
-
-	if (plane & 0x04)
-	{
-		if (p4 != 8)  tmpbitmap2->line[y     ][x     ] = Machine->pens[16+p4];
-		if (p3 != 8)  tmpbitmap2->line[y+  dy][x+  dx] = Machine->pens[16+p3];
-		if (p2 != 8)  tmpbitmap2->line[y+2*dy][x+2*dx] = Machine->pens[16+p2];
-		if (p1 != 8)  tmpbitmap2->line[y+3*dy][x+3*dx] = Machine->pens[16+p1];
-	}
-
-	if (dx >= 0 && dy >= 0)
-		osd_mark_dirty(x,y,x+3*dx,y+3*dy,0);
-	else if (dx >= 0)
-		osd_mark_dirty(x,y+3*dy,x+3*dx,y,0);
-	else if (dy >= 0)
-		osd_mark_dirty(x+3*dx,y,x,y+3*dy,0);
-	else
-		osd_mark_dirty(x+3*dx,y+3*dy,x,y,0);
-}
-
-
-void arabian_blit_area(UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy)
-{
+	UINT8 *srcdata = &converted_gfx[src * 4];
 	int i,j;
 
+	/* loop over X, then Y */
 	for (i = 0; i <= sx; i++, x += 4)
-	{
 		for (j = 0; j <= sy; j++)
 		{
-			blit_byte(x, y+j, memory_region(REGION_GFX1)[src], memory_region(REGION_GFX1)[src+0x4000], plane);
-			src++;
+			UINT8 p1 = *srcdata++;
+			UINT8 p2 = *srcdata++;
+			UINT8 p3 = *srcdata++;
+			UINT8 p4 = *srcdata++;
+			UINT8 *base;
+
+			/* get a pointer to the bitmap */
+			base = &main_bitmap[((y + j) & 0xff) * BITMAP_WIDTH + (x & 0xff)];
+
+			/* bit 0 means write to upper plane (upper 4 bits of our bitmap) */
+			if (plane & 0x01)
+			{
+				if (p4 != 8) base[0] = (base[0] & ~0xf0) | (p4 << 4);
+				if (p3 != 8) base[1] = (base[1] & ~0xf0) | (p3 << 4);
+				if (p2 != 8) base[2] = (base[2] & ~0xf0) | (p2 << 4);
+				if (p1 != 8) base[3] = (base[3] & ~0xf0) | (p1 << 4);
+			}
+
+
+			/* bit 2 means write to lower plane (lower 4 bits of our bitmap) */
+			if (plane & 0x04)
+			{
+				if (p4 != 8) base[0] = (base[0] & ~0x0f) | p4;
+				if (p3 != 8) base[1] = (base[1] & ~0x0f) | p3;
+				if (p2 != 8) base[2] = (base[2] & ~0x0f) | p2;
+				if (p1 != 8) base[3] = (base[3] & ~0x0f) | p1;
+			}
 		}
-	}
 }
+
+
+
+/*************************************
+ *
+ *	DMA blitter parameters
+ *
+ *************************************/
 
 
 WRITE_HANDLER( arabian_blitter_w )
 {
+	/* write the data */
+	offset &= 7;
 	spriteram[offset] = data;
 
+	/* watch for a write to offset 6 -- that triggers the blit */
 	if ((offset & 0x07) == 6)
 	{
-		UINT8 plane,x,y,sx,sy;
-		UINT16 src;
+		/* extract the data */
+		int plane = spriteram[offset - 6];
+		int src   = spriteram[offset - 5] | (spriteram[offset - 4] << 8);
+		int x     = spriteram[offset - 2] << 2;
+		int y     = spriteram[offset - 3];
+		int sx    = spriteram[offset - 0];
+		int sy    = spriteram[offset - 1];
 
-		plane = spriteram[offset-6];
-		src   = spriteram[offset-5] | (spriteram[offset-4] << 8);
-		x     = spriteram[offset-2] << 2;
-		y     = spriteram[offset-3];
-		sx    = spriteram[offset-0];
-		sy    = spriteram[offset-1];
-
-		arabian_blit_area(plane,src,x,y,sx,sy);
+		/* blit it */
+		blit_area(plane, src, x, y, sx, sy);
 	}
 }
 
 
 
+/*************************************
+ *
+ *	VRAM direct I/O
+ *
+ *************************************/
 WRITE_HANDLER( arabian_videoram_w )
 {
-	int plane1,plane2,plane3,plane4;
-	unsigned char *bm;
+	UINT8 *base;
+	UINT8 x, y;
 
-	UINT8 x,y;
-	INT8 dx=1, dy=0;
-
-
-	plane1 = spriteram[0] & 0x01;
-	plane2 = spriteram[0] & 0x02;
-	plane3 = spriteram[0] & 0x04;
-	plane4 = spriteram[0] & 0x08;
+	/* determine X/Y and mark the area dirty */
 
 	x = (offset >> 8) << 2;
 	y = offset & 0xff;
 
+	/* get a pointer to the pixels */
+	base = &main_bitmap[y * BITMAP_WIDTH + x];
 
-	if (Machine->orientation & ORIENTATION_SWAP_XY)
+	/* the data is written as 4 2-bit values, as follows:
+
+			bit 7 = pixel 3, upper bit
+			bit 6 = pixel 2, upper bit
+			bit 5 = pixel 1, upper bit
+			bit 4 = pixel 0, upper bit
+			bit 3 = pixel 3, lower bit
+			bit 2 = pixel 2, lower bit
+			bit 1 = pixel 1, lower bit
+			bit 0 = pixel 0, lower bit
+	*/
+
+	/* enable writes to AZ/AR */
+	if (spriteram[0] & 0x08)
 	{
-		int t;
-
-		t = x; x = y; y = t;
-		t = dx; dx = dy; dy = t;
+		base[0] = (base[0] & ~0x03) | ((data & 0x10) >> 3) | ((data & 0x01) >> 0);
+		base[1] = (base[1] & ~0x03) | ((data & 0x20) >> 4) | ((data & 0x02) >> 1);
+		base[2] = (base[2] & ~0x03) | ((data & 0x40) >> 5) | ((data & 0x04) >> 2);
+		base[3] = (base[3] & ~0x03) | ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
 	}
-	if (Machine->orientation & ORIENTATION_FLIP_X)
+	/* enable writes to AG/AB */
+	if (spriteram[0] & 0x04)
 	{
-		x = x ^ 0xff;
-		dx = -dx;
-	}
-	if (Machine->orientation & ORIENTATION_FLIP_Y)
-	{
-		y = y ^ 0xff;
-		dy = -dy;
-	}
-
-
-	/* JB 970727 */
-	tmpbitmap ->line[y     ][x     ] = inverse_palette[ tmpbitmap ->line[y     ][x     ] ];
-	tmpbitmap ->line[y+  dy][x+  dx] = inverse_palette[ tmpbitmap ->line[y+  dy][x+  dx] ];
-	tmpbitmap ->line[y+2*dy][x+2*dx] = inverse_palette[ tmpbitmap ->line[y+2*dy][x+2*dx] ];
-	tmpbitmap ->line[y+3*dy][x+3*dx] = inverse_palette[ tmpbitmap ->line[y+3*dy][x+3*dx] ];
-	tmpbitmap2->line[y     ][x     ] = inverse_palette[ tmpbitmap2->line[y     ][x     ] ];
-	tmpbitmap2->line[y+  dy][x+  dx] = inverse_palette[ tmpbitmap2->line[y+  dy][x+  dx] ];
-	tmpbitmap2->line[y+2*dy][x+2*dx] = inverse_palette[ tmpbitmap2->line[y+2*dy][x+2*dx] ];
-	tmpbitmap2->line[y+3*dy][x+3*dx] = inverse_palette[ tmpbitmap2->line[y+3*dy][x+3*dx] ];
-
-	if (plane1)
-	{
-		bm = &tmpbitmap->line[y     ][x     ];
-		*bm &= 0xf3;
-		if (data & 0x10) *bm |= 8;
-		if (data & 0x01) *bm |= 4;
-
-		bm = &tmpbitmap->line[y+  dy][x+  dx];
-		*bm &= 0xf3;
-		if (data & 0x20) *bm |= 8;
-		if (data & 0x02) *bm |= 4;
-
-		bm = &tmpbitmap->line[y+2*dy][x+2*dx];
-		*bm &= 0xf3;
-		if (data & 0x40) *bm |= 8;
-		if (data & 0x04) *bm |= 4;
-
-		bm = &tmpbitmap->line[y+3*dy][x+3*dx];
-		*bm &= 0xf3;
-		if (data & 0x80) *bm |= 8;
-		if (data & 0x08) *bm |= 4;
+		base[0] = (base[0] & ~0x0c) | ((data & 0x10) >> 1) | ((data & 0x01) << 2);
+		base[1] = (base[1] & ~0x0c) | ((data & 0x20) >> 2) | ((data & 0x02) << 1);
+		base[2] = (base[2] & ~0x0c) | ((data & 0x40) >> 3) | ((data & 0x04) << 0);
+		base[3] = (base[3] & ~0x0c) | ((data & 0x80) >> 4) | ((data & 0x08) >> 1);
 	}
 
-	if (plane2)
+
+	/* enable writes to BZ/BR */
+	if (spriteram[0] & 0x02)
 	{
-		bm = &tmpbitmap->line[y     ][x     ];
-		*bm &= 0xfc;
-		if (data & 0x10) *bm |= 2;
-		if (data & 0x01) *bm |= 1;
-
-		bm = &tmpbitmap->line[y+  dy][x+  dx];
-		*bm &= 0xfc;
-		if (data & 0x20) *bm |= 2;
-		if (data & 0x02) *bm |= 1;
-
-		bm = &tmpbitmap->line[y+2*dy][x+2*dx];
-		*bm &= 0xfc;
-		if (data & 0x40) *bm |= 2;
-		if (data & 0x04) *bm |= 1;
-
-		bm = &tmpbitmap->line[y+3*dy][x+3*dx];
-		*bm &= 0xfc;
-		if (data & 0x80) *bm |= 2;
-		if (data & 0x08) *bm |= 1;
+		base[0] = (base[0] & ~0x30) | ((data & 0x10) << 1) | ((data & 0x01) << 4);
+		base[1] = (base[1] & ~0x30) | ((data & 0x20) << 0) | ((data & 0x02) << 3);
+		base[2] = (base[2] & ~0x30) | ((data & 0x40) >> 1) | ((data & 0x04) << 2);
+		base[3] = (base[3] & ~0x30) | ((data & 0x80) >> 2) | ((data & 0x08) << 1);
 	}
 
-	if (plane3)
+	/* enable writes to BG/BB */
+	if (spriteram[0] & 0x01)
 	{
-		bm = &tmpbitmap2->line[y     ][x     ];
-		*bm &= 0xf3;
-		if (data & 0x10) *bm |= (16+8);
-		if (data & 0x01) *bm |= (16+4);
-
-		bm = &tmpbitmap2->line[y+  dy][x+  dx];
-		*bm &= 0xf3;
-		if (data & 0x20) *bm |= (16+8);
-		if (data & 0x02) *bm |= (16+4);
-
-		bm = &tmpbitmap2->line[y+2*dy][x+2*dx];
-		*bm &= 0xf3;
-		if (data & 0x40) *bm |= (16+8);
-		if (data & 0x04) *bm |= (16+4);
-
-		bm = &tmpbitmap2->line[y+3*dy][x+3*dx];
-		*bm &= 0xf3;
-		if (data & 0x80) *bm |= (16+8);
-		if (data & 0x08) *bm |= (16+4);
+		base[0] = (base[0] & ~0xc0) | ((data & 0x10) << 3) | ((data & 0x01) << 6);
+		base[1] = (base[1] & ~0xc0) | ((data & 0x20) << 2) | ((data & 0x02) << 5);
+		base[2] = (base[2] & ~0xc0) | ((data & 0x40) << 1) | ((data & 0x04) << 4);
+		base[3] = (base[3] & ~0xc0) | ((data & 0x80) << 0) | ((data & 0x08) << 3);
 	}
-
-	if (plane4)
-	{
-		bm = &tmpbitmap2->line[y     ][x     ];
-		*bm &= 0xfc;
-		if (data & 0x10) *bm |= (16+2);
-		if (data & 0x01) *bm |= (16+1);
-
-		bm = &tmpbitmap2->line[y+  dy][x+  dx];
-		*bm &= 0xfc;
-		if (data & 0x20) *bm |= (16+2);
-		if (data & 0x02) *bm |= (16+1);
-
-		bm = &tmpbitmap2->line[y+2*dy][x+2*dx];
-		*bm &= 0xfc;
-		if (data & 0x40) *bm |= (16+2);
-		if (data & 0x04) *bm |= (16+1);
-
-		bm = &tmpbitmap2->line[y+3*dy][x+3*dx];
-		*bm &= 0xfc;
-		if (data & 0x80) *bm |= (16+2);
-		if (data & 0x08) *bm |= (16+1);
-	}
-
-	/* JB 970727 */
-	tmpbitmap ->line[y     ][x     ] = Machine->pens[ tmpbitmap ->line[y     ][x     ] ];
-	tmpbitmap ->line[y+  dy][x+  dx] = Machine->pens[ tmpbitmap ->line[y+  dy][x+  dx] ];
-	tmpbitmap ->line[y+2*dy][x+2*dx] = Machine->pens[ tmpbitmap ->line[y+2*dy][x+2*dx] ];
-	tmpbitmap ->line[y+3*dy][x+3*dx] = Machine->pens[ tmpbitmap ->line[y+3*dy][x+3*dx] ];
-	tmpbitmap2->line[y     ][x     ] = Machine->pens[ tmpbitmap2->line[y     ][x     ] ];
-	tmpbitmap2->line[y+  dy][x+  dx] = Machine->pens[ tmpbitmap2->line[y+  dy][x+  dx] ];
-	tmpbitmap2->line[y+2*dy][x+2*dx] = Machine->pens[ tmpbitmap2->line[y+2*dy][x+2*dx] ];
-	tmpbitmap2->line[y+3*dy][x+3*dx] = Machine->pens[ tmpbitmap2->line[y+3*dy][x+3*dx] ];
-
-	if (dx >= 0 && dy >= 0)
-		osd_mark_dirty(x,y,x+3*dx,y+3*dy,0);
-	else if (dx >= 0)
-		osd_mark_dirty(x,y+3*dy,x+3*dx,y,0);
-	else if (dy >= 0)
-		osd_mark_dirty(x+3*dx,y,x,y+3*dy,0);
-	else
-		osd_mark_dirty(x+3*dx,y+3*dy,x,y,0);
 }
 
 
+
+/*************************************
+ *
+ *	Core video refresh
+ *
+ *************************************/
+
 void arabian_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh)
 {
-	copybitmap(bitmap,tmpbitmap2,0,0,0,0,&Machine->visible_area,TRANSPARENCY_NONE, 0);
- 	copybitmap(bitmap,tmpbitmap ,0,0,0,0,&Machine->visible_area,TRANSPARENCY_COLOR,0);
+	UINT16 *colortable = &Machine->remapped_colortable[(arabian_video_control >> 3) << 8];
+	int y;
+
+	/* render the screen from the bitmap */
+	for (y = 0; y < BITMAP_HEIGHT; y++)
+	{
+		/* non-flipped case */
+		if (!arabian_flip_screen)
+			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &main_bitmap[y * BITMAP_WIDTH], colortable, -1);
+
+		/* flipped case */
+		else
+		{
+			UINT8 scanline[BITMAP_WIDTH];
+			int x;
+			for (x = 0; x < BITMAP_WIDTH; x++)
+				scanline[BITMAP_WIDTH - 1 - x] = main_bitmap[y * BITMAP_WIDTH + x];
+			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, colortable, -1);
+		}
+	}
+
 }

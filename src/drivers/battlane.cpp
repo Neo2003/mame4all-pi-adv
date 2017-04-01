@@ -30,6 +30,7 @@ WRITE_HANDLER( battlane_bitmap_w );
 READ_HANDLER( battlane_bitmap_r );
 WRITE_HANDLER( battlane_video_ctrl_w );
 READ_HANDLER( battlane_video_ctrl_r );
+WRITE_HANDLER( battlane_palette_w );
 extern void battlane_set_video_flip(int);
 
 WRITE_HANDLER( battlane_scrolly_w );
@@ -139,7 +140,7 @@ static struct MemoryWriteAddress battlane_writemem[] =
     { 0x1c03, 0x1c03, battlane_cpu_command_w },
 	{ 0x1c04, 0x1c04, YM3526_control_port_0_w },
 	{ 0x1c05, 0x1c05, YM3526_write_port_0_w },
-	{ 0x1e00, 0x1e3f, MWA_RAM }, /* Palette ??? */
+	{ 0x1e00, 0x1e3f, battlane_palette_w },
 	{ 0x2000, 0x3fff, battlane_bitmap_w, &battlane_bitmap, &battlane_bitmap_size },
 	{ 0x4000, 0xffff, MWA_ROM },
 	{ -1 }  /* end of table */
@@ -149,14 +150,14 @@ int battlane_cpu1_interrupt(void)
 {
     if (cpu_getiloops()==0)
 	{
-        /* See note in battlane_cpu_command_w */
-        if (~battlane_cpu_control & 0x08)
-        {
-            cpu_set_nmi_line(1, PULSE_LINE);
-            return M6809_INT_NMI;
-        }
-        else
-            return ignore_interrupt();
+		/* See note in battlane_cpu_command_w */
+		if (~battlane_cpu_control & 0x08)
+		{
+			cpu_set_nmi_line(1, PULSE_LINE);
+			return M6809_INT_NMI;
+		}
+		else
+			return ignore_interrupt();
 	}
     else
 	{
@@ -232,19 +233,19 @@ INPUT_PORTS_END
 
 static struct GfxLayout spritelayout =
 {
-    16,16,  /* 16*16 sprites */
-    0x0400,    /* 0x400 sprites */
-	6,      /* 6 bits per pixel ??!!! */
-    { 0, 8, 0x08000*8,0x08000*8+8, 0x10000*8, 0x10000*8+8},
-    {
-        7, 6, 5, 4, 3, 2, 1, 0,
-      16*8+7, 16*8+6, 16*8+5, 16*8+4, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-    },
-    {
-        14*8,14*8,13*8,12*8,11*8,10*8,9*8,8*8,
-        7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8,
-    },
-    16*8*2     /* every char takes 16*8*2 consecutive bytes */
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{
+		7, 6, 5, 4, 3, 2, 1, 0,
+	  16*8+7, 16*8+6, 16*8+5, 16*8+4, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
+	},
+	{
+		15*8,14*8,13*8,12*8,11*8,10*8,9*8,8*8,
+		7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8,
+	},
+	16*8*2
 };
 
 static struct GfxLayout tilelayout =
@@ -252,7 +253,7 @@ static struct GfxLayout tilelayout =
 	16,16 ,    /* 16*16 tiles */
 	256,    /* 256 tiles */
 	3,      /* 3 bits per pixel */
-    {   4, 0, 0x8000*8+4 },    /* plane offset */
+	{ 0x8000*8+4, 4, 0 },    /* plane offset */
 	{
 	16+8+0, 16+8+1, 16+8+2, 16+8+3,
 	16+0, 16+1, 16+2,   16+3,
@@ -270,7 +271,7 @@ static struct GfxLayout tilelayout2 =
 	16,16 ,    /* 16*16 tiles */
 	256,    /* 256 tiles */
 	3,      /* 3 bits per pixel */
-    { 0x4000*8+4, 0x8000*8, 0x4000*8+0, },    /* plane offset */
+    { 0x8000*8, 0x4000*8+4, 0x4000*8+0 },    /* plane offset */
 	{
 	16+8+0, 16+8+1, 16+8+2, 16+8+3,
 	16+0, 16+1, 16+2,   16+3,
@@ -286,17 +287,24 @@ static struct GfxLayout tilelayout2 =
 
 static struct GfxDecodeInfo gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &spritelayout, 0, 32},
-	{ REGION_GFX2, 0, &tilelayout,   0, 32},
-	{ REGION_GFX2, 0, &tilelayout2,  0, 32},
+	{ REGION_GFX1, 0, &spritelayout,  0, 2 },	/* colors 0x00-0x0f */
+	{ REGION_GFX2, 0, &tilelayout,   32, 4 },	/* colors 0x20-0x3f */
+	{ REGION_GFX2, 0, &tilelayout2,  32, 4 },	/* colors 0x20-0x3f */
 	{ -1 } /* end of array */
 };
 
+/*
+static void irqhandler(int irq)
+{
+	cpu_set_irq_line(0,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
+}
+*/
 static struct YM3526interface ym3526_interface =
 {
     1,              /* 1 chip (no more supported) */
     3600000,        /* 3.600000 MHz ? (partially supported) */
     { 255 }         /* (not supported) */
+//	{ irqhandler }
 };
 
 
@@ -318,16 +326,16 @@ static struct MachineDriver machine_driver_battlane =
 		}
 	},
 	60, DEFAULT_REAL_60HZ_VBLANK_DURATION,  /* frames per second, vblank duration */
-    0,      /* CPU slices per frame */
+    100,      /* CPU slices per frame */
     0,      /* init machine */
 
 	/* video hardware */
 	32*8, 32*8, { 1*8, 31*8-1, 1*8, 31*8-1 },       /* not sure */
 	gfxdecodeinfo,
-    0x40,0x40,
-    NULL, //battlane_vh_convert_color_prom,
+	64, 64,
+	NULL,
 
-    VIDEO_TYPE_RASTER |VIDEO_MODIFIES_PALETTE,
+	VIDEO_TYPE_RASTER |VIDEO_MODIFIES_PALETTE,
     0 ,
 	battlane_vh_start,
 	battlane_vh_stop,
@@ -437,6 +445,6 @@ static void init_battlane(void)
 
 
 
-GAMEX( 1986, battlane, 0,        battlane, battlane, battlane, ROT90, "Technos (Taito license)", "Battle Lane Vol. 5 (set 1)", GAME_WRONG_COLORS | GAME_NO_COCKTAIL )
-GAMEX( 1986, battlan2, battlane, battlane, battlane, battlane, ROT90, "Technos (Taito license)", "Battle Lane Vol. 5 (set 2)", GAME_WRONG_COLORS | GAME_NO_COCKTAIL )
-GAMEX( 1986, battlan3, battlane, battlane, battlane, battlane, ROT90, "Technos (Taito license)", "Battle Lane Vol. 5 (set 3)", GAME_WRONG_COLORS | GAME_NO_COCKTAIL )
+GAMEX( 1986, battlane, 0,        battlane, battlane, battlane, ROT90, "Technos (Taito license)", "Battle Lane Vol. 5 (set 1)", GAME_NO_COCKTAIL )
+GAMEX( 1986, battlan2, battlane, battlane, battlane, battlane, ROT90, "Technos (Taito license)", "Battle Lane Vol. 5 (set 2)", GAME_NO_COCKTAIL )
+GAMEX( 1986, battlan3, battlane, battlane, battlane, battlane, ROT90, "Technos (Taito license)", "Battle Lane Vol. 5 (set 3)", GAME_NO_COCKTAIL )

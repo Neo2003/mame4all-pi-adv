@@ -1,5 +1,7 @@
 #include "../machine/asteroid.cpp"
 #include "../sndhrdw/asteroid.cpp"
+#include "../sndhrdw/llander.cpp"
+#include "../vidhrdw/llander.cpp"
 
 /***************************************************************************
 
@@ -154,16 +156,12 @@ WRITE_HANDLER( llander_led_w );
 WRITE_HANDLER( asteroid_explode_w );
 WRITE_HANDLER( asteroid_thump_w );
 WRITE_HANDLER( asteroid_sounds_w );
-int asteroid_sh_start(const struct MachineSound *msound);
-void asteroid_sh_stop(void);
-void asteroid_sh_update(void);
 
 WRITE_HANDLER( astdelux_sounds_w );
 int astdelux_sh_start(const struct MachineSound *msound);
 void astdelux_sh_stop(void);
 void astdelux_sh_update(void);
 
-WRITE_HANDLER( llander_sounds_w );
 WRITE_HANDLER( llander_snd_reset_w );
 int llander_sh_start(const struct MachineSound *msound);
 void llander_sh_stop(void);
@@ -233,6 +231,7 @@ static struct MemoryWriteAddress asteroid_writemem[] =
 	{ 0x3600, 0x3600, asteroid_explode_w },
 	{ 0x3a00, 0x3a00, asteroid_thump_w },
 	{ 0x3c00, 0x3c05, asteroid_sounds_w },
+	{ 0x3e00, 0x3e00, asteroid_noise_reset_w },
 	{ 0x4000, 0x47ff, MWA_RAM, &vectorram, &vectorram_size },
 	{ 0x5000, 0x57ff, MWA_ROM }, /* vector rom */
 	{ 0x6800, 0x7fff, MWA_ROM },
@@ -268,6 +267,7 @@ static struct MemoryWriteAddress astdelux_writemem[] =
 	{ 0x3c00, 0x3c03, MWA_NOP }, /* P1 LED, P2 LED, unknown, thrust? */
 	{ 0x3c04, 0x3c04, astdelux_bank_switch_w },
 	{ 0x3c05, 0x3c07, coin_counter_w },
+	{ 0x3e00, 0x3e00, asteroid_noise_reset_w },
 	{ 0x4000, 0x47ff, MWA_RAM, &vectorram, &vectorram_size },
 	{ 0x4800, 0x57ff, MWA_ROM }, /* vector rom */
 	{ 0x6000, 0x7fff, MWA_ROM },
@@ -593,16 +593,7 @@ static void asteroid_hisave(void)
 
 
 
-/* Asteroids Deluxe now uses the earom routines
- * However, we keep the highscore location, just in case
- *		osd_fwrite(f,&RAM[0x0023],3*10+3*11);
- */
 
-static struct CustomSound_interface asteroid_custom_interface = {
-	asteroid_sh_start,
-	asteroid_sh_stop,
-	asteroid_sh_update
-};
 
 static struct MachineDriver machine_driver_asteroid =
 {
@@ -635,8 +626,8 @@ static struct MachineDriver machine_driver_asteroid =
 	0,0,0,0,
 	{
 		{
-			SOUND_CUSTOM,
-			&asteroid_custom_interface
+			SOUND_DISCRETE,
+			&asteroid_sound_interface
 		}
 	}
 };
@@ -672,8 +663,8 @@ static struct MachineDriver machine_driver_asteroib =
 	0,0,0,0,
 	{
 		{
-			SOUND_CUSTOM,
-			&asteroid_custom_interface
+			SOUND_DISCRETE,
+			&asteroid_sound_interface
 		}
 	}
 };
@@ -696,12 +687,6 @@ static struct POKEYinterface pokey_interface =
 	{ 0 },
 	/* The allpot handler */
 	{ input_port_3_r }
-};
-
-static struct CustomSound_interface astdelux_custom_interface = {
-	astdelux_sh_start,
-	astdelux_sh_stop,
-	astdelux_sh_update
 };
 
 static struct MachineDriver machine_driver_astdelux =
@@ -739,8 +724,8 @@ static struct MachineDriver machine_driver_astdelux =
 			&pokey_interface
 		},
 		{
-			SOUND_CUSTOM,
-			&astdelux_custom_interface
+			SOUND_DISCRETE,
+			&astdelux_sound_interface
 		}
 	},
 
@@ -748,12 +733,6 @@ static struct MachineDriver machine_driver_astdelux =
 };
 
 
-static struct CustomSound_interface llander_custom_interface =
-{
-	llander_sh_start,
-	llander_sh_stop,
-	llander_sh_update
-};
 
 
 static struct MachineDriver machine_driver_llander =
@@ -787,8 +766,8 @@ static struct MachineDriver machine_driver_llander =
 	0,0,0,0,
 	{
 		{
-			SOUND_CUSTOM,
-			&llander_custom_interface
+			SOUND_DISCRETE,
+			&llander_sound_interface
 		}
 	}
 };

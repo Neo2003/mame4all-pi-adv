@@ -328,7 +328,7 @@ static struct MachineDriver machine_driver_ultraman =
 	0,
 
 	/* video hardware */
-	64*8, 32*8, { 14*8, (64-14)*8, 2*8, 30*8-1 },
+	64*8, 32*8, { 14*8, (64-14)*8-1, 2*8, 30*8-1 },
 	0,	/* decoded by KonamiIC */
 	8192, 8192,
 	0,

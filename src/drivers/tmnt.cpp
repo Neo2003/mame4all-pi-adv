@@ -346,20 +346,45 @@ static READ_HANDLER( punkshot_kludge_r )
 static READ_HANDLER( ssriders_kludge_r )
 {
     int data = cpu_readmem24bew_word(0x105a0a);
+    int cmd = cpu_readmem24bew_word(0x1058fc);
 
-    //logerror("%06x: read 1c0800 (D7=%02x 105a0a=%02x)\n",cpu_get_pc(),cpu_get_reg(M68K_D7),data);
+    switch (cmd)
+    {
+	case 0x100b:
+	    /* read twice in a row, first result discarded? */
+	    /* data is always == 0x75c */
+	    return 0x0064;
 
-    if (data == 0x075c) data = 0x0064;
+	case 0x6003:
+	    /* start of level */
+	    return data & 0x000f;
 
-    if ( cpu_readmem24bew_word(cpu_get_pc()) == 0x45f9 )
-	{
-        data = -( ( cpu_get_reg(M68K_D7) & 0xff ) + 32 );
-        data = ( ( data / 8 ) & 0x1f ) * 0x40;
-        data += ( ( ( cpu_get_reg(M68K_D6) & 0xffff ) + ( K052109_r(0x1a01) * 256 )
-				+ K052109_r(0x1a00) + 96 ) / 8 ) & 0x3f;
+	case 0x6004:
+	    return data & 0x001f;
+
+	case 0x6000:
+	    return data & 0x0001;
+
+	case 0x0000:
+	    return data & 0x00ff;
+
+	case 0x6007:
+	    return data & 0x00ff;
+
+	case 0x8abc:
+	    /* collision table */
+	    data = -cpu_readmem24bew_word(0x105818);
+	    data = ((data / 8 - 4) & 0x1f) * 0x40;
+	    data += ((cpu_readmem24bew_word(0x105cb0) +
+	    256*K052109_r(0x1a01) + K052109_r(0x1a00) - 6) / 8 + 12) & 0x3f; //*
+	    return data;
+
+	default:
+	//usrintf_showmessage("%06x: unknown protection read",activecpu_get_pc());
+	//logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",activecpu_get_pc(),(UINT32)activecpu_get_reg(M68K_D7),cmd,data);
+	return 0xffff;
     }
 
-    return data;
 }
 
 

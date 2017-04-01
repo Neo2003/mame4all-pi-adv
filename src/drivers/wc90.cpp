@@ -172,7 +172,7 @@ static struct MemoryWriteAddress wc90_writemem1[] =
 	{ 0xfc46, 0xfc46, MWA_RAM, &wc90_scroll2xlo },
 	{ 0xfc47, 0xfc47, MWA_RAM, &wc90_scroll2xhi },
 	{ 0xfcc0, 0xfcc0, wc90_sound_command_w },
-	{ 0xfcd0, 0xfcd0, MWA_NOP },	/* ??? */
+	{ 0xfcd0, 0xfcd0, watchdog_reset_w },
 	{ 0xfce0, 0xfce0, wc90_bankswitch_w },
 	{ -1 }	/* end of table */
 };
@@ -187,7 +187,7 @@ static struct MemoryWriteAddress wc90_writemem2[] =
 	{ 0xf000, 0xf7ff, MWA_ROM },
 	{ 0xf800, 0xfbff, wc90_shared_w },
 	{ 0xfc00, 0xfc00, wc90_bankswitch1_w },
-	{ 0xfc01, 0xfc01, MWA_NOP },	/* ??? */
+	{ 0xfc01, 0xfc01, watchdog_reset_w },
 	{ -1 }	/* end of table */
 };
 
@@ -195,10 +195,8 @@ static struct MemoryReadAddress sound_readmem[] =
 {
 	{ 0x0000, 0xbfff, MRA_ROM },
 	{ 0xf000, 0xf7ff, MRA_RAM },
-	{ 0xf800, 0xf800, YM2203_status_port_0_r },
-	{ 0xf801, 0xf801, YM2203_read_port_0_r },
-	{ 0xf802, 0xf802, YM2203_status_port_1_r },
-	{ 0xf803, 0xf803, YM2203_read_port_1_r },
+	{ 0xf800, 0xf800, YM2608_status_port_0_A_r },
+	{ 0xf802, 0xf802, YM2608_status_port_0_B_r },
 	{ 0xfc00, 0xfc00, MRA_NOP }, /* ??? adpcm ??? */
 	{ 0xfc10, 0xfc10, soundlatch_r },
 	{ -1 }	/* end of table */
@@ -208,10 +206,10 @@ static struct MemoryWriteAddress sound_writemem[] =
 {
 	{ 0x0000, 0xbfff, MWA_ROM },
 	{ 0xf000, 0xf7ff, MWA_RAM },
-	{ 0xf800, 0xf800, YM2203_control_port_0_w },
-	{ 0xf801, 0xf801, YM2203_write_port_0_w },
-	{ 0xf802, 0xf802, YM2203_control_port_1_w },
-	{ 0xf803, 0xf803, YM2203_write_port_1_w },
+	{ 0xf800, 0xf800, YM2608_control_port_0_A_w },
+	{ 0xf801, 0xf801, YM2608_data_port_0_A_w },
+	{ 0xf802, 0xf802, YM2608_control_port_0_B_w },
+	{ 0xf803, 0xf803, YM2608_data_port_0_B_w },
 	{ -1 }	/* end of table */
 };
 
@@ -348,23 +346,24 @@ static struct GfxDecodeInfo gfxdecodeinfo[] =
 
 
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
+/* handler called by the 2608 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
 {
 	cpu_set_irq_line(2,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_interface =
+static struct YM2608interface ym2608_interface =
 {
-	2,			/* 2 chips */
-	6000000,	/* 6 MHz ????? seems awfully fast, I don't even know if the */
-				/*  YM2203 can go at that speed */
-	{ YM2203_VOL(25,25), YM2203_VOL(25,25) },
+	1,
+	8000000,
+	{ 50 },
 	{ 0 },
 	{ 0 },
 	{ 0 },
 	{ 0 },
-	{ irqhandler }
+	{ irqhandler },
+	{ REGION_SOUND1 },
+	{ YM3012_VOL(50,MIXER_PAN_LEFT,50,MIXER_PAN_RIGHT) }
 };
 
 static struct MachineDriver machine_driver_wc90 =
@@ -411,8 +410,8 @@ static struct MachineDriver machine_driver_wc90 =
 	0,0,0,0,
 	{
 		{
-			SOUND_YM2203,
-			&ym2203_interface
+			SOUND_YM2608,
+			&ym2608_interface
 		}
 	}
 };
@@ -453,4 +452,4 @@ ROM_START( wc90 )
 ROM_END
 
 
-GAMEX( 1989, wc90, 0, wc90, wc90, 0, ROT0, "Tecmo", "World Cup 90", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAMEX( 1989, wc90, 0, wc90, wc90, 0, ROT0, "Tecmo", "World Cup 90", GAME_NO_COCKTAIL )

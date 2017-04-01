@@ -19,6 +19,8 @@
 #define STEP 0x8000
 
 
+int ay8910_index_ym;
+static int num = 0, ym_num = 0;
 struct AY8910
 {
 	int Channel;
@@ -29,6 +31,7 @@ struct AY8910
 	mem_write_handler PortBwrite;
 	int register_latch;
 	unsigned char Regs[16];
+	int lastEnable;
 	unsigned int UpdateStep;
 	int PeriodA,PeriodB,PeriodC,PeriodN,PeriodE;
 	int CountA,CountB,CountC,CountN,CountE;
@@ -120,6 +123,25 @@ void _AYWriteReg(int n, int r, int v)
 		PSG->CountN += PSG->PeriodN - old;
 		if (PSG->CountN <= 0) PSG->CountN = 1;
 		break;
+	case AY_ENABLE:
+		if ((PSG->lastEnable == -1) ||
+		    ((PSG->lastEnable & 0x40) != (PSG->Regs[AY_ENABLE] & 0x40)))
+		{
+			/* write out 0xff if port set to input */
+			if (PSG->PortAwrite)
+				(*PSG->PortAwrite)(0, (PSG->Regs[AY_ENABLE] & 0x40) ? PSG->Regs[AY_PORTA] : 0xff);
+		}
+
+		if ((PSG->lastEnable == -1) ||
+		    ((PSG->lastEnable & 0x80) != (PSG->Regs[AY_ENABLE] & 0x80)))
+		{
+			/* write out 0xff if port set to input */
+			if (PSG->PortBwrite)
+				(*PSG->PortBwrite)(0, (PSG->Regs[AY_ENABLE] & 0x80) ? PSG->Regs[AY_PORTB] : 0xff);
+		}
+
+		PSG->lastEnable = PSG->Regs[AY_ENABLE];
+		break;
 	case AY_AVOL:
 		PSG->Regs[AY_AVOL] &= 0x1f;
 		PSG->EnvelopeA = PSG->Regs[AY_AVOL] & 0x10;
@@ -192,16 +214,18 @@ void _AYWriteReg(int n, int r, int v)
 		if (PSG->EnvelopeC) PSG->VolC = PSG->VolE;
 		break;
 	case AY_PORTA:
-//		if ((PSG->Regs[AY_ENABLE] & 0x40) == 0)
-//logerror("warning: write to 8910 #%d Port A set as input\n",n);
-if (PSG->PortAwrite) (*PSG->PortAwrite)(0,v);
-//else logerror("PC %04x: warning - write %02x to 8910 #%d Port A\n",cpu_get_pc(),v,n);
+		if (PSG->Regs[AY_ENABLE] & 0x40)
+		{
+			if (PSG->PortAwrite)
+				(*PSG->PortAwrite)(0, PSG->Regs[AY_PORTA]);
+		}
 		break;
 	case AY_PORTB:
-//		if ((PSG->Regs[AY_ENABLE] & 0x80) == 0)
-//logerror("warning: write to 8910 #%d Port B set as input\n",n);
-if (PSG->PortBwrite) (*PSG->PortBwrite)(0,v);
-//else logerror("PC %04x: warning - write %02x to 8910 #%d Port B\n",cpu_get_pc(),v,n);
+		if (PSG->Regs[AY_ENABLE] & 0x80)
+		{
+			if (PSG->PortBwrite)
+				(*PSG->PortBwrite)(0, PSG->Regs[AY_PORTB]);
+		}
 		break;
 	}
 }
@@ -249,16 +273,16 @@ unsigned char AYReadReg(int n, int r)
 	switch (r)
 	{
 	case AY_PORTA:
-//		if ((PSG->Regs[AY_ENABLE] & 0x40) != 0)
-//logerror("warning: read from 8910 #%d Port A set as output\n",n);
-if (PSG->PortAread) PSG->Regs[AY_PORTA] = (*PSG->PortAread)(0);
-//else logerror("PC %04x: warning - read 8910 #%d Port A\n",cpu_get_pc(),n);
+		/*
+		   even if the port is set as output, we still need to return the external
+		   data. Some games, like kidniki, need this to work.
+		 */
+		if (PSG->PortAread) PSG->Regs[AY_PORTA] = (*PSG->PortAread)(0);
 		break;
 	case AY_PORTB:
-//		if ((PSG->Regs[AY_ENABLE] & 0x80) != 0)
-//logerror("warning: read from 8910 #%d Port B set as output\n",n);
-if (PSG->PortBread) PSG->Regs[AY_PORTB] = (*PSG->PortBread)(0);
-//else logerror("PC %04x: warning - read 8910 #%d Port B\n",cpu_get_pc(),n);
+		if ((PSG->Regs[AY_ENABLE] & 0x80) != 0)
+			logerror("warning: read from 8910 #%d Port B set as output\n",n);
+		if (PSG->PortBread) PSG->Regs[AY_PORTB] = (*PSG->PortBread)(0);
 		break;
 	}
 	return PSG->Regs[r];
@@ -512,11 +536,11 @@ static void AY8910Update(int chip,INT16 **buffer,int length)
 				/* register. The input to the shift register is bit0 XOR bit2 */
 				/* (bit0 is the output). */
 
-				/* The following is a fast way to compute bit 17 = bit0^bit2. */
+				/* The following is a fast way to compute bit17 = bit0^bit2. */
 				/* Instead of doing all the logic operations, we only check */
-				/* bit 0, relying on the fact that after two shifts of the */
-				/* register, what now is bit 2 will become bit 0, and will */
-				/* invert, if necessary, bit 16, which previously was bit 18. */
+				/* bit0, relying on the fact that after two shifts of the */
+				/* register, what now is bit2 will become bit0, and will */
+				/* invert, if necessary, bit15, which previously was bit17. */
 				if (PSG->RNG & 1) PSG->RNG ^= 0x28000;
 				PSG->RNG >>= 1;
 				PSG->CountN += PSG->PeriodN;
@@ -587,7 +611,7 @@ void AY8910_set_clock(int chip,int clock)
 	/* at the given sample rate. No. of events = sample rate / (clock/8).    */
 	/* STEP is a multiplier used to turn the fraction into a fixed point     */
 	/* number.                                                               */
-	PSG->UpdateStep = ((float)STEP * PSG->SampleRate * 8) / clock;
+	PSG->UpdateStep = ((double)STEP * PSG->SampleRate * 8 + clock/2) / clock;
 }
 
 
@@ -606,7 +630,7 @@ static void build_mixer_table(int chip)
 {
 	struct AY8910 *PSG = &AYPSG[chip];
 	int i;
-	float out;
+	double out;
 
 
 	/* calculate the volume->voltage conversion table */
@@ -637,16 +661,24 @@ void AY8910_reset(int chip)
 	PSG->OutputB = 0;
 	PSG->OutputC = 0;
 	PSG->OutputN = 0xff;
+	PSG->lastEnable = -1;	/* force a write */
 	for (i = 0;i < AY_PORTA;i++)
 		_AYWriteReg(chip,i,0);	/* AYWriteReg() uses the timer system; we cannot */
 								/* call it at this time because the timer system */
 								/* has not been initialized. */
 }
 
+void AY8910_sh_reset(void)
+{
+	int i;
+
+	for (i = 0;i < num + ym_num;i++)
+		AY8910_reset(i);
+}
 static int AY8910_init(const struct MachineSound *msound,int chip,
-		int clock,int volume,int sample_rate,
-		mem_read_handler portAread,mem_read_handler portBread,
-		mem_write_handler portAwrite,mem_write_handler portBwrite)
+			int clock,int volume,int sample_rate,
+			mem_read_handler portAread,mem_read_handler portBread,
+			mem_write_handler portAwrite,mem_write_handler portBwrite)
 {
 	int i;
 	struct AY8910 *PSG = &AYPSG[chip];
@@ -673,7 +705,6 @@ static int AY8910_init(const struct MachineSound *msound,int chip,
 		return 1;
 
 	AY8910_set_clock(chip,clock);
-	AY8910_reset(chip);
 
 	return 0;
 }
@@ -685,8 +716,9 @@ int AY8910_sh_start(const struct MachineSound *msound)
 	int chip;
 	const struct AY8910interface *intf = (const struct AY8910interface *)msound->sound_interface;
 
+        num = intf->num;
 
-	for (chip = 0;chip < intf->num;chip++)
+	for (chip = 0;chip < num;chip++)
 	{
 		if (AY8910_init(msound,chip,intf->baseclock,
 				intf->mixing_level[chip] & 0xffff,
@@ -694,7 +726,37 @@ int AY8910_sh_start(const struct MachineSound *msound)
 				intf->portAread[chip],intf->portBread[chip],
 				intf->portAwrite[chip],intf->portBwrite[chip]) != 0)
 			return 1;
-		build_mixer_table(chip);
+		build_mixer_table(chip+ym_num);
 	}
 	return 0;
+}
+void AY8910_sh_stop(void)
+{
+	num = 0;
+}
+
+int AY8910_sh_start_ym(const struct MachineSound *msound)
+{
+	int chip;
+	const struct AY8910interface *intf = (const struct AY8910interface *)msound->sound_interface;
+
+	ym_num = intf->num;
+	ay8910_index_ym = num;
+
+	for (chip = 0;chip < ym_num;chip++)
+	{
+		if (AY8910_init(msound,chip+num,intf->baseclock,
+				intf->mixing_level[chip] & 0xffff,
+				Machine->sample_rate,
+				intf->portAread[chip],intf->portBread[chip],
+				intf->portAwrite[chip],intf->portBwrite[chip]) != 0)
+			return 1;
+		build_mixer_table(chip+num);
+	}
+	return 0;
+}
+
+void AY8910_sh_stop_ym(void)
+{
+	ym_num = 0;
 }

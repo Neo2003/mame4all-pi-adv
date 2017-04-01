@@ -47,4 +47,16 @@ WRITE_HANDLER( AY8910_write_port_4_w );
 
 int AY8910_sh_start(const struct MachineSound *msound);
 
+void AY8910_sh_stop(void);
+void AY8910_sh_reset(void);
+
+/*********** An interface for SSG of YM2203 ***********/
+
+/* When both of AY8910 and YM2203 or YM2608 or YM2610 are used.      */
+/* It must be called AY8910_sh_start () before AY8910_sh_start_ym()  */
+
+extern int ay8910_index_ym;
+
+void AY8910_sh_stop_ym(void);
+int AY8910_sh_start_ym(const struct MachineSound *msound);
 #endif

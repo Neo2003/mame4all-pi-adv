@@ -174,10 +174,10 @@ $(OBJ)/drivers/popeye.o: src/vidhrdw/popeye.cpp src/drivers/popeye.cpp
 $(OBJ)/drivers/punchout.o: src/vidhrdw/punchout.cpp src/drivers/punchout.cpp
 OBJ_NINTENDO = $(OBJ)/drivers/dkong.o $(OBJ)/drivers/mario.o $(OBJ)/drivers/popeye.o $(OBJ)/drivers/punchout.o
 
-$(OBJ)/drivers/8080bw.o: src/machine/8080bw.cpp src/machine/74123.cpp src/vidhrdw/8080bw.cpp src/sndhrdw/8080bw.cpp src/drivers/8080bw.cpp
+$(OBJ)/drivers/8080bw.o: src/machine/8080bw.cpp src/machine/74123.cpp src/vidhrdw/8080bw.cpp src/sndhrdw/8080bw.cpp src/drivers/8080bw.cpp src/drivers/n8080.cpp
 $(OBJ)/drivers/m79amb.o: src/vidhrdw/m79amb.cpp src/drivers/m79amb.cpp
 $(OBJ)/drivers/z80bw.o: src/sndhrdw/z80bw.cpp src/drivers/z80bw.cpp
-OBJ_MIDW8080 = $(OBJ)/drivers/8080bw.o $(OBJ)/drivers/m79amb.o $(OBJ)/drivers/z80bw.o
+OBJ_MIDW8080 = $(OBJ)/drivers/8080bw.o $(OBJ)/drivers/n8080.o $(OBJ)/drivers/m79amb.o $(OBJ)/drivers/z80bw.o
 
 $(OBJ)/drivers/lazercmd.o: src/drivers/lazercmd.cpp src/vidhrdw/lazercmd.cpp
 $(OBJ)/drivers/meadows.o: src/drivers/meadows.cpp src/sndhrdw/meadows.cpp src/vidhrdw/meadows.cpp
@@ -198,11 +198,13 @@ $(OBJ)/drivers/m62.o: src/vidhrdw/m62.cpp src/drivers/m62.cpp
 $(OBJ)/drivers/vigilant.o: src/vidhrdw/vigilant.cpp src/drivers/vigilant.cpp
 $(OBJ)/vidhrdw/m72.o: src/vidhrdw/m72.cpp src/sndhrdw/m72.cpp src/drivers/m72.cpp
 $(OBJ)/drivers/shisen.o: src/vidhrdw/shisen.cpp src/drivers/shisen.cpp
-$(OBJ)/drivers/m92.o: src/vidhrdw/m92.cpp src/machine/irem_cpu.cpp src/drivers/m92.cpp
+$(OBJ)/drivers/m90.o: src/vidhrdw/m90.cpp src/drivers/m90.cpp
+$(OBJ)/machine/irem_cpu.o: src/machine/irem_cpu.cpp
+$(OBJ)/drivers/m92.o: src/vidhrdw/m92.cpp src/drivers/m92.cpp
 $(OBJ)/drivers/m107.o: src/vidhrdw/m107.cpp src/drivers/m107.cpp
 OBJ_IREM = $(OBJ)/drivers/skychut.o $(OBJ)/drivers/olibochu.o $(OBJ)/sndhrdw/irem.o $(OBJ)/drivers/mpatrol.o $(OBJ)/drivers/troangel.o \
 	$(OBJ)/drivers/yard.o $(OBJ)/drivers/travrusa.o $(OBJ)/drivers/m62.o $(OBJ)/drivers/vigilant.o $(OBJ)/drivers/m72.o $(OBJ)/drivers/shisen.o \
-	$(OBJ)/drivers/m92.o $(OBJ)/drivers/m97.o $(OBJ)/drivers/m107.o
+	$(OBJ)/drivers/m90.o $(OBJ)/drivers/m92.o $(OBJ)/drivers/m97.o $(OBJ)/drivers/m107.o $(OBJ)/machine/irem_cpu.o
 
 $(OBJ)/drivers/gottlieb.o: src/vidhrdw/gottlieb.cpp src/sndhrdw/gottlieb.cpp src/drivers/gottlieb.cpp
 OBJ_GOTTLIEB = $(OBJ)/drivers/gottlieb.o
@@ -478,7 +480,7 @@ $(OBJ)/drivers/relief.o: src/vidhrdw/relief.cpp src/drivers/relief.cpp
 $(OBJ)/drivers/offtwall.o: src/vidhrdw/offtwall.cpp src/drivers/offtwall.cpp
 $(OBJ)/drivers/arcadecl.o: src/vidhrdw/arcadecl.cpp src/drivers/arcadecl.cpp
 $(OBJ)/drivers/firetrk.o: src/drivers/firetrk.cpp
-OBJ_ATARI = $(OBJ)/machine/atari_vg.o $(OBJ)/drivers/asteroid.o $(OBJ)/vidhrdw/llander.o $(OBJ)/sndhrdw/llander.o \
+OBJ_ATARI = $(OBJ)/machine/atari_vg.o $(OBJ)/drivers/asteroid.o \
     $(OBJ)/drivers/bwidow.o $(OBJ)/drivers/bzone.o $(OBJ)/sndhrdw/redbaron.o $(OBJ)/drivers/tempest.o \
 	$(OBJ)/drivers/starwars.o $(OBJ)/drivers/mhavoc.o $(OBJ)/drivers/quantum.o $(OBJ)/drivers/atarifb.o $(OBJ)/drivers/sprint2.o \
 	$(OBJ)/drivers/sbrkout.o $(OBJ)/drivers/dominos.o $(OBJ)/drivers/nitedrvr.o $(OBJ)/drivers/bsktball.o $(OBJ)/drivers/copsnrob.o \

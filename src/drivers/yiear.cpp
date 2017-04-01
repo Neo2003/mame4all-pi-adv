@@ -68,17 +68,20 @@ WRITE_HANDLER( konami_SN76496_0_w );
 
 static READ_HANDLER( yiear_speech_r )
 {
-	return rand();
+	//return rand();
 	/* maybe bit 0 is VLM5030 busy pin??? */
 	if (VLM5030_BSY()) return 1;
 	else return 0;
 }
 
-static WRITE_HANDLER( yiear_speech_st_w )
+static WRITE_HANDLER( yiear_VLM5030_control_w )
 {
-	/* no idea if this is correct... */
-	VLM5030_ST( 1 );
-	VLM5030_ST( 0 );
+	//VLM5030_ST( 1 );
+	//VLM5030_ST( 0 );
+
+	/* bit 0 is latch direction */
+	VLM5030_ST( ( data >> 1 ) & 1 );
+	VLM5030_RST( ( data >> 2 ) & 1 );
 }
 
 
@@ -101,8 +104,8 @@ static struct MemoryWriteAddress writemem[] =
 	{ 0x4000, 0x4000, yiear_control_w },
 	{ 0x4800, 0x4800, konami_SN76496_latch_w },
 	{ 0x4900, 0x4900, konami_SN76496_0_w },
-	{ 0x4a00, 0x4a00, VLM5030_data_w },
-	{ 0x4b00, 0x4b00, yiear_speech_st_w },
+	{ 0x4a00, 0x4a00, yiear_VLM5030_control_w },
+	{ 0x4b00, 0x4b00, VLM5030_data_w },
 	{ 0x4f00, 0x4f00, watchdog_reset_w },
 	{ 0x5000, 0x502f, MWA_RAM, &spriteram, &spriteram_size },
 	{ 0x5030, 0x53ff, MWA_RAM },
@@ -179,21 +182,10 @@ INPUT_PORTS_START( yiear )
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown DSW2 4" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown DSW2 5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown DSW2 6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown DSW2 7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown DSW2 8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START	/* DSW2 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
@@ -270,7 +262,7 @@ static struct GfxDecodeInfo gfxdecodeinfo[] =
 struct SN76496interface sn76496_interface =
 {
 	1,			/* 1 chip */
-	{ 1500000 },	/*  1.5 MHz ? (hand tuned) */
+	{ 1536000 },	/*  1.536 MHz  (hand tuned) */
 	{ 100 }
 };
 
@@ -291,7 +283,7 @@ static struct MachineDriver machine_driver_yiear =
 	{
 		{
 			CPU_M6809,
-			1250000,	/* 1.25 Mhz */
+			1536000,	/* 1.536 Mhz */
 			readmem, writemem, 0, 0,
 			interrupt,1,	/* vblank */
 			yiear_nmi_interrupt,500	/* music tempo (correct frequency unknown) */

@@ -63,6 +63,9 @@ void crbaloon_vh_screenrefresh(struct osd_bitmap *bitmap,int full_refresh);
 
 int val06,val08,val0a;
 
+static int crbaloon_tone_stream;
+static UINT32 crbaloon_tone_step;
+static UINT32 crbaloon_tone_pos;
 static void crbaloon_machine_init(void)
 {
 	/* MIXER A = 0, MIXER C = 1 */
@@ -195,6 +198,16 @@ READ_HANDLER( crbaloon_IN_r )
 	return 0;
 }
 
+WRITE_HANDLER( crbaloon_tone_w )
+{
+    crbaloon_tone_step = 0;
+    if (data && data != 0xff)
+    {
+	double freq = (13630.0 / (256 - data) + (data>=0xea ? 13 : 0))*0.5;
+
+	crbaloon_tone_step = (UINT32)(freq * 65536.0 * 65536.0 / (double)Machine->sample_rate);
+    }
+}
 
 
 static struct MemoryReadAddress readmem[] =
@@ -224,6 +237,7 @@ static struct IOReadPort readport[] =
 static struct IOWritePort writeport[] =
 {
 	{ 0x02, 0x04, crbaloon_spritectrl_w },
+	{ 0x05, 0x05, crbaloon_tone_w },
 	{ 0x06, 0x06, crbaloon_06_w },
 	{ 0x08, 0x08, crbaloon_08_w },
 	{ 0x0a, 0x0a, crbaloon_0a_w },
@@ -358,6 +372,38 @@ static struct SN76477interface sn76477_interface =
 };
 
 
+static void crbaloon_tone_update(int ch, INT16 *buffer, int len)
+{
+    memset(buffer, 0, len * sizeof(INT16));
+
+    if (crbaloon_tone_step)
+    {
+	while (len-- > 0)
+	{
+	    *buffer++ = crbaloon_tone_pos & 0x80000000 ? 0x7fff : 0x8000;
+	    crbaloon_tone_pos += crbaloon_tone_step;
+	}
+    }
+}
+
+
+static int crbaloon_sh_start(const struct MachineSound *msound)
+{
+    crbaloon_tone_step = 0;
+    crbaloon_tone_pos = 0;
+
+    crbaloon_tone_stream = stream_init(sound_name(msound), 10, Machine->sample_rate, 0, crbaloon_tone_update);
+
+    return 0;
+}
+
+
+static struct CustomSound_interface crbaloon_custom_interface =
+{
+    crbaloon_sh_start,
+    0,
+    0
+};
 static struct MachineDriver machine_driver_crbaloon =
 {
 	/* basic machine hardware */
@@ -391,6 +437,10 @@ static struct MachineDriver machine_driver_crbaloon =
 		{
 			SOUND_SN76477,
 			&sn76477_interface
+		},
+		{
+			SOUND_CUSTOM,
+			&crbaloon_custom_interface
 		}
 	}
 };

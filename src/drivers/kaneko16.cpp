@@ -1831,7 +1831,9 @@ void init_shogwarr(void)
 
 GAMEX( 1991, berlwall, 0,        berlwall, berlwall, kaneko16, ROT0_16BIT, "Kaneko", "The Berlin Wall (set 1)", GAME_WRONG_COLORS )
 GAMEX( 1991, berlwalt, berlwall, berlwall, berlwalt, kaneko16, ROT0_16BIT, "Kaneko", "The Berlin Wall (set 2)", GAME_WRONG_COLORS )
-GAMEX( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr, ROT0,       "Kaneko", "Shogun Warriors", GAME_NOT_WORKING )
 GAME ( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16, ROT0_16BIT, "Kaneko", "Great 1000 Miles Rally" )
 GAME ( 1994, gtmre,    gtmr,     gtmr,     gtmr,     kaneko16, ROT0_16BIT, "Kaneko", "Great 1000 Miles Rally (Evolution Model)" )
+/* Non-working games (mainly due to incomplete dumps) */
+
+GAMEX( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr, ROT0,       "Kaneko", "Shogun Warriors", GAME_NOT_WORKING )
 GAMEX( 1995, gtmr2,    0,        gtmr,     gtmr,     kaneko16, ROT0,       "Kaneko", "Great 1000 Miles Rally 2", GAME_NOT_WORKING )

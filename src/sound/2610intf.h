@@ -38,6 +38,7 @@ int YM2610B_sh_start(const struct MachineSound *msound);
 /* Sound Hardware Stop							*/
 /************************************************/
 void YM2610_sh_stop(void);
+void YM2610B_sh_stop(void);
 
 void YM2610_sh_reset(void);
 
